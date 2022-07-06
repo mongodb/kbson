@@ -1,23 +1,52 @@
-# Compiled class file
-*.class
+*~
+.#*
+.git
+*#
 
-# Log file
-*.log
+# os x stuff
+*Thumbs.db*
+*.DS_Store
 
-# BlueJ files
-*.ctxt
+# Build artifacts
+build
+target
+out
+mongo*.jar
 
-# Mobile Tools for Java (J2ME)
-.mtj.tmp/
+# Eclipse files
+.classpath
+.project
+.settings
 
-# Package Files #
-*.jar
-*.war
-*.nar
-*.ear
-*.zip
-*.tar.gz
-*.rar
+# Intellij IDEA files
+*.ipr
+*.iws
+*.iml
+*.idea
+workspace.xml
+atlassian-ide-plugin.xml
 
-# virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
-hs_err_pid*
+# gradle
+.gradle
+
+# code review
+codereview.rc
+
+# evergreen
+expansion.yml
+
+# local settings
+**/gradle.properties
+local.properties
+
+# jenv
+.java-version
+
+# mongocryptd
+**/mongocryptd.pid
+
+# shell scripts
+*.sh
+
+# security-sensitive files
+*.gpg
