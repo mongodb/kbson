@@ -2,7 +2,7 @@ group = "org.mongodb"
 version = "1.0-SNAPSHOT"
 
 plugins {
-    kotlin("multiplatform") version "1.6.21"
+    kotlin("multiplatform") version "1.7.0"
 }
 
 repositories {
