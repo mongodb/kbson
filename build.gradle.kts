@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
+import org.gradle.api.tasks.testing.logging.TestLogEvent
 
 group = "org.mongodb"
 
@@ -31,35 +32,6 @@ kotlin {
     jvm {
         compilations.all { kotlinOptions.jvmTarget = "1.8" }
         withJava()
-        testRuns["test"].executionTask.configure {
-            useJUnitPlatform()
-            testLogging.showStandardStreams = true
-            testLogging.exceptionFormat = TestExceptionFormat.FULL
-            addTestListener(
-                object : TestListener {
-                    override fun beforeTest(testDescriptor: TestDescriptor?) {}
-                    override fun beforeSuite(suite: TestDescriptor?) {}
-                    override fun afterTest(testDescriptor: TestDescriptor?, result: TestResult?) {}
-                    override fun afterSuite(d: TestDescriptor?, r: TestResult?) {
-                        if (d != null && r != null && d.parent == null) {
-                            val resultsSummary =
-                                """Tests summary:
-                    | ${r.testCount} tests,
-                    | ${r.successfulTestCount} succeeded,
-                    | ${r.failedTestCount} failed,
-                    | ${r.skippedTestCount} skipped"""
-                                    .trimMargin()
-                                    .replace("\n", "")
-
-                            val border = "=".repeat(resultsSummary.length)
-                            logger.lifecycle("\n$border")
-                            logger.lifecycle("Test result: ${r.resultType}")
-                            logger.lifecycle(resultsSummary)
-                            logger.lifecycle("${border}\n")
-                        }
-                    }
-                })
-        }
     }
 
     js(IR) { nodejs {} }
@@ -86,6 +58,47 @@ kotlin {
         val nativeMain by getting
         val nativeTest by getting
     }
+}
+
+// Output summaries for all test environments (jvm, js and native)
+tasks.withType<AbstractTestTask> {
+    testLogging {
+        events =
+            setOf(
+                TestLogEvent.FAILED,
+                TestLogEvent.SKIPPED,
+                TestLogEvent.STANDARD_OUT,
+                TestLogEvent.STANDARD_ERROR)
+        exceptionFormat = TestExceptionFormat.FULL
+        showExceptions = true
+        showCauses = true
+        showStackTraces = true
+    }
+    ignoreFailures = true // Always try to run all tests for all modules
+    addTestListener(
+        object : TestListener {
+            override fun beforeTest(testDescriptor: TestDescriptor?) {}
+            override fun beforeSuite(suite: TestDescriptor?) {}
+            override fun afterTest(testDescriptor: TestDescriptor?, result: TestResult?) {}
+            override fun afterSuite(d: TestDescriptor?, r: TestResult?) {
+                if (d != null && r != null && d.parent == null) {
+                    val resultsSummary =
+                        """Tests summary:
+                    | ${r.testCount} tests,
+                    | ${r.successfulTestCount} succeeded,
+                    | ${r.failedTestCount} failed,
+                    | ${r.skippedTestCount} skipped"""
+                            .trimMargin()
+                            .replace("\n", "")
+
+                    val border = "=".repeat(resultsSummary.length)
+                    logger.lifecycle("\n$border")
+                    logger.lifecycle("Test result: ${r.resultType}")
+                    logger.lifecycle(resultsSummary)
+                    logger.lifecycle("${border}\n")
+                }
+            }
+        })
 }
 
 spotless {
