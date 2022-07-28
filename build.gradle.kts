@@ -23,7 +23,7 @@ version = "1.0-SNAPSHOT"
 plugins {
     kotlin("multiplatform") version "1.7.0"
 
-    id("com.diffplug.spotless") version "6.8.0"
+    id("com.diffplug.spotless") version "6.9.0"
 }
 
 repositories { mavenCentral() }
