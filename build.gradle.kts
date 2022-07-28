@@ -13,6 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import org.gradle.api.tasks.testing.logging.TestExceptionFormat
+
 group = "org.mongodb"
 
 version = "1.0-SNAPSHOT"
@@ -29,10 +31,38 @@ kotlin {
     jvm {
         compilations.all { kotlinOptions.jvmTarget = "1.8" }
         withJava()
-        testRuns["test"].executionTask.configure { useJUnitPlatform() }
+        testRuns["test"].executionTask.configure {
+            useJUnitPlatform()
+            testLogging.showStandardStreams = true
+            testLogging.exceptionFormat = TestExceptionFormat.FULL
+            addTestListener(
+                object : TestListener {
+                    override fun beforeTest(testDescriptor: TestDescriptor?) {}
+                    override fun beforeSuite(suite: TestDescriptor?) {}
+                    override fun afterTest(testDescriptor: TestDescriptor?, result: TestResult?) {}
+                    override fun afterSuite(d: TestDescriptor?, r: TestResult?) {
+                        if (d != null && r != null && d.parent == null) {
+                            val resultsSummary =
+                                """Tests summary:
+                    | ${r.testCount} tests,
+                    | ${r.successfulTestCount} succeeded,
+                    | ${r.failedTestCount} failed,
+                    | ${r.skippedTestCount} skipped"""
+                                    .trimMargin()
+                                    .replace("\n", "")
+
+                            val border = "=".repeat(resultsSummary.length)
+                            logger.lifecycle("\n$border")
+                            logger.lifecycle("Test result: ${r.resultType}")
+                            logger.lifecycle(resultsSummary)
+                            logger.lifecycle("${border}\n")
+                        }
+                    }
+                })
+        }
     }
 
-    js(IR) { browser { commonWebpackConfig { cssSupport.enabled = true } } }
+    js(IR) { nodejs {} }
 
     val hostOs = System.getProperty("os.name")
     val isMingwX64 = hostOs.startsWith("Windows")
@@ -95,3 +125,5 @@ spotless {
         endWithNewline()
     }
 }
+
+tasks.named("compileKotlinMetadata") { dependsOn(":spotlessApply") }
