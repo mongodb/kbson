@@ -32,6 +32,7 @@ kotlin {
     jvm {
         compilations.all { kotlinOptions.jvmTarget = "1.8" }
         withJava()
+        tasks.withType<Test> { useJUnitPlatform() }
     }
 
     js(IR) { nodejs {} }
@@ -50,7 +51,15 @@ kotlin {
         val commonMain by getting
         val commonTest by getting { dependencies { implementation(kotlin("test")) } }
         val jvmMain by getting
-        val jvmTest by getting
+        val jvmTest by getting {
+            dependencies {
+                implementation(kotlin("test"))
+                implementation("org.jetbrains.kotlin:kotlin-reflect:1.7.10")
+                implementation("org.junit.jupiter:junit-jupiter:5.9.0")
+                implementation("org.reflections:reflections:0.10.2")
+                implementation("org.mongodb:bson:4.7.0")
+            }
+        }
 
         val jsMain by getting
         val jsTest by getting
@@ -138,5 +147,7 @@ spotless {
         endWithNewline()
     }
 }
+
+tasks.named("check") { dependsOn(":spotlessApply") }
 
 tasks.named("compileKotlinMetadata") { dependsOn(":spotlessApply") }
