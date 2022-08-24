@@ -17,4 +17,4 @@ fi
 echo "Running tests"
 
 ./gradlew -version
-./gradlew --stacktrace --info allTests $1
+./gradlew --stacktrace --info allTests $@

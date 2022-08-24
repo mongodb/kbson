@@ -11,6 +11,5 @@ export JAVA_HOME=/opt/java/jdk11
 
 echo "Compiling and running checks"
 
-# We always compile with the latest version of java
 ./gradlew -version
-./gradlew --info -x jvmTest -x nativeTest -x jsNodeTest clean check
+./gradlew --info clean check -x allTests
