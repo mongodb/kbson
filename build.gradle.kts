@@ -28,6 +28,7 @@ plugins {
 
 repositories { mavenCentral() }
 
+@Suppress("UNUSED_VARIABLE")
 kotlin {
     jvm {
         compilations.all { kotlinOptions.jvmTarget = "1.8" }
