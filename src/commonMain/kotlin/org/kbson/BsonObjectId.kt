@@ -15,8 +15,8 @@
  */
 package org.kbson
 
-import org.kbson.ext.AtomicInt
-import org.kbson.ext.getCurrentTimeInSeconds
+import org.kbson.internal.ext.AtomicInt
+import org.kbson.internal.ext.getCurrentTimeInSeconds
 
 /**
  *

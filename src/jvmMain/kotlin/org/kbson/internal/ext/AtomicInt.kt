@@ -13,13 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.kbson.ext
+package org.kbson.internal.ext
 
-/** Cross-platform atomic integer */
-expect class AtomicInt(value: Int) {
+import java.util.concurrent.atomic.AtomicInteger
+
+/** A Jvm wrapper of atomic integer */
+actual class AtomicInt actual constructor(value: Int) {
+
+    val atomicInt: AtomicInteger
+
+    init {
+        atomicInt = AtomicInteger(value)
+    }
 
     /** Gets the current value */
-    fun getValue(): Int
+    actual fun getValue(): Int = atomicInt.get()
 
     /**
      * Increments the value by [delta] and returns the new value.
@@ -27,7 +35,7 @@ expect class AtomicInt(value: Int) {
      * @param delta the value to add
      * @return the new value
      */
-    fun addAndGet(delta: Int): Int
+    actual fun addAndGet(delta: Int): Int = atomicInt.addAndGet(delta)
 
     /**
      * Compares value with [expected] and replaces it with [new] value if values matches.
@@ -36,11 +44,16 @@ expect class AtomicInt(value: Int) {
      * @param new the new value
      * @return true if successful
      */
-    fun compareAndSet(expected: Int, new: Int): Boolean
+    actual fun compareAndSet(expected: Int, new: Int): Boolean =
+        atomicInt.compareAndSet(expected, new)
 
     /** Increments value by one. */
-    fun increment()
+    actual fun increment() {
+        atomicInt.incrementAndGet()
+    }
 
     /** Decrements value by one. */
-    fun decrement()
+    actual fun decrement() {
+        atomicInt.decrementAndGet()
+    }
 }

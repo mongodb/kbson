@@ -13,8 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.kbson.ext
+package org.kbson.internal.ext
 
-expect fun getCurrentTimeInMillis(): Long
+import kotlin.system.getTimeMillis
 
-expect fun getCurrentTimeInSeconds(): Int
+actual fun getCurrentTimeInMillis(): Long = getTimeMillis()
+
+actual fun getCurrentTimeInSeconds(): Int = (getCurrentTimeInMillis() / 1000).toInt()

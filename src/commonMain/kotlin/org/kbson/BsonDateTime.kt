@@ -15,7 +15,7 @@
  */
 package org.kbson
 
-import org.kbson.ext.getCurrentTimeInMillis
+import org.kbson.internal.ext.getCurrentTimeInMillis
 
 /** A representation of the BSON DateTime type. */
 class BsonDateTime(val value: Long) : BsonValue(), Comparable<BsonDateTime> {

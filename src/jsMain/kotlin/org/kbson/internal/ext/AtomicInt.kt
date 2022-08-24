@@ -13,29 +13,34 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.kbson.ext
+package org.kbson.internal.ext
 
-import java.util.concurrent.atomic.AtomicInteger
-
-/** A Jvm wrapper of atomic integer */
+/**
+ * Js version of an atomic integer
+ *
+ * In JavaScript, a function always runs to completion, before any other function is called. So
+ * there no locking required to protect the int.
+ */
 actual class AtomicInt actual constructor(value: Int) {
 
-    val atomicInt: AtomicInteger
+    private var atomicInt: Int
 
     init {
-        atomicInt = AtomicInteger(value)
+        atomicInt = value
     }
 
     /** Gets the current value */
-    actual fun getValue(): Int = atomicInt.get()
-
+    actual fun getValue(): Int = atomicInt
     /**
      * Increments the value by [delta] and returns the new value.
      *
      * @param delta the value to add
      * @return the new value
      */
-    actual fun addAndGet(delta: Int): Int = atomicInt.addAndGet(delta)
+    actual fun addAndGet(delta: Int): Int {
+        atomicInt += delta
+        return atomicInt
+    }
 
     /**
      * Compares value with [expected] and replaces it with [new] value if values matches.
@@ -44,16 +49,21 @@ actual class AtomicInt actual constructor(value: Int) {
      * @param new the new value
      * @return true if successful
      */
-    actual fun compareAndSet(expected: Int, new: Int): Boolean =
-        atomicInt.compareAndSet(expected, new)
+    actual fun compareAndSet(expected: Int, new: Int): Boolean {
+        if (atomicInt == expected) {
+            atomicInt = new
+            return true
+        }
+        return false
+    }
 
     /** Increments value by one. */
     actual fun increment() {
-        atomicInt.incrementAndGet()
+        atomicInt++
     }
 
     /** Decrements value by one. */
     actual fun decrement() {
-        atomicInt.decrementAndGet()
+        atomicInt--
     }
 }
