@@ -17,4 +17,4 @@ package org.kbson
 
 /** An exception indicating an invalid BSON operation. */
 class BsonInvalidOperationException(message: String? = null, cause: Throwable? = null) :
-    BSONException(message, cause) {}
+    BsonException(message, cause) {}

@@ -16,7 +16,7 @@
 package org.kbson
 
 /** A general runtime exception raised in BSON processing. */
-open class BSONException(
+open class BsonException(
     message: String? = null,
     cause: Throwable? = null,
     val errorCode: Int? = null
