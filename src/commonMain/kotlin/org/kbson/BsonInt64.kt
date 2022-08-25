@@ -15,19 +15,16 @@
  */
 package org.kbson
 
-/** A representation of the BSON Int64 type. */
-class BsonInt64(val value: Long) : BsonNumber(), Comparable<BsonInt64> {
+/**
+ * A representation of the BSON Int64 type.
+ *
+ * @constructor constructs a new instance with the given value
+ * @property value the value
+ */
+public class BsonInt64(public val value: Long) : BsonNumber(), Comparable<BsonInt64> {
 
-    override fun intValue(): Int {
-        return value.toInt()
-    }
-
-    override fun longValue(): Long {
+    override fun getNumber(): Number {
         return value
-    }
-
-    override fun doubleValue(): Double {
-        return value.toDouble()
     }
 
     override fun getBsonType(): BsonType {

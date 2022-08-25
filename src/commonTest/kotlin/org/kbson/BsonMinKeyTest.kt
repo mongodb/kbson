@@ -19,8 +19,7 @@ import kotlin.test.*
 
 class BsonMinKeyTest {
 
-    private val bsonValue = BsonMinKey()
-
+    private val bsonValue = BsonMinKey
     @Test
     fun shouldHaveTheExpectedBsonType() {
         assertTrue { bsonValue.isMinKey() }
@@ -29,7 +28,7 @@ class BsonMinKeyTest {
 
     @Test
     fun shouldOverrideEquals() {
-        assertEquals(bsonValue, BsonMinKey())
-        assertNotEquals(bsonValue as BsonValue, BsonMaxKey())
+        assertEquals(bsonValue, BsonMinKey)
+        assertNotEquals(bsonValue as BsonValue, BsonMaxKey)
     }
 }

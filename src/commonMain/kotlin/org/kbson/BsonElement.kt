@@ -18,6 +18,9 @@ package org.kbson
 /**
  * A mapping from a name to a BsonValue.
  *
+ * @constructor constructs a new instance with the given name and value pair
+ * @property name the name
+ * @property value the value
  * @see BsonDocument
  */
-data class BsonElement(val name: String, val value: BsonValue) {}
+public data class BsonElement(val name: String, val value: BsonValue)

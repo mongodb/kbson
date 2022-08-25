@@ -18,7 +18,7 @@ package org.kbson.internal.ext
 import kotlin.native.concurrent.AtomicInt
 
 /** A Kotlin native wrapper of atomic integer */
-actual class AtomicInt actual constructor(value: Int) {
+internal actual class AtomicInt actual constructor(value: Int) {
 
     val atomicInt: AtomicInt
 

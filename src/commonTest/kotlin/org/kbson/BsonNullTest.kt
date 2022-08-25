@@ -29,6 +29,6 @@ class BsonNullTest {
 
     @Test
     fun shouldOverrideEquals() {
-        assertEquals(bsonValue, BsonNull())
+        assertEquals(bsonValue, BsonNull)
     }
 }

@@ -28,14 +28,6 @@ class BsonObjectIdTest {
     }
 
     @Test
-    fun shouldHaveAccessToTheUnderlyingValues() {
-        assertEquals(0, bsonValue.timestamp)
-        assertEquals(0, bsonValue.randomValue1)
-        assertEquals(0, bsonValue.randomValue2)
-        assertEquals(0, bsonValue.counter)
-    }
-
-    @Test
     fun testToBytes() {
         val expectedBytes = byteArrayOf(81, 6, -4, -102, -68, -126, 55, 85, -127, 54, -46, -119)
         assertContentEquals(expectedBytes, BsonObjectId(expectedBytes).toByteArray())

@@ -24,6 +24,7 @@ plugins {
     kotlin("multiplatform") version "1.7.0"
 
     id("com.diffplug.spotless") version "6.9.0"
+    id("org.jetbrains.dokka") version "1.7.10"
 }
 
 repositories { mavenCentral() }
@@ -68,6 +69,10 @@ kotlin {
         val nativeMain by getting
         val nativeTest by getting
     }
+
+    // Require that all methods in the API have visibility modifiers and return types.
+    // Anything inside `org.kbson.internal.*` is considered internal
+    explicitApi = org.jetbrains.kotlin.gradle.dsl.ExplicitApiMode.Strict
 }
 
 // Output summaries for all test environments (jvm, js and native)

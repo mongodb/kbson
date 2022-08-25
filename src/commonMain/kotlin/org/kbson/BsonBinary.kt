@@ -18,37 +18,47 @@ package org.kbson
 /**
  * A representation of the BSON Binary type.
  *
- * <p>Note that for performance reasons instances of this class are not immutable, so care should be
+ * Note: that for performance reasons instances of this class are not immutable, so care should be
  * taken to only modify the underlying byte array if you know what you're doing, or else make a
- * defensive copy. </p>
+ * defensive copy: [BsonBinary.clone].
+ *
+ * @constructor constructs a new instance with the given subtype and data
+ * @property type the [BsonBinarySubType] byte value
+ * @property data the [ByteArray]
  */
-class BsonBinary(val type: Byte, val data: ByteArray) : BsonValue() {
+public class BsonBinary(public val type: Byte, public val data: ByteArray) : BsonValue() {
 
     /**
-     * Construct a new instance with the given data and the default sub-type
+     * Construct a new instance with the given data and the default subtype
+     * [BsonBinarySubType.BINARY].
      *
      * @param data the data
-     *
-     * @see org.kbson.multi.BsonBinarySubType.BINARY
      */
-    constructor(data: ByteArray) : this(BsonBinarySubType.BINARY.value, data)
+    public constructor(data: ByteArray) : this(BsonBinarySubType.BINARY, data)
 
     /**
-     * Construct a new instance with the given data and binary sub type.
+     * Construct a new instance with the given data and byte value of the subtype
      *
+     * @param type the subtype byte value
      * @param data the data
-     * @param type the binary sub type
-     *
-     * @see org.kbson.multi.BsonBinarySubType.BINARY
      */
-    constructor(type: BsonBinarySubType, data: ByteArray) : this(type.value, data)
+    public constructor(type: BsonBinarySubType, data: ByteArray) : this(type.value, data)
+
+    /**
+     * Clones this BsonBinary
+     *
+     * @return a clone of this BsonBinary
+     */
+    public fun clone(): BsonBinary {
+        return BsonBinary(type, data.copyOf())
+    }
 
     override fun getBsonType(): BsonType {
         return BsonType.BINARY
     }
 
     override fun toString(): String {
-        return ("BsonBinary{type=$type, data=$data}")
+        return "BsonBinary{type=$type, data=$data}"
     }
 
     override fun equals(other: Any?): Boolean {
@@ -67,13 +77,5 @@ class BsonBinary(val type: Byte, val data: ByteArray) : BsonValue() {
         var result = type.toInt()
         result = 31 * result + data.contentHashCode()
         return result
-    }
-
-    companion object {
-
-        /** Creates a clone of the BsonBinary */
-        fun clone(from: BsonBinary): BsonBinary {
-            return BsonBinary(from.type, from.data.copyOf())
-        }
     }
 }

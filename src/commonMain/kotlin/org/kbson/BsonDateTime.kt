@@ -17,11 +17,16 @@ package org.kbson
 
 import org.kbson.internal.ext.getCurrentTimeInMillis
 
-/** A representation of the BSON DateTime type. */
-class BsonDateTime(val value: Long) : BsonValue(), Comparable<BsonDateTime> {
+/**
+ * A representation of the BSON DateTime type.
+ *
+ * @constructor constructs a new instance with the given value
+ * @property value the time in milliseconds since epoch
+ */
+public class BsonDateTime(public val value: Long) : BsonValue(), Comparable<BsonDateTime> {
 
     /** Construct a new instance with 'now' as the current date time */
-    constructor() : this(getCurrentTimeInMillis())
+    public constructor() : this(getCurrentTimeInMillis())
 
     override fun getBsonType(): BsonType {
         return BsonType.DATE_TIME

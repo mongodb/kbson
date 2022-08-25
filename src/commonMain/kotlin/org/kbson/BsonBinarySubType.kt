@@ -15,8 +15,12 @@
  */
 package org.kbson
 
-/** The Binary subtype */
-enum class BsonBinarySubType(val value: Byte) {
+/**
+ * The Binary subtype
+ *
+ * @property value they byte representation of this binary subtype
+ */
+public enum class BsonBinarySubType(public val value: Byte) {
     /** Binary data. */
     BINARY(0x00.toByte()),
 

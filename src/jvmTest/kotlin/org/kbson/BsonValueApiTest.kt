@@ -33,7 +33,7 @@ class BsonValueApiTest {
         assertEquals(bsonConstructors, kBsonConstructors)
 
         val bsonMethods = getMethodNames(bsonClass, listOf("parse", "toJson", "asBsonReader"))
-        val kBsonMethods = getMethodNames(kBsonClass, listOf("getSize"))
+        val kBsonMethods = getMethodNames(kBsonClass, listOf("getSize", "removeAt"))
         assertEquals(bsonMethods, kBsonMethods)
     }
 
@@ -45,10 +45,12 @@ class BsonValueApiTest {
         val bsonConstructors =
             getConstructorParams(bsonClass) { c -> c.parameterTypes.contains(UUID::class.java) }
         val kBsonConstructors = getConstructorParams(kBsonClass)
+
         assertEquals(bsonConstructors, kBsonConstructors)
 
         val bsonMethods = getMethodNames(bsonClass, listOf("asUuid"))
-        val kBsonMethods = getMethodNames(kBsonClass)
+        val kBsonMethods = getMethodNames(kBsonClass, listOf("clone"))
+
         assertEquals(bsonMethods, kBsonMethods)
     }
 
@@ -62,7 +64,8 @@ class BsonValueApiTest {
         assertEquals(bsonConstructors, kBsonConstructors)
 
         val bsonMethods = getMethodNames(bsonClass)
-        val kBsonMethods = getMethodNames(kBsonClass)
+        val kBsonMethods = getMethodNames(kBsonClass, listOf("getTRUE", "getFALSE"))
+
         assertEquals(bsonMethods, kBsonMethods)
     }
 
@@ -92,27 +95,6 @@ class BsonValueApiTest {
 
         val bsonMethods = getMethodNames(bsonClass)
         val kBsonMethods = getMethodNames(kBsonClass)
-        assertEquals(bsonMethods, kBsonMethods)
-    }
-
-    @Test
-    fun bsonObjectIdTest() {
-        val bsonClass = org.bson.BsonObjectId::class.java
-        val kBsonClass = BsonObjectId::class.java
-
-        // Note: Constructors differ as no ObjectId underlying class so not asserting.
-
-        val bsonMethods = getMethodNames(bsonClass, listOf("getValue"))
-        val kBsonMethods =
-            getMethodNames(
-                kBsonClass,
-                listOf(
-                    "toHexString",
-                    "toByteArray",
-                    "getTimestamp",
-                    "getRandomValue1",
-                    "getRandomValue2",
-                    "getCounter"))
         assertEquals(bsonMethods, kBsonMethods)
     }
 
@@ -238,9 +220,7 @@ class BsonValueApiTest {
         val bsonClass = org.bson.BsonMaxKey::class.java
         val kBsonClass = BsonMaxKey::class.java
 
-        val bsonConstructors = getConstructorParams(bsonClass)
-        val kBsonConstructors = getConstructorParams(kBsonClass)
-        assertEquals(bsonConstructors, kBsonConstructors)
+        // No constructor as it's a singleton object
 
         val bsonMethods = getMethodNames(bsonClass)
         val kBsonMethods = getMethodNames(kBsonClass)
@@ -252,12 +232,43 @@ class BsonValueApiTest {
         val bsonClass = org.bson.BsonMinKey::class.java
         val kBsonClass = BsonMinKey::class.java
 
-        val bsonConstructors = getConstructorParams(bsonClass)
-        val kBsonConstructors = getConstructorParams(kBsonClass)
-        assertEquals(bsonConstructors, kBsonConstructors)
+        // No constructor as it's a singleton object
 
         val bsonMethods = getMethodNames(bsonClass)
         val kBsonMethods = getMethodNames(kBsonClass)
+        assertEquals(bsonMethods, kBsonMethods)
+    }
+
+    @Test
+    fun bsonNullTest() {
+        val bsonClass = org.bson.BsonNull::class.java
+        val kBsonClass = BsonNull::class.java
+
+        // No constructor as it's a singleton object
+
+        val bsonMethods = getMethodNames(bsonClass)
+        val kBsonMethods = getMethodNames(kBsonClass, listOf("getVALUE", "getVALUE\$annotations"))
+        assertEquals(bsonMethods, kBsonMethods)
+    }
+
+    @Test
+    fun bsonObjectIdTest() {
+        val bsonClass = org.bson.BsonObjectId::class.java
+        val kBsonClass = BsonObjectId::class.java
+
+        // Note: Constructors differ as no ObjectId underlying class so not asserting.
+
+        val bsonMethods = getMethodNames(bsonClass, listOf("getValue"))
+        val kBsonMethods =
+            getMethodNames(
+                kBsonClass,
+                listOf(
+                    "toHexString",
+                    "toByteArray",
+                    "getTimestamp",
+                    "getRandomValue1",
+                    "getRandomValue2",
+                    "getCounter"))
         assertEquals(bsonMethods, kBsonMethods)
     }
 
@@ -299,7 +310,8 @@ class BsonValueApiTest {
         assertEquals(bsonConstructors, kBsonConstructors)
 
         val bsonMethods = getMethodNames(bsonClass)
-        val kBsonMethods = getMethodNames(kBsonClass)
+        val kBsonMethods = getMethodNames(kBsonClass, listOf("getValue"))
+
         assertEquals(bsonMethods, kBsonMethods)
     }
 
@@ -322,12 +334,11 @@ class BsonValueApiTest {
         val bsonClass = org.bson.BsonUndefined::class.java
         val kBsonClass = BsonUndefined::class.java
 
-        val bsonConstructors = getConstructorParams(bsonClass)
-        val kBsonConstructors = getConstructorParams(kBsonClass)
-        assertEquals(bsonConstructors, kBsonConstructors)
+        // No constructor as it's a singleton object
 
         val bsonMethods = getMethodNames(bsonClass)
-        val kBsonMethods = getMethodNames(kBsonClass)
+        val kBsonMethods =
+            getMethodNames(kBsonClass, listOf("getUNDEFINED", "getUNDEFINED\$annotations"))
         assertEquals(bsonMethods, kBsonMethods)
     }
 

@@ -19,8 +19,8 @@ import kotlin.test.*
 
 class BsonArrayTest {
 
-    val listOfBsonValues = listOf(BsonBoolean.TRUE, BsonBoolean.FALSE)
-    val bsonValue = BsonArray(listOfBsonValues)
+    private val listOfBsonValues = listOf(BsonBoolean.TRUE, BsonBoolean.FALSE)
+    private val bsonValue = BsonArray(listOfBsonValues)
 
     @Test
     fun shouldHaveTheExpectedBsonType() {
@@ -34,7 +34,7 @@ class BsonArrayTest {
 
         assertTrue(bsonValue.isEmpty())
         assertEquals(0, bsonValue.size)
-        assertTrue(bsonValue.values.isEmpty())
+        assertTrue(bsonValue.getValues().isEmpty())
     }
 
     @Test
@@ -43,14 +43,14 @@ class BsonArrayTest {
 
         assertTrue(bsonValue.isEmpty())
         assertEquals(0, bsonValue.size)
-        assertTrue(bsonValue.values.isEmpty())
+        assertTrue(bsonValue.getValues().isEmpty())
     }
 
     @Test
     fun shouldConstructFromAList() {
         assertFalse(bsonValue.isEmpty())
         assertEquals(2, bsonValue.size)
-        assertContentEquals(listOfBsonValues, bsonValue.values)
+        assertContentEquals(listOfBsonValues, bsonValue.getValues())
     }
 
     @Test
@@ -93,7 +93,7 @@ class BsonArrayTest {
         assertTrue(subListIterator.hasPrevious())
         assertFalse(subListIterator.hasNext())
 
-        assertEquals(listOf(BsonBoolean.FALSE), bsonValue.subList(1, 2))
+        assertEquals(mutableListOf<BsonValue>(BsonBoolean.FALSE), bsonValue.subList(1, 2))
         assertEquals(
             2,
             BsonArray(listOf(BsonBoolean.TRUE, BsonBoolean.TRUE, BsonBoolean.TRUE))

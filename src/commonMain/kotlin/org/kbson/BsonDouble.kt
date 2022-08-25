@@ -15,18 +15,15 @@
  */
 package org.kbson
 
-/** A representation of the BSON Double type. */
-class BsonDouble(val value: Double) : BsonNumber(), Comparable<BsonDouble> {
+/**
+ * A representation of the BSON Double type.
+ *
+ * @constructor constructs a new instance with the given value
+ * @property value the [Double] value
+ */
+public class BsonDouble(public val value: Double) : BsonNumber(), Comparable<BsonDouble> {
 
-    override fun intValue(): Int {
-        return value.toInt()
-    }
-
-    override fun longValue(): Long {
-        return value.toLong()
-    }
-
-    override fun doubleValue(): Double {
+    override fun getNumber(): Number {
         return value
     }
 

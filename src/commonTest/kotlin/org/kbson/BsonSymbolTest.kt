@@ -29,7 +29,7 @@ class BsonSymbolTest {
 
     @Test
     fun shouldHaveAccessToTheUnderlyingValues() {
-        assertEquals("s", bsonValue.symbol)
+        assertEquals("s", bsonValue.value)
     }
 
     @Test

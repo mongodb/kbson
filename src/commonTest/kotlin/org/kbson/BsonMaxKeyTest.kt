@@ -19,7 +19,7 @@ import kotlin.test.*
 
 class BsonMaxKeyTest {
 
-    private val bsonValue = BsonMaxKey()
+    private val bsonValue = BsonMaxKey
 
     @Test
     fun shouldHaveTheExpectedBsonType() {
@@ -29,7 +29,7 @@ class BsonMaxKeyTest {
 
     @Test
     fun shouldOverrideEquals() {
-        assertEquals(bsonValue, BsonMaxKey())
-        assertNotEquals(bsonValue as BsonValue, BsonMinKey())
+        assertEquals(bsonValue, BsonMaxKey)
+        assertNotEquals(bsonValue as BsonValue, BsonMinKey)
     }
 }

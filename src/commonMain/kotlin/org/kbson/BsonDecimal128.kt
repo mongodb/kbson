@@ -15,8 +15,15 @@
  */
 package org.kbson
 
-/** A representation of the BSON Decimal128 type. */
-class BsonDecimal128(val high: Long, val low: Long) : BsonValue() {
+/**
+ * A representation of the BSON Decimal128 type.
+ *
+ * @constructor Create an instance with the given high and low order bits representing this
+ * BsonDecimal128 as an IEEE 754-2008 128-bit decimal floating point using the BID encoding scheme.
+ * @property high the high-order 64 bits
+ * @property low the low-order 64 bits
+ */
+public class BsonDecimal128(public val high: Long, public val low: Long) : BsonValue() {
 
     override fun getBsonType(): BsonType {
         return BsonType.DECIMAL128
@@ -27,7 +34,7 @@ class BsonDecimal128(val high: Long, val low: Long) : BsonValue() {
      *
      * @return true if this Decimal128 is negative
      */
-    fun isNegative(): Boolean {
+    public fun isNegative(): Boolean {
         return (high and SIGN_BIT_MASK) == SIGN_BIT_MASK
     }
 
@@ -36,7 +43,7 @@ class BsonDecimal128(val high: Long, val low: Long) : BsonValue() {
      *
      * @return true if this Decimal128 is infinite
      */
-    fun isInfinite(): Boolean {
+    public fun isInfinite(): Boolean {
         return (high and INFINITY_MASK) == INFINITY_MASK
     }
 
@@ -45,7 +52,7 @@ class BsonDecimal128(val high: Long, val low: Long) : BsonValue() {
      *
      * @return true if this Decimal128 is finite
      */
-    fun isFinite(): Boolean {
+    public fun isFinite(): Boolean {
         return !isInfinite()
     }
 
@@ -54,7 +61,7 @@ class BsonDecimal128(val high: Long, val low: Long) : BsonValue() {
      *
      * @return true if this Decimal128 is Not-A-Number
      */
-    fun isNaN(): Boolean {
+    public fun isNaN(): Boolean {
         return (high and NaN_MASK) == NaN_MASK
     }
 
@@ -80,7 +87,7 @@ class BsonDecimal128(val high: Long, val low: Long) : BsonValue() {
         return result
     }
 
-    companion object {
+    private companion object {
         private const val INFINITY_MASK = 0x7800000000000000L
         private const val NaN_MASK = 0x7c00000000000000L
         private const val SIGN_BIT_MASK = 1L shl 63

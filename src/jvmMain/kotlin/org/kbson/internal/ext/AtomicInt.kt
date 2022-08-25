@@ -18,7 +18,7 @@ package org.kbson.internal.ext
 import java.util.concurrent.atomic.AtomicInteger
 
 /** A Jvm wrapper of atomic integer */
-actual class AtomicInt actual constructor(value: Int) {
+internal actual class AtomicInt actual constructor(value: Int) {
 
     val atomicInt: AtomicInteger
 

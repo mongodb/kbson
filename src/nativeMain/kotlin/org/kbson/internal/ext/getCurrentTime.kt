@@ -17,6 +17,6 @@ package org.kbson.internal.ext
 
 import kotlin.system.getTimeMillis
 
-actual fun getCurrentTimeInMillis(): Long = getTimeMillis()
+internal actual fun getCurrentTimeInMillis(): Long = getTimeMillis()
 
-actual fun getCurrentTimeInSeconds(): Int = (getCurrentTimeInMillis() / 1000).toInt()
+internal actual fun getCurrentTimeInSeconds(): Int = (getCurrentTimeInMillis() / 1000).toInt()

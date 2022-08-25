@@ -15,24 +15,32 @@
  */
 package org.kbson
 
-/** A representation of the BSON regular expression type */
-class BsonRegularExpression(val pattern: String, options: String) : BsonValue() {
+/**
+ * A representation of the BSON regular expression type
+ *
+ * @constructor constructs a new instance with the given pattern and options
+ * @property pattern the regular expression pattern
+ * @param options the regular expression options
+ */
+public class BsonRegularExpression(public val pattern: String, options: String) : BsonValue() {
 
-    /**
-     * Gets the options for the regular expression
-     *
-     * @return the options.
-     */
-    val options: String
+    /** The sorted options for the regular expression */
+    public val options: String
 
     init {
         this.options = options.toCharArray().apply { sort() }.joinToString("")
     }
 
-    /** Construct a new instance without any options */
-    constructor(pattern: String) : this(pattern, "")
+    /**
+     * Construct a new instance without any options
+     *
+     * @param pattern the regular expression pattern
+     */
+    public constructor(pattern: String) : this(pattern, "")
 
-    override fun getBsonType(): BsonType = BsonType.REGULAR_EXPRESSION
+    override fun getBsonType(): BsonType {
+        return BsonType.REGULAR_EXPRESSION
+    }
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

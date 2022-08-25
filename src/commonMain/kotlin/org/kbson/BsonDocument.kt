@@ -15,19 +15,37 @@
  */
 package org.kbson
 
-/** A type-safe container for a BSON document. */
-class BsonDocument(map: Map<String, BsonValue> = LinkedHashMap()) :
+/**
+ * A type-safe container for a BSON document.
+ *
+ * @constructor constructs the bson document with the initial values, defaults to an empty document
+ * @param map the initial values
+ */
+public class BsonDocument(map: Map<String, BsonValue> = LinkedHashMap()) :
     BsonValue(), MutableMap<String, BsonValue> {
     private val wrapped: LinkedHashMap<String, BsonValue>
+    init {
+        wrapped = if (map is LinkedHashMap) map else LinkedHashMap(map)
+    }
 
-    /** Construct an empty document with the specified initial capacity. */
-    constructor(initialCapacity: Int) : this(LinkedHashMap(initialCapacity))
+    /**
+     * Construct an empty document with the specified initial capacity.
+     * @param initialCapacity the initial capacity
+     */
+    public constructor(initialCapacity: Int) : this(LinkedHashMap(initialCapacity))
 
-    /** Construct a new instance with a single key value pair */
-    constructor(key: String, value: BsonValue) : this(linkedMapOf(key to value))
+    /**
+     * Construct a new instance with a single key value pair
+     * @param key the key
+     * @param value the value
+     */
+    public constructor(key: String, value: BsonValue) : this(linkedMapOf(key to value))
 
-    /** Construct a new instance with the given list [BsonElement]s */
-    constructor(
+    /**
+     * Construct a new instance with the given list [BsonElement]s
+     * @param bsonElements the initial list of [BsonElement]s
+     */
+    public constructor(
         bsonElements: List<BsonElement>
     ) : this(
         linkedMapOf(
@@ -35,12 +53,11 @@ class BsonDocument(map: Map<String, BsonValue> = LinkedHashMap()) :
                 .map { bsonElement -> Pair(bsonElement.name, bsonElement.value) }
                 .toTypedArray()))
 
-    /** Construct a new instance with the varargs of key value pairs */
-    constructor(vararg pairs: Pair<String, BsonValue>) : this(linkedMapOf(*pairs))
-
-    init {
-        wrapped = if (map is LinkedHashMap) map else LinkedHashMap(map)
-    }
+    /**
+     * Construct a new instance with the varargs of key value pairs
+     * @param pairs the initial pairs of values
+     */
+    public constructor(vararg pairs: Pair<String, BsonValue>) : this(linkedMapOf(*pairs))
 
     override val entries: MutableSet<MutableMap.MutableEntry<String, BsonValue>>
         get() = wrapped.entries
@@ -74,7 +91,9 @@ class BsonDocument(map: Map<String, BsonValue> = LinkedHashMap()) :
         return wrapped.put(key, value)
     }
 
-    override fun getBsonType(): BsonType = BsonType.DOCUMENT
+    override fun getBsonType(): BsonType {
+        return BsonType.DOCUMENT
+    }
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -96,7 +115,7 @@ class BsonDocument(map: Map<String, BsonValue> = LinkedHashMap()) :
     }
 
     /** Clone the document */
-    fun clone(): BsonDocument {
+    public fun clone(): BsonDocument {
         val clonedValues = HashMap<String, BsonValue>()
         wrapped.onEach { entry ->
             if (entry.value.isArray()) {
@@ -116,7 +135,7 @@ class BsonDocument(map: Map<String, BsonValue> = LinkedHashMap()) :
      * @return the first key in the document
      * @throws NoSuchElementException if the document is empty
      */
-    fun getFirstKey(): String {
+    public fun getFirstKey(): String {
         return keys.iterator().next()
     }
 
@@ -127,7 +146,7 @@ class BsonDocument(map: Map<String, BsonValue> = LinkedHashMap()) :
      * @param value the value
      * @return this
      */
-    fun append(key: String, value: BsonValue): BsonDocument {
+    public fun append(key: String, value: BsonValue): BsonDocument {
         put(key, value)
         return this
     }
@@ -140,7 +159,7 @@ class BsonDocument(map: Map<String, BsonValue> = LinkedHashMap()) :
      * @return true if the value of the key is a BsonNull, returns false if the document does not
      * contain the key.
      */
-    fun isNull(key: String): Boolean {
+    public fun isNull(key: String): Boolean {
         return get(key)?.isNull() ?: false
     }
 
@@ -152,7 +171,7 @@ class BsonDocument(map: Map<String, BsonValue> = LinkedHashMap()) :
      * @return true if the value of the key is a BsonDocument, returns false if the document does
      * not contain the key.
      */
-    fun isDocument(key: String): Boolean {
+    public fun isDocument(key: String): Boolean {
         return get(key)?.isDocument() ?: false
     }
 
@@ -164,7 +183,7 @@ class BsonDocument(map: Map<String, BsonValue> = LinkedHashMap()) :
      * @return true if the value of the key is a BsonArray, returns false if the document does not
      * contain the key.
      */
-    fun isArray(key: String): Boolean {
+    public fun isArray(key: String): Boolean {
         return get(key)?.isArray() ?: false
     }
 
@@ -176,7 +195,7 @@ class BsonDocument(map: Map<String, BsonValue> = LinkedHashMap()) :
      * @return true if the value of the key is a BsonNumber, returns false if the document does not
      * contain the key.
      */
-    fun isNumber(key: String): Boolean {
+    public fun isNumber(key: String): Boolean {
         return get(key)?.isNumber() ?: false
     }
 
@@ -188,7 +207,7 @@ class BsonDocument(map: Map<String, BsonValue> = LinkedHashMap()) :
      * @return true if the value of the key is a BsonInt32, returns false if the document does not
      * contain the key.
      */
-    fun isInt32(key: String): Boolean {
+    public fun isInt32(key: String): Boolean {
         return get(key)?.isInt32() ?: false
     }
 
@@ -200,7 +219,7 @@ class BsonDocument(map: Map<String, BsonValue> = LinkedHashMap()) :
      * @return true if the value of the key is a BsonInt64, returns false if the document does not
      * contain the key.
      */
-    fun isInt64(key: String): Boolean {
+    public fun isInt64(key: String): Boolean {
         return get(key)?.isInt64() ?: false
     }
 
@@ -211,9 +230,8 @@ class BsonDocument(map: Map<String, BsonValue> = LinkedHashMap()) :
      * @param key the key
      * @return true if the value of the key is a BsonDecimal128, returns false if the document does
      * not contain the key.
-     * @since 3.4
      */
-    fun isDecimal128(key: String): Boolean {
+    public fun isDecimal128(key: String): Boolean {
         return get(key)?.isDecimal128() ?: false
     }
 
@@ -225,7 +243,7 @@ class BsonDocument(map: Map<String, BsonValue> = LinkedHashMap()) :
      * @return true if the value of the key is a BsonDouble, returns false if the document does not
      * contain the key.
      */
-    fun isDouble(key: String): Boolean {
+    public fun isDouble(key: String): Boolean {
         return get(key)?.isDouble() ?: false
     }
 
@@ -237,7 +255,7 @@ class BsonDocument(map: Map<String, BsonValue> = LinkedHashMap()) :
      * @return true if the value of the key is a BsonBoolean, returns false if the document does not
      * contain the key.
      */
-    fun isBoolean(key: String): Boolean {
+    public fun isBoolean(key: String): Boolean {
         return get(key)?.isBoolean() ?: false
     }
 
@@ -249,7 +267,7 @@ class BsonDocument(map: Map<String, BsonValue> = LinkedHashMap()) :
      * @return true if the value of the key is a BsonString, returns false if the document does not
      * contain the key.
      */
-    fun isString(key: String): Boolean {
+    public fun isString(key: String): Boolean {
         return get(key)?.isString() ?: false
     }
 
@@ -261,7 +279,7 @@ class BsonDocument(map: Map<String, BsonValue> = LinkedHashMap()) :
      * @return true if the value of the key is a BsonDateTime, returns false if the document does
      * not contain the key.
      */
-    fun isDateTime(key: String): Boolean {
+    public fun isDateTime(key: String): Boolean {
         return get(key)?.isDateTime() ?: false
     }
 
@@ -273,7 +291,7 @@ class BsonDocument(map: Map<String, BsonValue> = LinkedHashMap()) :
      * @return true if the value of the key is a BsonTimestamp, returns false if the document does
      * not contain the key.
      */
-    fun isTimestamp(key: String): Boolean {
+    public fun isTimestamp(key: String): Boolean {
         return get(key)?.isTimestamp() ?: false
     }
 
@@ -285,7 +303,7 @@ class BsonDocument(map: Map<String, BsonValue> = LinkedHashMap()) :
      * @return true if the value of the key is a BsonObjectId, returns false if the document does
      * not contain the key.
      */
-    fun isObjectId(key: String): Boolean {
+    public fun isObjectId(key: String): Boolean {
         return get(key)?.isObjectId() ?: false
     }
 
@@ -297,7 +315,7 @@ class BsonDocument(map: Map<String, BsonValue> = LinkedHashMap()) :
      * @return true if the value of the key is a BsonBinary, returns false if the document does not
      * contain the key.
      */
-    fun isBinary(key: String): Boolean {
+    public fun isBinary(key: String): Boolean {
         return get(key)?.isBinary() ?: false
     }
 
@@ -309,7 +327,7 @@ class BsonDocument(map: Map<String, BsonValue> = LinkedHashMap()) :
      * @param defaultValue the default value
      * @return the value of the key as a BsonValue
      */
-    operator fun get(key: String, defaultValue: BsonValue): BsonValue {
+    public operator fun get(key: String, defaultValue: BsonValue): BsonValue {
         val value = get(key)
         return value ?: defaultValue
     }
@@ -324,7 +342,7 @@ class BsonDocument(map: Map<String, BsonValue> = LinkedHashMap()) :
      * @throws org.kbson.BsonInvalidOperationException if the document contains the key but the
      * value is not of the expected type
      */
-    fun getDocument(key: String, defaultValue: BsonDocument): BsonDocument {
+    public fun getDocument(key: String, defaultValue: BsonDocument): BsonDocument {
         return get(key)?.asDocument() ?: defaultValue
     }
 
@@ -338,7 +356,7 @@ class BsonDocument(map: Map<String, BsonValue> = LinkedHashMap()) :
      * @throws org.kbson.BsonInvalidOperationException if the document contains the key but the
      * value is not of the expected type
      */
-    fun getArray(key: String, defaultValue: BsonArray): BsonArray {
+    public fun getArray(key: String, defaultValue: BsonArray): BsonArray {
         return get(key)?.asArray() ?: defaultValue
     }
 
@@ -352,7 +370,7 @@ class BsonDocument(map: Map<String, BsonValue> = LinkedHashMap()) :
      * @throws org.kbson.BsonInvalidOperationException if the document contains the key but the
      * value is not of the expected type
      */
-    fun getNumber(key: String, defaultValue: BsonNumber): BsonNumber {
+    public fun getNumber(key: String, defaultValue: BsonNumber): BsonNumber {
         return get(key)?.asNumber() ?: defaultValue
     }
 
@@ -366,7 +384,7 @@ class BsonDocument(map: Map<String, BsonValue> = LinkedHashMap()) :
      * @throws org.kbson.BsonInvalidOperationException if the document contains the key but the
      * value is not of the expected type
      */
-    fun getInt32(key: String, defaultValue: BsonInt32): BsonInt32 {
+    public fun getInt32(key: String, defaultValue: BsonInt32): BsonInt32 {
         return get(key)?.asInt32() ?: defaultValue
     }
 
@@ -380,7 +398,7 @@ class BsonDocument(map: Map<String, BsonValue> = LinkedHashMap()) :
      * @throws org.kbson.BsonInvalidOperationException if the document contains the key but the
      * value is not of the expected type
      */
-    fun getInt64(key: String, defaultValue: BsonInt64): BsonInt64 {
+    public fun getInt64(key: String, defaultValue: BsonInt64): BsonInt64 {
         return get(key)?.asInt64() ?: defaultValue
     }
 
@@ -393,9 +411,8 @@ class BsonDocument(map: Map<String, BsonValue> = LinkedHashMap()) :
      * @return the value of the key as a BsonDecimal128
      * @throws org.kbson.BsonInvalidOperationException if the document contains the key but the
      * value is not of the expected type
-     * @since 3.4
      */
-    fun getDecimal128(key: String, defaultValue: BsonDecimal128): BsonDecimal128 {
+    public fun getDecimal128(key: String, defaultValue: BsonDecimal128): BsonDecimal128 {
         return get(key)?.asDecimal128() ?: defaultValue
     }
 
@@ -409,7 +426,7 @@ class BsonDocument(map: Map<String, BsonValue> = LinkedHashMap()) :
      * @throws org.kbson.BsonInvalidOperationException if the document contains the key but the
      * value is not of the expected type
      */
-    fun getDouble(key: String, defaultValue: BsonDouble): BsonDouble {
+    public fun getDouble(key: String, defaultValue: BsonDouble): BsonDouble {
         return get(key)?.asDouble() ?: defaultValue
     }
 
@@ -423,7 +440,7 @@ class BsonDocument(map: Map<String, BsonValue> = LinkedHashMap()) :
      * @throws org.kbson.BsonInvalidOperationException if the document contains the key but the
      * value is not of the expected type
      */
-    fun getBoolean(key: String, defaultValue: BsonBoolean): BsonBoolean {
+    public fun getBoolean(key: String, defaultValue: BsonBoolean): BsonBoolean {
         return get(key)?.asBoolean() ?: defaultValue
     }
 
@@ -437,7 +454,7 @@ class BsonDocument(map: Map<String, BsonValue> = LinkedHashMap()) :
      * @throws org.kbson.BsonInvalidOperationException if the document contains the key but the
      * value is not of the expected type
      */
-    fun getString(key: String, defaultValue: BsonString): BsonString {
+    public fun getString(key: String, defaultValue: BsonString): BsonString {
         return get(key)?.asString() ?: defaultValue
     }
 
@@ -451,7 +468,7 @@ class BsonDocument(map: Map<String, BsonValue> = LinkedHashMap()) :
      * @throws org.kbson.BsonInvalidOperationException if the document contains the key but the
      * value is not of the expected type
      */
-    fun getDateTime(key: String, defaultValue: BsonDateTime): BsonDateTime {
+    public fun getDateTime(key: String, defaultValue: BsonDateTime): BsonDateTime {
         return get(key)?.asDateTime() ?: defaultValue
     }
 
@@ -465,7 +482,7 @@ class BsonDocument(map: Map<String, BsonValue> = LinkedHashMap()) :
      * @throws org.kbson.BsonInvalidOperationException if the document contains the key but the
      * value is not of the expected type
      */
-    fun getTimestamp(key: String, defaultValue: BsonTimestamp): BsonTimestamp {
+    public fun getTimestamp(key: String, defaultValue: BsonTimestamp): BsonTimestamp {
         return get(key)?.asTimestamp() ?: defaultValue
     }
 
@@ -479,7 +496,7 @@ class BsonDocument(map: Map<String, BsonValue> = LinkedHashMap()) :
      * @throws org.kbson.BsonInvalidOperationException if the document contains the key but the
      * value is not of the expected type
      */
-    fun getObjectId(key: String, defaultValue: BsonObjectId): BsonObjectId {
+    public fun getObjectId(key: String, defaultValue: BsonObjectId): BsonObjectId {
         return get(key)?.asObjectId() ?: defaultValue
     }
 
@@ -493,7 +510,7 @@ class BsonDocument(map: Map<String, BsonValue> = LinkedHashMap()) :
      * @throws org.kbson.BsonInvalidOperationException if the document contains the key but the
      * value is not of the expected type
      */
-    fun getBinary(key: String, defaultValue: BsonBinary): BsonBinary {
+    public fun getBinary(key: String, defaultValue: BsonBinary): BsonBinary {
         return get(key)?.asBinary() ?: defaultValue
     }
 
@@ -507,7 +524,7 @@ class BsonDocument(map: Map<String, BsonValue> = LinkedHashMap()) :
      * @throws org.kbson.BsonInvalidOperationException if the document contains the key but the
      * value is not of the expected type
      */
-    fun getRegularExpression(
+    public fun getRegularExpression(
         key: String,
         defaultValue: BsonRegularExpression
     ): BsonRegularExpression {
@@ -522,7 +539,7 @@ class BsonDocument(map: Map<String, BsonValue> = LinkedHashMap()) :
      * @throws org.kbson.BsonInvalidOperationException if the document does not contain the key or
      * the value is not a BsonDocument
      */
-    fun getDocument(key: String): BsonDocument {
+    public fun getDocument(key: String): BsonDocument {
         throwIfKeyAbsent(key)
         return get(key)!!.asDocument()
     }
@@ -535,7 +552,7 @@ class BsonDocument(map: Map<String, BsonValue> = LinkedHashMap()) :
      * @throws org.kbson.BsonInvalidOperationException if the document does not contain the key or
      * the value is not of the expected type
      */
-    fun getArray(key: String): BsonArray {
+    public fun getArray(key: String): BsonArray {
         throwIfKeyAbsent(key)
         return get(key)!!.asArray()
     }
@@ -548,7 +565,7 @@ class BsonDocument(map: Map<String, BsonValue> = LinkedHashMap()) :
      * @throws org.kbson.BsonInvalidOperationException if the document does not contain the key or
      * the value is not of the expected type
      */
-    fun getNumber(key: String): BsonNumber {
+    public fun getNumber(key: String): BsonNumber {
         throwIfKeyAbsent(key)
         return get(key)!!.asNumber()
     }
@@ -561,7 +578,7 @@ class BsonDocument(map: Map<String, BsonValue> = LinkedHashMap()) :
      * @throws org.kbson.BsonInvalidOperationException if the document does not contain the key or
      * the value is not of the expected type
      */
-    fun getInt32(key: String): BsonInt32 {
+    public fun getInt32(key: String): BsonInt32 {
         throwIfKeyAbsent(key)
         return get(key)!!.asInt32()
     }
@@ -574,7 +591,7 @@ class BsonDocument(map: Map<String, BsonValue> = LinkedHashMap()) :
      * @throws org.kbson.BsonInvalidOperationException if the document does not contain the key or
      * the value is not of the expected type
      */
-    fun getInt64(key: String): BsonInt64 {
+    public fun getInt64(key: String): BsonInt64 {
         throwIfKeyAbsent(key)
         return get(key)!!.asInt64()
     }
@@ -586,9 +603,8 @@ class BsonDocument(map: Map<String, BsonValue> = LinkedHashMap()) :
      * @return the value of the key as a BsonDecimal128
      * @throws org.kbson.BsonInvalidOperationException if the document does not contain the key or
      * the value is not of the expected type
-     * @since 3.4
      */
-    fun getDecimal128(key: String): BsonDecimal128 {
+    public fun getDecimal128(key: String): BsonDecimal128 {
         throwIfKeyAbsent(key)
         return get(key)!!.asDecimal128()
     }
@@ -601,7 +617,7 @@ class BsonDocument(map: Map<String, BsonValue> = LinkedHashMap()) :
      * @throws org.kbson.BsonInvalidOperationException if the document does not contain the key or
      * the value is not of the expected type
      */
-    fun getDouble(key: String): BsonDouble {
+    public fun getDouble(key: String): BsonDouble {
         throwIfKeyAbsent(key)
         return get(key)!!.asDouble()
     }
@@ -614,7 +630,7 @@ class BsonDocument(map: Map<String, BsonValue> = LinkedHashMap()) :
      * @throws org.kbson.BsonInvalidOperationException if the document does not contain the key or
      * the value is not of the expected type
      */
-    fun getBoolean(key: String): BsonBoolean {
+    public fun getBoolean(key: String): BsonBoolean {
         throwIfKeyAbsent(key)
         return get(key)!!.asBoolean()
     }
@@ -627,7 +643,7 @@ class BsonDocument(map: Map<String, BsonValue> = LinkedHashMap()) :
      * @throws org.kbson.BsonInvalidOperationException if the document does not contain the key or
      * the value is not of the expected type
      */
-    fun getString(key: String): BsonString {
+    public fun getString(key: String): BsonString {
         throwIfKeyAbsent(key)
         return get(key)!!.asString()
     }
@@ -640,7 +656,7 @@ class BsonDocument(map: Map<String, BsonValue> = LinkedHashMap()) :
      * @throws org.kbson.BsonInvalidOperationException if the document does not contain the key or
      * the value is not of the expected type
      */
-    fun getDateTime(key: String): BsonDateTime {
+    public fun getDateTime(key: String): BsonDateTime {
         throwIfKeyAbsent(key)
         return get(key)!!.asDateTime()
     }
@@ -653,7 +669,7 @@ class BsonDocument(map: Map<String, BsonValue> = LinkedHashMap()) :
      * @throws org.kbson.BsonInvalidOperationException if the document does not contain the key or
      * the value is not of the expected type
      */
-    fun getTimestamp(key: String): BsonTimestamp {
+    public fun getTimestamp(key: String): BsonTimestamp {
         throwIfKeyAbsent(key)
         return get(key)!!.asTimestamp()
     }
@@ -666,7 +682,7 @@ class BsonDocument(map: Map<String, BsonValue> = LinkedHashMap()) :
      * @throws org.kbson.BsonInvalidOperationException if the document does not contain the key or
      * the value is not of the expected type
      */
-    fun getObjectId(key: String): BsonObjectId {
+    public fun getObjectId(key: String): BsonObjectId {
         throwIfKeyAbsent(key)
         return get(key)!!.asObjectId()
     }
@@ -679,7 +695,7 @@ class BsonDocument(map: Map<String, BsonValue> = LinkedHashMap()) :
      * @throws org.kbson.BsonInvalidOperationException if the document does not contain the key or
      * the value is not of the expected type
      */
-    fun getRegularExpression(key: String): BsonRegularExpression {
+    public fun getRegularExpression(key: String): BsonRegularExpression {
         throwIfKeyAbsent(key)
         return get(key)!!.asRegularExpression()
     }
@@ -692,7 +708,7 @@ class BsonDocument(map: Map<String, BsonValue> = LinkedHashMap()) :
      * @throws org.kbson.BsonInvalidOperationException if the document does not contain the key or
      * the value is not of the expected type
      */
-    fun getBinary(key: String): BsonBinary {
+    public fun getBinary(key: String): BsonBinary {
         throwIfKeyAbsent(key)
         return get(key)!!.asBinary()
     }

@@ -16,122 +16,122 @@
 package org.kbson
 
 /** Base class for any BSON type. */
-sealed class BsonValue protected constructor() {
+public sealed class BsonValue {
 
     /**
      * Gets the BSON type of this value.
      *
-     * @return the BSON type, which may not be null (but may be BSONType.NULL)
+     * @return the BSON type
      */
-    abstract fun getBsonType(): BsonType
+    public abstract fun getBsonType(): BsonType
 
     /** @return true if this is a BsonNull, false otherwise */
-    open fun isNull(): Boolean {
+    public fun isNull(): Boolean {
         return this is BsonNull
     }
 
     /** @return true if this is a BsonDocument, false otherwise */
-    open fun isDocument(): Boolean {
+    public fun isDocument(): Boolean {
         return this is BsonDocument
     }
 
     /** @return true if this is a BsonArray, false otherwise */
-    open fun isArray(): Boolean {
+    public fun isArray(): Boolean {
         return this is BsonArray
     }
 
     /** @return true if this is a BsonString, false otherwise */
-    open fun isString(): Boolean {
+    public fun isString(): Boolean {
         return this is BsonString
     }
 
     /** @return true if this is a BsonNumber, false otherwise */
-    open fun isNumber(): Boolean {
+    public fun isNumber(): Boolean {
         return isInt32() || isInt64() || isDouble()
     }
 
     /** @return true if this is a BsonInt32, false otherwise */
-    open fun isInt32(): Boolean {
+    public fun isInt32(): Boolean {
         return this is BsonInt32
     }
 
     /** @return true if this is a BsonInt64, false otherwise */
-    open fun isInt64(): Boolean {
+    public fun isInt64(): Boolean {
         return this is BsonInt64
     }
 
     /** @return true if this is a BsonDecimal128, false otherwise */
-    open fun isDecimal128(): Boolean {
+    public fun isDecimal128(): Boolean {
         return this is BsonDecimal128
     }
 
     /** @return true if this is a BsonDouble, false otherwise */
-    open fun isDouble(): Boolean {
+    public fun isDouble(): Boolean {
         return this is BsonDouble
     }
 
     /** @return true if this is a BsonBoolean, false otherwise */
-    open fun isBoolean(): Boolean {
+    public fun isBoolean(): Boolean {
         return this is BsonBoolean
     }
 
     /** @return true if this is an BsonObjectId, false otherwise */
-    open fun isObjectId(): Boolean {
+    public fun isObjectId(): Boolean {
         return this is BsonObjectId
     }
 
     /** @return true if this is a BsonDbPointer, false otherwise */
-    open fun isDBPointer(): Boolean {
+    public fun isDBPointer(): Boolean {
         return this is BsonDbPointer
     }
 
     /** @return true if this is a BsonTimestamp, false otherwise */
-    open fun isTimestamp(): Boolean {
+    public fun isTimestamp(): Boolean {
         return this is BsonTimestamp
     }
 
     /** @return true if this is a BsonBinary, false otherwise */
-    open fun isBinary(): Boolean {
+    public fun isBinary(): Boolean {
         return this is BsonBinary
     }
 
     /** @return true if this is a BsonDateTime, false otherwise */
-    open fun isDateTime(): Boolean {
+    public fun isDateTime(): Boolean {
         return this is BsonDateTime
     }
 
     /** @return true if this is a BsonSymbol, false otherwise */
-    open fun isSymbol(): Boolean {
+    public fun isSymbol(): Boolean {
         return this is BsonSymbol
     }
 
     /** @return true if this is a BsonRegularExpression, false otherwise */
-    open fun isRegularExpression(): Boolean {
+    public fun isRegularExpression(): Boolean {
         return this is BsonRegularExpression
     }
 
     /** @return true if this is a BsonJavaScript, false otherwise */
-    open fun isJavaScript(): Boolean {
+    public fun isJavaScript(): Boolean {
         return this is BsonJavaScript
     }
 
     /** @return true if this is a BsonJavaScriptWithScope, false otherwise */
-    open fun isJavaScriptWithScope(): Boolean {
+    public fun isJavaScriptWithScope(): Boolean {
         return this is BsonJavaScriptWithScope
     }
 
     /** @return true if this is a BsonMaxKey, false otherwise */
-    open fun isMaxKey(): Boolean {
+    public fun isMaxKey(): Boolean {
         return this is BsonMaxKey
     }
 
     /** @return true if this is a BsonMinKey, false otherwise */
-    open fun isMinKey(): Boolean {
+    public fun isMinKey(): Boolean {
         return this is BsonMinKey
     }
 
     /** @return true if this is a BsonUndefined, false otherwise */
-    open fun isUndefined(): Boolean {
+    public fun isUndefined(): Boolean {
         return this is BsonUndefined
     }
 
@@ -141,7 +141,7 @@ sealed class BsonValue protected constructor() {
      * @return a BsonDocument
      * @throws org.kbson.BsonInvalidOperationException if this value is not of the expected type
      */
-    open fun asDocument(): BsonDocument {
+    public fun asDocument(): BsonDocument {
         throwIfInvalidType(BsonType.DOCUMENT)
         return this as BsonDocument
     }
@@ -152,7 +152,7 @@ sealed class BsonValue protected constructor() {
      * @return a BsonArray
      * @throws org.kbson.BsonInvalidOperationException if this value is not of the expected type
      */
-    open fun asArray(): BsonArray {
+    public fun asArray(): BsonArray {
         throwIfInvalidType(BsonType.ARRAY)
         return this as BsonArray
     }
@@ -163,7 +163,7 @@ sealed class BsonValue protected constructor() {
      * @return a BsonString
      * @throws org.kbson.BsonInvalidOperationException if this value is not of the expected type
      */
-    open fun asString(): BsonString {
+    public fun asString(): BsonString {
         throwIfInvalidType(BsonType.STRING)
         return this as BsonString
     }
@@ -174,7 +174,7 @@ sealed class BsonValue protected constructor() {
      * @return a BsonNumber
      * @throws org.kbson.BsonInvalidOperationException if this value is not of the expected type
      */
-    open fun asNumber(): BsonNumber {
+    public fun asNumber(): BsonNumber {
         if (getBsonType() !== BsonType.INT32 &&
             getBsonType() !== BsonType.INT64 &&
             getBsonType() !== BsonType.DOUBLE) {
@@ -190,7 +190,7 @@ sealed class BsonValue protected constructor() {
      * @return a BsonInt32
      * @throws org.kbson.BsonInvalidOperationException if this value is not of the expected type
      */
-    open fun asInt32(): BsonInt32 {
+    public fun asInt32(): BsonInt32 {
         throwIfInvalidType(BsonType.INT32)
         return this as BsonInt32
     }
@@ -201,7 +201,7 @@ sealed class BsonValue protected constructor() {
      * @return a BsonInt64
      * @throws org.kbson.BsonInvalidOperationException if this value is not of the expected type
      */
-    open fun asInt64(): BsonInt64 {
+    public fun asInt64(): BsonInt64 {
         throwIfInvalidType(BsonType.INT64)
         return this as BsonInt64
     }
@@ -211,9 +211,8 @@ sealed class BsonValue protected constructor() {
      *
      * @return a BsonDecimal128
      * @throws org.kbson.BsonInvalidOperationException if this value is not of the expected type
-     * @since 3.4
      */
-    open fun asDecimal128(): BsonDecimal128 {
+    public fun asDecimal128(): BsonDecimal128 {
         throwIfInvalidType(BsonType.DECIMAL128)
         return this as BsonDecimal128
     }
@@ -224,7 +223,7 @@ sealed class BsonValue protected constructor() {
      * @return a BsonDouble
      * @throws org.kbson.BsonInvalidOperationException if this value is not of the expected type
      */
-    open fun asDouble(): BsonDouble {
+    public fun asDouble(): BsonDouble {
         throwIfInvalidType(BsonType.DOUBLE)
         return this as BsonDouble
     }
@@ -235,7 +234,7 @@ sealed class BsonValue protected constructor() {
      * @return a BsonBoolean
      * @throws org.kbson.BsonInvalidOperationException if this value is not of the expected type
      */
-    open fun asBoolean(): BsonBoolean {
+    public fun asBoolean(): BsonBoolean {
         throwIfInvalidType(BsonType.BOOLEAN)
         return this as BsonBoolean
     }
@@ -246,7 +245,7 @@ sealed class BsonValue protected constructor() {
      * @return an BsonObjectId
      * @throws org.kbson.BsonInvalidOperationException if this value is not of the expected type
      */
-    open fun asObjectId(): BsonObjectId {
+    public fun asObjectId(): BsonObjectId {
         throwIfInvalidType(BsonType.OBJECT_ID)
         return this as BsonObjectId
     }
@@ -257,7 +256,7 @@ sealed class BsonValue protected constructor() {
      * @return an BsonDbPointer
      * @throws org.kbson.BsonInvalidOperationException if this value is not of the expected type
      */
-    open fun asDBPointer(): BsonDbPointer {
+    public fun asDBPointer(): BsonDbPointer {
         throwIfInvalidType(BsonType.DB_POINTER)
         return this as BsonDbPointer
     }
@@ -268,7 +267,7 @@ sealed class BsonValue protected constructor() {
      * @return an BsonTimestamp
      * @throws org.kbson.BsonInvalidOperationException if this value is not of the expected type
      */
-    open fun asTimestamp(): BsonTimestamp {
+    public fun asTimestamp(): BsonTimestamp {
         throwIfInvalidType(BsonType.TIMESTAMP)
         return this as BsonTimestamp
     }
@@ -279,7 +278,7 @@ sealed class BsonValue protected constructor() {
      * @return an BsonBinary
      * @throws org.kbson.BsonInvalidOperationException if this value is not of the expected type
      */
-    open fun asBinary(): BsonBinary {
+    public fun asBinary(): BsonBinary {
         throwIfInvalidType(BsonType.BINARY)
         return this as BsonBinary
     }
@@ -290,7 +289,7 @@ sealed class BsonValue protected constructor() {
      * @return an BsonDateTime
      * @throws org.kbson.BsonInvalidOperationException if this value is not of the expected type
      */
-    open fun asDateTime(): BsonDateTime {
+    public fun asDateTime(): BsonDateTime {
         throwIfInvalidType(BsonType.DATE_TIME)
         return this as BsonDateTime
     }
@@ -301,7 +300,7 @@ sealed class BsonValue protected constructor() {
      * @return an BsonSymbol
      * @throws org.kbson.BsonInvalidOperationException if this value is not of the expected type
      */
-    open fun asSymbol(): BsonSymbol {
+    public fun asSymbol(): BsonSymbol {
         throwIfInvalidType(BsonType.SYMBOL)
         return this as BsonSymbol
     }
@@ -312,7 +311,7 @@ sealed class BsonValue protected constructor() {
      * @return an BsonRegularExpression
      * @throws org.kbson.BsonInvalidOperationException if this value is not of the expected type
      */
-    open fun asRegularExpression(): BsonRegularExpression {
+    public fun asRegularExpression(): BsonRegularExpression {
         throwIfInvalidType(BsonType.REGULAR_EXPRESSION)
         return this as BsonRegularExpression
     }
@@ -323,7 +322,7 @@ sealed class BsonValue protected constructor() {
      * @return a BsonJavaScript
      * @throws org.kbson.BsonInvalidOperationException if this value is not of the expected type
      */
-    open fun asJavaScript(): BsonJavaScript {
+    public fun asJavaScript(): BsonJavaScript {
         throwIfInvalidType(BsonType.JAVASCRIPT)
         return this as BsonJavaScript
     }
@@ -334,7 +333,7 @@ sealed class BsonValue protected constructor() {
      * @return a BsonJavaScriptWithScope
      * @throws org.kbson.BsonInvalidOperationException if this value is not of the expected type
      */
-    open fun asJavaScriptWithScope(): BsonJavaScriptWithScope {
+    public fun asJavaScriptWithScope(): BsonJavaScriptWithScope {
         throwIfInvalidType(BsonType.JAVASCRIPT_WITH_SCOPE)
         return this as BsonJavaScriptWithScope
     }

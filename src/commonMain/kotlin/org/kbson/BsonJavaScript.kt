@@ -15,8 +15,13 @@
  */
 package org.kbson
 
-/** For using the JavaScript Code type. */
-class BsonJavaScript(val code: String) : BsonValue() {
+/**
+ * A representation of the BSON JavaScript type.
+ *
+ * @constructor constructs a new instance with the given code
+ * @property code the javascript code as a string
+ */
+public class BsonJavaScript(public val code: String) : BsonValue() {
     override fun getBsonType(): BsonType {
         return BsonType.JAVASCRIPT
     }

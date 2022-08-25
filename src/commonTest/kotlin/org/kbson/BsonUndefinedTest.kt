@@ -29,6 +29,6 @@ class BsonUndefinedTest {
 
     @Test
     fun shouldOverrideEquals() {
-        assertEquals(bsonValue, BsonUndefined())
+        assertEquals(bsonValue, BsonUndefined)
     }
 }

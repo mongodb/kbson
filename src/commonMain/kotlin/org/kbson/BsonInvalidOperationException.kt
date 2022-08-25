@@ -15,6 +15,15 @@
  */
 package org.kbson
 
-/** An exception indicating an invalid BSON operation. */
-class BsonInvalidOperationException(message: String? = null, cause: Throwable? = null) :
-    BsonException(message, cause) {}
+/**
+ * An exception indicating an invalid BSON operation.
+ * @constructor constructs a new instance with the given message and cause
+ * @param message the message
+ * @param cause the cause
+ */
+public class BsonInvalidOperationException(message: String? = null, cause: Throwable? = null) :
+    BsonException(message, cause) {
+    override fun toString(): String {
+        return "BsonInvalidOperationException(message=$message, cause=$cause)"
+    }
+}

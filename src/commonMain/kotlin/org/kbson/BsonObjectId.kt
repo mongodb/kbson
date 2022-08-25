@@ -19,22 +19,30 @@ import org.kbson.internal.ext.AtomicInt
 import org.kbson.internal.ext.getCurrentTimeInSeconds
 
 /**
+ * A representation of the BSON ObjectId type
  *
- * <p>A globally unique identifier for objects.</p>
+ * A globally unique identifier for objects.
  *
- * <p>Consists of 12 bytes, divided as follows:</p> <table border="1"> <caption>ObjectID
- * layout</caption> <tr>
- * <td>0</td><td>1</td><td>2</td><td>3</td><td>4</td><td>5</td><td>6</td><td>7</td><td>8</td><td>9</td><td>10</td><td>11</td>
+ * Consists of 12 bytes, divided as follows:
+ *
+ * <table border="1"> <caption>ObjectID layout</caption> <tr>
+ * ```
+ *     <td>0</td><td>1</td><td>2</td><td>3</td><td>4</td><td>5</td><td>6</td><td>7</td><td>8</td><td>9</td><td>10</td><td>11</td>
+ * ```
  * </tr> <tr><td colspan="4">time</td><td colspan="5">random value</td><td colspan="3">inc</td></tr>
  * </table>
  *
- * <p>Instances of this class are immutable.</p>
+ * @constructor constructs a new instance with the given timestamp, random values and counter
+ * @property timestamp the timestamp seconds since epoch
+ * @property randomValue1 a random int value
+ * @property randomValue2 a random short value
+ * @property counter a counter
  */
-class BsonObjectId(
-    val timestamp: Int,
-    val randomValue1: Int,
-    val randomValue2: Short,
-    val counter: Int
+public class BsonObjectId(
+    public val timestamp: Int,
+    private val randomValue1: Int,
+    private val randomValue2: Short,
+    private val counter: Int
 ) : BsonValue(), Comparable<BsonObjectId> {
 
     init {
@@ -51,7 +59,7 @@ class BsonObjectId(
      *
      * @return the byte array
      */
-    fun toByteArray(): ByteArray {
+    public fun toByteArray(): ByteArray {
         val bytes = ByteArray(OBJECT_ID_LENGTH)
         bytes[0] = (timestamp shr 24).toByte()
         bytes[1] = (timestamp shr 16).toByte()
@@ -73,7 +81,7 @@ class BsonObjectId(
      *
      * @return a string representation of the ObjectId in hexadecimal format
      */
-    fun toHexString(): String {
+    public fun toHexString(): String {
         val chars = CharArray(OBJECT_ID_LENGTH * 2)
         var i = 0
         for (b in toByteArray()) {
@@ -83,7 +91,9 @@ class BsonObjectId(
         return chars.concatToString()
     }
 
-    override fun getBsonType(): BsonType = BsonType.OBJECT_ID
+    override fun getBsonType(): BsonType {
+        return BsonType.OBJECT_ID
+    }
 
     override fun toString(): String {
         return "BsonObjectId(${toHexString()})"
@@ -123,7 +133,7 @@ class BsonObjectId(
         return result
     }
 
-    companion object {
+    public companion object {
         private const val OBJECT_ID_LENGTH = 12
         private const val LOW_ORDER_THREE_BYTES = 0x00ffffff
         private val HEX_CHARS = "0123456789abcdef".toCharArray()
@@ -141,7 +151,7 @@ class BsonObjectId(
         }
 
         /** Create a new BsonObjectId */
-        operator fun invoke(): BsonObjectId {
+        public operator fun invoke(): BsonObjectId {
             return BsonObjectId(
                 getCurrentTimeInSeconds(), RANDOM_VALUE1, RANDOM_VALUE2, nextCounter())
         }
@@ -151,7 +161,7 @@ class BsonObjectId(
          *
          * @see [BsonObjectId.toHexString]
          */
-        operator fun invoke(hexString: String): BsonObjectId {
+        public operator fun invoke(hexString: String): BsonObjectId {
             val invalidHexString =
                 hexString.length != 24 ||
                     hexString.none { c ->
@@ -164,7 +174,7 @@ class BsonObjectId(
         }
 
         /** Construct a new BsonObjectId from a ByteArray */
-        operator fun invoke(byteArray: ByteArray): BsonObjectId {
+        public operator fun invoke(byteArray: ByteArray): BsonObjectId {
             require(byteArray.size == OBJECT_ID_LENGTH) {
                 "invalid byteArray.size() ${byteArray.size} != $OBJECT_ID_LENGTH"
             }

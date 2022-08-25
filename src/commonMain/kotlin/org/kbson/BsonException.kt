@@ -15,11 +15,18 @@
  */
 package org.kbson
 
-/** A general runtime exception raised in BSON processing. */
-open class BsonException(
+/**
+ * A general runtime exception raised in BSON processing.
+ *
+ * @constructor constructs a new instance with the given message, cause and errorCode
+ * @param message the error message
+ * @param cause the error cause
+ * @param errorCode the error code
+ */
+public open class BsonException(
     message: String? = null,
     cause: Throwable? = null,
-    val errorCode: Int? = null
+    private val errorCode: Int? = null
 ) : RuntimeException(message, cause) {
 
     /**
@@ -27,7 +34,20 @@ open class BsonException(
      *
      * @return true if the error code is not null.
      */
-    fun hasErrorCode(): Boolean {
+    public fun hasErrorCode(): Boolean {
         return errorCode != null
+    }
+
+    /**
+     * Return the error code if set
+     *
+     * @return the error code
+     */
+    public fun getErrorCode(): Int? {
+        return errorCode
+    }
+
+    override fun toString(): String {
+        return "BsonException(message=$message, cause=$cause, errorCode=$errorCode)"
     }
 }

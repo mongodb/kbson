@@ -15,6 +15,6 @@
  */
 package org.kbson.internal.ext
 
-actual fun getCurrentTimeInMillis(): Long = System.currentTimeMillis()
+internal actual fun getCurrentTimeInMillis(): Long = System.currentTimeMillis()
 
-actual fun getCurrentTimeInSeconds(): Int = (getCurrentTimeInMillis() / 1000).toInt()
+internal actual fun getCurrentTimeInSeconds(): Int = (getCurrentTimeInMillis() / 1000).toInt()

@@ -15,20 +15,10 @@
  */
 package org.kbson
 
-/** Represent the maximum key value regardless of the key's type */
-class BsonMaxKey : BsonValue() {
+/** A representation of the BSON the maximum key value regardless of the key's type */
+public object BsonMaxKey : BsonValue() {
     override fun getBsonType(): BsonType {
         return BsonType.MAX_KEY
-    }
-
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (other == null || this::class != other::class) return false
-        return true
-    }
-
-    override fun hashCode(): Int {
-        return this::class.hashCode()
     }
 
     override fun toString(): String {

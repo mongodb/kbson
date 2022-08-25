@@ -93,7 +93,7 @@ class BsonBinaryTest {
     @Test
     fun implementsClone() {
         val original = BsonBinary(BsonBinarySubType.BINARY, data)
-        val clone = BsonBinary.clone(original)
+        val clone = original.clone()
         assertEquals(original, clone)
 
         original.data[0] = 9

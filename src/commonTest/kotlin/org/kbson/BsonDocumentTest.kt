@@ -19,7 +19,7 @@ import kotlin.test.*
 
 class BsonDocumentTest {
 
-    private val bsonNull = BsonNull()
+    private val bsonNull = BsonNull
     private val bsonInt32 = BsonInt32(42)
     private val bsonInt64 = BsonInt64(52L)
     private val bsonDecimal128 = BsonDecimal128(1, 0)
@@ -27,8 +27,8 @@ class BsonDocumentTest {
     private val bsonDateTime = BsonDateTime()
     private val bsonDouble = BsonDouble(62.0)
     private val bsonString = BsonString("the fox ...")
-    private val bsonMinKey = BsonMinKey()
-    private val bsonMaxKey = BsonMaxKey()
+    private val bsonMinKey = BsonMinKey
+    private val bsonMaxKey = BsonMaxKey
     private val bsonJavaScript = BsonJavaScript("int i = 0;")
     private val bsonObjectId = BsonObjectId()
     private val bsonJavaScriptWithScope =
@@ -36,7 +36,7 @@ class BsonDocumentTest {
     private val bsonRegularExpression = BsonRegularExpression("^test.*regex.*xyz$", "i")
     private val bsonSymbol = BsonSymbol("ruby stuff")
     private val bsonTimestamp = BsonTimestamp(0x12345678, 5)
-    private val bsonUndefined = BsonUndefined()
+    private val bsonUndefined = BsonUndefined
     private val bsonBinary =
         BsonBinary(
             80.toByte(),

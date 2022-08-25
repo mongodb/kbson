@@ -15,9 +15,15 @@
  */
 package org.kbson
 
-/** A type-safe representation of the BSON array type. */
-class BsonArray(initial: List<BsonValue> = emptyList()) : BsonValue(), List<BsonValue> {
-    val values: MutableList<BsonValue>
+/**
+ * A type-safe representation of the BSON array type.
+ *
+ * @constructor constructs the bson array with an initial list of values, defaults to no items
+ * @param initial the initial list of [BsonValue]s in the array
+ */
+public class BsonArray(initial: List<BsonValue> = emptyList()) :
+    BsonValue(), MutableList<BsonValue> {
+    private val values: MutableList<BsonValue>
     init {
         values = initial.toMutableList()
     }
@@ -28,10 +34,16 @@ class BsonArray(initial: List<BsonValue> = emptyList()) : BsonValue(), List<Bson
      * @param initialCapacity the initial capacity of the BsonArray
      * @throws IllegalArgumentException if the specified initial capacity is negative
      */
-    constructor(initialCapacity: Int) : this(ArrayList<BsonValue>(initialCapacity))
+    public constructor(initialCapacity: Int) : this(ArrayList<BsonValue>(initialCapacity))
+
+    /**
+     * Gets the values in this array as a list of BsonValue objects.
+     * @return the BsonValues in this array
+     */
+    public fun getValues(): List<BsonValue> = values.toList()
 
     /** Creates and returns a deep copy of this object */
-    fun clone(): BsonArray {
+    public fun clone(): BsonArray {
         val clonedValues =
             values.fold(ArrayList<BsonValue>(values.size)) { list, value ->
                 if (value.isArray()) {
@@ -66,19 +78,39 @@ class BsonArray(initial: List<BsonValue> = emptyList()) : BsonValue(), List<Bson
         return values.isEmpty()
     }
 
-    override fun iterator(): Iterator<BsonValue> {
+    override fun iterator(): MutableIterator<BsonValue> {
         return values.iterator()
     }
 
-    override fun listIterator(): ListIterator<BsonValue> {
+    override fun listIterator(): MutableListIterator<BsonValue> {
         return values.listIterator()
     }
 
-    override fun listIterator(index: Int): ListIterator<BsonValue> {
+    override fun listIterator(index: Int): MutableListIterator<BsonValue> {
         return values.listIterator(index)
     }
 
-    override fun subList(fromIndex: Int, toIndex: Int): List<BsonValue> {
+    override fun remove(element: BsonValue): Boolean {
+        return values.remove(element)
+    }
+
+    override fun removeAll(elements: Collection<BsonValue>): Boolean {
+        return values.removeAll(elements)
+    }
+
+    override fun removeAt(index: Int): BsonValue {
+        return values.removeAt(index)
+    }
+
+    override fun retainAll(elements: Collection<BsonValue>): Boolean {
+        return values.retainAll(elements)
+    }
+
+    override fun set(index: Int, element: BsonValue): BsonValue {
+        return values.set(index, element)
+    }
+
+    override fun subList(fromIndex: Int, toIndex: Int): MutableList<BsonValue> {
         return values.subList(fromIndex, toIndex)
     }
 
@@ -96,6 +128,26 @@ class BsonArray(initial: List<BsonValue> = emptyList()) : BsonValue(), List<Bson
 
     override val size: Int
         get() = values.size
+
+    override fun clear() {
+        values.clear()
+    }
+
+    override fun addAll(elements: Collection<BsonValue>): Boolean {
+        return values.addAll(elements)
+    }
+
+    override fun addAll(index: Int, elements: Collection<BsonValue>): Boolean {
+        return values.addAll(index, elements)
+    }
+
+    override fun add(index: Int, element: BsonValue) {
+        values.add(index, element)
+    }
+
+    override fun add(element: BsonValue): Boolean {
+        return values.add(element)
+    }
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

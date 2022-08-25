@@ -17,6 +17,6 @@ package org.kbson.internal.ext
 
 import kotlin.js.Date
 
-actual fun getCurrentTimeInMillis(): Long = Date.now().toLong()
+internal actual fun getCurrentTimeInMillis(): Long = Date.now().toLong()
 
-actual fun getCurrentTimeInSeconds(): Int = (getCurrentTimeInMillis() / 1000).toInt()
+internal actual fun getCurrentTimeInSeconds(): Int = (getCurrentTimeInMillis() / 1000).toInt()

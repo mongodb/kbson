@@ -15,9 +15,15 @@
  */
 package org.kbson
 
-/** A representation of the BSON String type. */
-class BsonString(val value: String) : BsonValue(), Comparable<BsonString> {
-    override fun getBsonType(): BsonType = BsonType.STRING
+/**
+ * A representation of the BSON String type.
+ *
+ * @property value the string value
+ */
+public class BsonString(public val value: String) : BsonValue(), Comparable<BsonString> {
+    override fun getBsonType(): BsonType {
+        return BsonType.STRING
+    }
 
     override fun compareTo(other: BsonString): Int {
         return value.compareTo(other.value)

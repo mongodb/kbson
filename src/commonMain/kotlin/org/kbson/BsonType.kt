@@ -15,15 +15,12 @@
  */
 package org.kbson
 
-/** Enumeration of all the BSON types currently supported. */
-enum class BsonType(
-    /**
-     * Get the int value of this BSON type.
-     *
-     * @return the int value of this type.
-     */
-    val value: Int
-) {
+/**
+ * Enumeration of all the BSON types currently supported.
+ *
+ * @property value the int value of this BSON type.
+ */
+public enum class BsonType(public val value: Int) {
     /** Not a real BSON type. Used to signal the end of a document. */
     END_OF_DOCUMENT(0x00), // no values of this type exist it marks the end of a document
 
@@ -81,11 +78,7 @@ enum class BsonType(
     /** A BSON 64-bit integer. */
     INT64(0x12),
 
-    /**
-     * A BSON Decimal128.
-     *
-     * @since 3.4
-     */
+    /** A BSON Decimal128. */
     DECIMAL128(0x13),
 
     /** A BSON MinKey value. */
@@ -99,7 +92,7 @@ enum class BsonType(
      *
      * @return true if this is some sort of containing type rather than a primitive value
      */
-    open fun isContainer(): Boolean {
+    public fun isContainer(): Boolean {
         return this == DOCUMENT || this == ARRAY
     }
 }

@@ -15,28 +15,17 @@
  */
 package org.kbson
 
+import kotlin.jvm.JvmStatic
+
 /** A representation of the BSON Null type. */
-class BsonNull : BsonValue() {
+public object BsonNull : BsonValue() {
     override fun getBsonType(): BsonType {
         return BsonType.NULL
-    }
-
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (other == null || this::class != other::class) return false
-        return true
-    }
-
-    override fun hashCode(): Int {
-        return this::class.hashCode()
     }
 
     override fun toString(): String {
         return "BsonNull()"
     }
 
-    companion object {
-        /** A singleton instance of the null value. */
-        val VALUE = BsonNull()
-    }
+    @JvmStatic public val VALUE: BsonNull = BsonNull
 }

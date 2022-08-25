@@ -17,8 +17,13 @@ package org.kbson
 
 import kotlin.jvm.JvmStatic
 
-/** A representation of the BSON Boolean type. */
-class BsonBoolean(val value: Boolean) : BsonValue(), Comparable<BsonBoolean> {
+/**
+ * A representation of the BSON Boolean type.
+ *
+ * @constructor constructs a new instance with the given value
+ * @property value the boolean value
+ */
+public class BsonBoolean(public val value: Boolean) : BsonValue(), Comparable<BsonBoolean> {
 
     override fun getBsonType(): BsonType {
         return BsonType.BOOLEAN
@@ -47,12 +52,12 @@ class BsonBoolean(val value: Boolean) : BsonValue(), Comparable<BsonBoolean> {
         return "BsonBoolean(value=$value)"
     }
 
-    companion object {
+    public companion object {
         /** The true value. */
-        val TRUE = BsonBoolean(true)
+        @JvmStatic public val TRUE: BsonBoolean = BsonBoolean(true)
 
         /** The false value. */
-        val FALSE = BsonBoolean(false)
+        @JvmStatic public val FALSE: BsonBoolean = BsonBoolean(false)
 
         /**
          * Returns a `BsonBoolean` instance representing the specified `boolean` value.
@@ -61,7 +66,7 @@ class BsonBoolean(val value: Boolean) : BsonValue(), Comparable<BsonBoolean> {
          * @return @link if `value` is true, [BsonBoolean.FALSE] if `value` is false
          */
         @JvmStatic
-        fun valueOf(value: Boolean): BsonBoolean {
+        public fun valueOf(value: Boolean): BsonBoolean {
             return if (value) TRUE else FALSE
         }
     }

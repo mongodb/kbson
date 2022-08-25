@@ -15,8 +15,18 @@
  */
 package org.kbson
 
-/** A representation the BSON timestamp type. */
-class BsonTimestamp(val value: Long = 0) : BsonValue(), Comparable<BsonTimestamp> {
+/**
+ * A representation the BSON timestamp type.
+ *
+ * Note: BSON has a special timestamp type for internal MongoDB use and is not associated with the
+ * regular [BsonDateTime]. This internal timestamp type is a 64 bit value where:
+ * - the most significant 32 bits are a time_t value (seconds since the Unix epoch)
+ * - the least significant 32 bits are an incrementing ordinal for operations within a given second.
+ *
+ * @constructor construct a new instance
+ * @property value the timestamp
+ */
+public class BsonTimestamp(public val value: Long = 0) : BsonValue(), Comparable<BsonTimestamp> {
 
     /**
      * Construct a new instance for the given time and increment.
@@ -24,26 +34,28 @@ class BsonTimestamp(val value: Long = 0) : BsonValue(), Comparable<BsonTimestamp
      * @param seconds the number of seconds since the epoch
      * @param increment the increment.
      */
-    constructor(
+    public constructor(
         seconds: Int,
         increment: Int
     ) : this((seconds.toLong() shl 32) or (increment.toLong() and 0xFFFFFFFFL))
-
-    override fun getBsonType(): BsonType = BsonType.TIMESTAMP
 
     /**
      * Gets the time in seconds since epoch.
      *
      * @return an int representing time in seconds since epoch
      */
-    fun getTime(): Int = (value shr 32).toInt()
+    public fun getTime(): Int = (value shr 32).toInt()
 
     /**
      * Gets the increment value.
      *
      * @return an incrementing ordinal for operations within a given second
      */
-    fun getInc(): Int = value.toInt()
+    public fun getInc(): Int = value.toInt()
+
+    override fun getBsonType(): BsonType {
+        return BsonType.TIMESTAMP
+    }
 
     override fun compareTo(other: BsonTimestamp): Int {
         return value.compareTo(other.value)

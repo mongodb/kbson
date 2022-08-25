@@ -18,26 +18,41 @@ package org.kbson
 /**
  * A representation of the BSON Symbol type.
  *
- * <p>Note: It's deprecated in BSON Specification and present here only for compatibility reasons.
+ * Note: It's deprecated in BSON Specification and present here only for compatibility reasons.
+ *
+ * @property value the symbol value
  */
-class BsonSymbol(val symbol: String) : BsonValue() {
-    override fun getBsonType(): BsonType = BsonType.SYMBOL
+public class BsonSymbol(public val value: String) : BsonValue() {
+
+    /**
+     * Gets the symbol value
+     *
+     * @return the symbol.
+     */
+    public fun getSymbol(): String {
+        return value
+    }
+
+    override fun getBsonType(): BsonType {
+        return BsonType.SYMBOL
+    }
+
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (other == null || this::class != other::class) return false
 
         other as BsonSymbol
 
-        if (symbol != other.symbol) return false
+        if (value != other.value) return false
 
         return true
     }
 
     override fun hashCode(): Int {
-        return symbol.hashCode()
+        return value.hashCode()
     }
 
     override fun toString(): String {
-        return "BsonSymbol(value='$symbol')"
+        return "BsonSymbol(value='$value')"
     }
 }

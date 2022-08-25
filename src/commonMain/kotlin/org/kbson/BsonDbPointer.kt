@@ -16,11 +16,16 @@
 package org.kbson
 
 /**
- * Holder for a BSON type DBPointer(0x0c).
+ * A representation of the BSON DBPointer type.
  *
- * <p>Note: It's deprecated in BSON Specification and present here only for compatibility reasons.
+ * Note: It's deprecated in BSON Specification and present here only for compatibility reasons.
+ *
+ * @constructor constructs a new instance with the given namespace and id
+ * @property namespace the namespace
+ * @property id the id
  */
-class BsonDbPointer(val namespace: String, val id: BsonObjectId) : BsonValue() {
+public class BsonDbPointer(public val namespace: String, public val id: BsonObjectId) :
+    BsonValue() {
 
     override fun getBsonType(): BsonType {
         return BsonType.DB_POINTER

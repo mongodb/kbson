@@ -21,7 +21,7 @@ package org.kbson.internal.ext
  * In JavaScript, a function always runs to completion, before any other function is called. So
  * there no locking required to protect the int.
  */
-actual class AtomicInt actual constructor(value: Int) {
+internal actual class AtomicInt actual constructor(value: Int) {
 
     private var atomicInt: Int
 

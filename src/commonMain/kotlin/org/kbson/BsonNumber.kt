@@ -20,14 +20,18 @@ package org.kbson
  *
  * <p>This class mirrors the functionality provided by the java `Number` class.
  */
-abstract class BsonNumber : BsonValue() {
+public abstract class BsonNumber : BsonValue() {
+    protected abstract fun getNumber(): Number
+
     /**
      * Returns the value of the specified number as an `int`, which may involve rounding or
      * truncation.
      *
      * @return the numeric value represented by this object after conversion to type `int`.
      */
-    abstract fun intValue(): Int
+    public fun intValue(): Int {
+        return getNumber().toInt()
+    }
 
     /**
      * Returns the value of the specified number as an `long`, which may involve rounding or
@@ -35,12 +39,16 @@ abstract class BsonNumber : BsonValue() {
      *
      * @return the numeric value represented by this object after conversion to type `long`.
      */
-    abstract fun longValue(): Long
+    public fun longValue(): Long {
+        return getNumber().toLong()
+    }
 
     /**
      * Returns the value of the specified number as a `double`, which may involve rounding.
      *
      * @return the numeric value represented by this object after conversion to type `double`.
      */
-    abstract fun doubleValue(): Double
+    public fun doubleValue(): Double {
+        return getNumber().toDouble()
+    }
 }

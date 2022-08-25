@@ -15,6 +15,8 @@
  */
 package org.kbson.internal.ext
 
-expect fun getCurrentTimeInMillis(): Long
+/** @return the current time in milliseconds since epoch */
+internal expect fun getCurrentTimeInMillis(): Long
 
-expect fun getCurrentTimeInSeconds(): Int
+/** @return the current time in seconds since epoch */
+internal expect fun getCurrentTimeInSeconds(): Int

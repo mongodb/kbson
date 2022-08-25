@@ -15,8 +15,15 @@
  */
 package org.kbson
 
-/** A representation of the JavaScript Code with Scope BSON type. */
-class BsonJavaScriptWithScope(val code: String, val scope: BsonDocument) : BsonValue() {
+/**
+ * A representation of the BSON JavaScript with scope type.
+ *
+ * @constructor constructs a new instance with the given code and scope
+ * @property code the javascript code as a string
+ * @property scope the javascript scope
+ */
+public class BsonJavaScriptWithScope(public val code: String, public val scope: BsonDocument) :
+    BsonValue() {
     override fun getBsonType(): BsonType {
         return BsonType.JAVASCRIPT_WITH_SCOPE
     }

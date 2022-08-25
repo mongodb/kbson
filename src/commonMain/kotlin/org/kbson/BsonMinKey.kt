@@ -15,20 +15,10 @@
  */
 package org.kbson
 
-/** Represent the minimum key value regardless of the key's type */
-class BsonMinKey : BsonValue() {
+/** A representation of the BSON the minimum key value regardless of the key's type */
+public object BsonMinKey : BsonValue() {
     override fun getBsonType(): BsonType {
         return BsonType.MIN_KEY
-    }
-
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (other == null || this::class != other::class) return false
-        return true
-    }
-
-    override fun hashCode(): Int {
-        return this::class.hashCode()
     }
 
     override fun toString(): String {
