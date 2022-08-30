@@ -16,7 +16,7 @@
 package org.kbson.internal
 
 /** Cross-platform atomic integer */
-internal expect class AtomicInt(value: Int) {
+internal expect class AtomicInt(initial: Int) {
 
     /** Gets the current value */
     fun getValue(): Int

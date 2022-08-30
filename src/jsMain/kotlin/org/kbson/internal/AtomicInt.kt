@@ -21,16 +21,16 @@ package org.kbson.internal
  * In JavaScript, a function always runs to completion, before any other function is called. So
  * there no locking required to protect the int.
  */
-internal actual class AtomicInt actual constructor(value: Int) {
+internal actual class AtomicInt actual constructor(initial: Int) {
 
-    private var atomicInt: Int
+    private var value: Int
 
     init {
-        atomicInt = value
+        value = initial
     }
 
     /** Gets the current value */
-    actual fun getValue(): Int = atomicInt
+    actual fun getValue(): Int = value
 
     /**
      * Increments the value by [delta] and returns the new value.
@@ -39,8 +39,8 @@ internal actual class AtomicInt actual constructor(value: Int) {
      * @return the new value
      */
     actual fun addAndGet(delta: Int): Int {
-        atomicInt += delta
-        return atomicInt
+        value += delta
+        return value
     }
 
     /**
@@ -51,8 +51,8 @@ internal actual class AtomicInt actual constructor(value: Int) {
      * @return true if successful
      */
     actual fun compareAndSet(expected: Int, new: Int): Boolean {
-        if (atomicInt == expected) {
-            atomicInt = new
+        if (value == expected) {
+            value = new
             return true
         }
         return false
@@ -60,11 +60,11 @@ internal actual class AtomicInt actual constructor(value: Int) {
 
     /** Increments value by one. */
     actual fun increment() {
-        atomicInt++
+        value++
     }
 
     /** Decrements value by one. */
     actual fun decrement() {
-        atomicInt--
+        value--
     }
 }

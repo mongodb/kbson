@@ -27,7 +27,8 @@ import org.kbson.internal.CurrentTime.getCurrentTimeInSeconds
  *
  * <table border="1"> <caption>ObjectID layout</caption> <tr>
  * ```
- *     <td>0</td><td>1</td><td>2</td><td>3</td><td>4</td><td>5</td><td>6</td><td>7</td><td>8</td><td>9</td><td>10</td><td>11</td>
+ *     <td>0</td><td>1</td><td>2</td><td>3</td><td>4</td><td>5</td><td>6</td><td>7</td><td>8</td><td>9</td><td>10</td>
+ *     <td>11</td>
  * ```
  * </tr> <tr><td colspan="4">time</td><td colspan="5">random value</td><td colspan="3">inc</td></tr>
  * </table>
@@ -38,6 +39,7 @@ import org.kbson.internal.CurrentTime.getCurrentTimeInSeconds
  * @property randomValue2 a random short value
  * @property counter a counter
  */
+@Suppress("MagicNumber")
 public class BsonObjectId(
     public val timestamp: Int,
     private val randomValue1: Int,

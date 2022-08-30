@@ -21,6 +21,7 @@ package org.kbson
  * @constructor constructs the bson document with the initial values, defaults to an empty document
  * @param map the initial values
  */
+@Suppress("TooManyFunctions")
 public class BsonDocument(map: Map<String, BsonValue> = LinkedHashMap()) :
     BsonValue(), MutableMap<String, BsonValue> {
     private val wrapped: LinkedHashMap<String, BsonValue>
@@ -47,17 +48,13 @@ public class BsonDocument(map: Map<String, BsonValue> = LinkedHashMap()) :
      */
     public constructor(
         bsonElements: List<BsonElement>
-    ) : this(
-        linkedMapOf(
-            *bsonElements
-                .map { bsonElement -> Pair(bsonElement.name, bsonElement.value) }
-                .toTypedArray()))
+    ) : this(bsonElements.associate { Pair(it.name, it.value) })
 
     /**
      * Construct a new instance with the varargs of key value pairs
      * @param pairs the initial pairs of values
      */
-    public constructor(vararg pairs: Pair<String, BsonValue>) : this(linkedMapOf(*pairs))
+    public constructor(vararg pairs: Pair<String, BsonValue>) : this(pairs.toMap())
 
     override val entries: MutableSet<MutableMap.MutableEntry<String, BsonValue>>
         get() = wrapped.entries

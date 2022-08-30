@@ -63,6 +63,7 @@ class BsonDocumentTest {
         assertEquals(BsonType.DOCUMENT, bsonDocument.bsonType)
     }
 
+    @Suppress("LongMethod")
     @Test
     fun conversionMethodsShouldBehaveCorrectlyForTheHappyPath() {
         val document =

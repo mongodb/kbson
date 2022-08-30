@@ -18,16 +18,16 @@ package org.kbson.internal
 import java.util.concurrent.atomic.AtomicInteger
 
 /** A Jvm wrapper of atomic integer */
-internal actual class AtomicInt actual constructor(value: Int) {
+internal actual class AtomicInt actual constructor(initial: Int) {
 
-    val atomicInt: AtomicInteger
+    private val value: AtomicInteger
 
     init {
-        atomicInt = AtomicInteger(value)
+        this.value = AtomicInteger(initial)
     }
 
     /** Gets the current value */
-    actual fun getValue(): Int = atomicInt.get()
+    actual fun getValue(): Int = value.get()
 
     /**
      * Increments the value by [delta] and returns the new value.
@@ -35,7 +35,7 @@ internal actual class AtomicInt actual constructor(value: Int) {
      * @param delta the value to add
      * @return the new value
      */
-    actual fun addAndGet(delta: Int): Int = atomicInt.addAndGet(delta)
+    actual fun addAndGet(delta: Int): Int = value.addAndGet(delta)
 
     /**
      * Compares value with [expected] and replaces it with [new] value if values matches.
@@ -44,16 +44,15 @@ internal actual class AtomicInt actual constructor(value: Int) {
      * @param new the new value
      * @return true if successful
      */
-    actual fun compareAndSet(expected: Int, new: Int): Boolean =
-        atomicInt.compareAndSet(expected, new)
+    actual fun compareAndSet(expected: Int, new: Int): Boolean = value.compareAndSet(expected, new)
 
     /** Increments value by one. */
     actual fun increment() {
-        atomicInt.incrementAndGet()
+        value.incrementAndGet()
     }
 
     /** Decrements value by one. */
     actual fun decrement() {
-        atomicInt.decrementAndGet()
+        value.decrementAndGet()
     }
 }

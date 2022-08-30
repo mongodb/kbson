@@ -16,6 +16,7 @@
 package org.kbson
 
 /** Base class for any BSON type. */
+@Suppress("TooManyFunctions")
 public sealed class BsonValue {
 
     /**

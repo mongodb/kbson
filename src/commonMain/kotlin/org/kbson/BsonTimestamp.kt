@@ -26,6 +26,7 @@ package org.kbson
  * @constructor construct a new instance
  * @property value the timestamp
  */
+@Suppress("MagicNumber")
 public class BsonTimestamp(public val value: Long = 0) : BsonValue(), Comparable<BsonTimestamp> {
 
     /**

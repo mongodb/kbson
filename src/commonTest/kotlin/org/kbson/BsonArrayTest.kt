@@ -109,6 +109,46 @@ class BsonArrayTest {
     }
 
     @Test
+    fun shouldSupportMutableListMethods() {
+        val mutableList = BsonArray()
+
+        assertTrue(mutableList.add(BsonBoolean.TRUE))
+        assertFalse(mutableList.isEmpty())
+        assertTrue(mutableList.remove(BsonBoolean.TRUE))
+        assertTrue(mutableList.isEmpty())
+
+        assertTrue(mutableList.addAll(listOfBsonValues))
+        assertFalse(mutableList.isEmpty())
+        assertTrue(mutableList.removeAll(listOfBsonValues))
+        assertTrue(mutableList.isEmpty())
+
+        mutableList.addAll(listOf(BsonNull, BsonBoolean.TRUE, BsonBoolean.FALSE, BsonUndefined))
+        assertEquals(BsonNull, mutableList.removeAt(0))
+        assertEquals(3, mutableList.size)
+
+        mutableList.add(0, BsonNull)
+        assertEquals(4, mutableList.size)
+        mutableList.add(BsonMaxKey)
+        assertEquals(5, mutableList.size)
+
+        assertEquals(BsonNull, mutableList.set(0, BsonMinKey))
+        assertEquals(BsonMinKey, mutableList.first())
+
+        val expected =
+            listOf(BsonMinKey, BsonBoolean.TRUE, BsonBoolean.FALSE, BsonUndefined, BsonMaxKey)
+        assertContentEquals(expected, mutableList.values)
+
+        assertTrue(mutableList.retainAll(listOf(BsonMinKey, BsonMaxKey, BsonUndefined)))
+        assertContentEquals(listOf(BsonMinKey, BsonUndefined, BsonMaxKey), mutableList.values)
+
+        assertTrue(mutableList.addAll(1, listOf(BsonBoolean.TRUE, BsonBoolean.FALSE)))
+        assertEquals(expected, mutableList.values)
+
+        mutableList.clear()
+        assertTrue(mutableList.isEmpty())
+    }
+
+    @Test
     fun cloneShouldMakeADeepCopyOfAllMutableBsonValueTypes() {
         val bsonArray =
             BsonArray(

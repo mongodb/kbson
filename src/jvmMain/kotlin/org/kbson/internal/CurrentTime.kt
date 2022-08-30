@@ -17,9 +17,11 @@ package org.kbson.internal
 
 internal actual object CurrentTime {
 
+    private const val millisInASecond: Int = 1000
+
     /** @return the current time in milliseconds since epoch */
     actual fun getCurrentTimeInMillis(): Long = System.currentTimeMillis()
 
     /** @return the current time in seconds since epoch */
-    actual fun getCurrentTimeInSeconds(): Int = (getCurrentTimeInMillis() / 1000).toInt()
+    actual fun getCurrentTimeInSeconds(): Int = (getCurrentTimeInMillis() / millisInASecond).toInt()
 }
