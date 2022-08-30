@@ -24,9 +24,8 @@ import kotlin.jvm.JvmStatic
  */
 public object BsonUndefined : BsonValue() {
 
-    override fun getBsonType(): BsonType {
-        return BsonType.UNDEFINED
-    }
+    override val bsonType: BsonType
+        get() = BsonType.UNDEFINED
 
     override fun toString(): String {
         return "BsonUndefined()"

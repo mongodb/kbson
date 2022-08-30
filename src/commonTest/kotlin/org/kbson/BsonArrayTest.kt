@@ -32,7 +32,7 @@ class BsonArrayTest {
     @Test
     fun shouldHaveTheExpectedBsonType() {
         assertTrue { bsonValue.isArray() }
-        assertEquals(BsonType.ARRAY, BsonArray().getBsonType())
+        assertEquals(BsonType.ARRAY, BsonArray().bsonType)
     }
 
     @Test
@@ -41,7 +41,7 @@ class BsonArrayTest {
 
         assertTrue(bsonValue.isEmpty())
         assertEquals(0, bsonValue.size)
-        assertTrue(bsonValue.getValues().isEmpty())
+        assertTrue(bsonValue.values.isEmpty())
     }
 
     @Test
@@ -50,14 +50,14 @@ class BsonArrayTest {
 
         assertTrue(bsonValue.isEmpty())
         assertEquals(0, bsonValue.size)
-        assertTrue(bsonValue.getValues().isEmpty())
+        assertTrue(bsonValue.values.isEmpty())
     }
 
     @Test
     fun shouldConstructFromAList() {
         assertFalse(bsonValue.isEmpty())
         assertEquals(2, bsonValue.size)
-        assertContentEquals(listOfBsonValues, bsonValue.getValues())
+        assertContentEquals(listOfBsonValues, bsonValue.values)
     }
 
     @Test

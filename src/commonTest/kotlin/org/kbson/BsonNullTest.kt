@@ -26,7 +26,7 @@ class BsonNullTest {
     @Test
     fun shouldHaveTheExpectedBsonType() {
         assertTrue { bsonValue.isNull() }
-        assertEquals(BsonType.NULL, bsonValue.getBsonType())
+        assertEquals(BsonType.NULL, bsonValue.bsonType)
     }
 
     @Test

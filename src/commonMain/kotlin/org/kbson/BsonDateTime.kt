@@ -28,9 +28,8 @@ public class BsonDateTime(public val value: Long) : BsonValue(), Comparable<Bson
     /** Construct a new instance with 'now' as the current date time */
     public constructor() : this(getCurrentTimeInMillis())
 
-    override fun getBsonType(): BsonType {
-        return BsonType.DATE_TIME
-    }
+    override val bsonType: BsonType
+        get() = BsonType.DATE_TIME
 
     override fun compareTo(other: BsonDateTime): Int {
         return value.compareTo(other.value)

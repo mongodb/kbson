@@ -27,7 +27,7 @@ class BsonSymbolTest {
     @Test
     fun shouldHaveTheExpectedBsonType() {
         assertTrue { bsonValue.isSymbol() }
-        assertEquals(BsonType.SYMBOL, bsonValue.getBsonType())
+        assertEquals(BsonType.SYMBOL, bsonValue.bsonType)
     }
 
     @Test

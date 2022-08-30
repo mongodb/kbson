@@ -28,7 +28,7 @@ class BsonInt64Test {
     fun shouldHaveTheExpectedBsonType() {
         assertTrue { bsonValue.isInt64() }
         assertTrue { bsonValue.isNumber() }
-        assertEquals(BsonType.INT64, bsonValue.getBsonType())
+        assertEquals(BsonType.INT64, bsonValue.bsonType)
     }
 
     @Test

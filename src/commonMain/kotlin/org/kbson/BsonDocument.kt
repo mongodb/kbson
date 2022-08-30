@@ -91,9 +91,8 @@ public class BsonDocument(map: Map<String, BsonValue> = LinkedHashMap()) :
         return wrapped.put(key, value)
     }
 
-    override fun getBsonType(): BsonType {
-        return BsonType.DOCUMENT
-    }
+    override val bsonType: BsonType
+        get() = BsonType.DOCUMENT
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

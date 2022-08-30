@@ -26,7 +26,7 @@ class BsonBooleanTest {
     @Test
     fun shouldHaveTheExpectedBsonType() {
         assertTrue { BsonBoolean.TRUE.isBoolean() }
-        assertEquals(BsonType.BOOLEAN, BsonBoolean.TRUE.getBsonType())
+        assertEquals(BsonType.BOOLEAN, BsonBoolean.TRUE.bsonType)
     }
 
     @Test

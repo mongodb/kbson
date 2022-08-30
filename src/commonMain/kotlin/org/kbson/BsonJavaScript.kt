@@ -22,9 +22,8 @@ package org.kbson
  * @property code the javascript code as a string
  */
 public class BsonJavaScript(public val code: String) : BsonValue() {
-    override fun getBsonType(): BsonType {
-        return BsonType.JAVASCRIPT
-    }
+    override val bsonType: BsonType
+        get() = BsonType.JAVASCRIPT
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

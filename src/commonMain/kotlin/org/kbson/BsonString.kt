@@ -21,9 +21,8 @@ package org.kbson
  * @property value the string value
  */
 public class BsonString(public val value: String) : BsonValue(), Comparable<BsonString> {
-    override fun getBsonType(): BsonType {
-        return BsonType.STRING
-    }
+    override val bsonType: BsonType
+        get() = BsonType.STRING
 
     override fun compareTo(other: BsonString): Int {
         return value.compareTo(other.value)

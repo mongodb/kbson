@@ -25,9 +25,8 @@ import kotlin.jvm.JvmStatic
  */
 public class BsonBoolean(public val value: Boolean) : BsonValue(), Comparable<BsonBoolean> {
 
-    override fun getBsonType(): BsonType {
-        return BsonType.BOOLEAN
-    }
+    override val bsonType: BsonType
+        get() = BsonType.BOOLEAN
 
     override fun compareTo(other: BsonBoolean): Int {
         return value.compareTo(other.value)

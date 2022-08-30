@@ -28,7 +28,7 @@ class BsonJavaScriptTest {
     @Test
     fun shouldHaveTheExpectedBsonType() {
         assertTrue { bsonValue.isJavaScript() }
-        assertEquals(BsonType.JAVASCRIPT, bsonValue.getBsonType())
+        assertEquals(BsonType.JAVASCRIPT, bsonValue.bsonType)
     }
 
     @Test

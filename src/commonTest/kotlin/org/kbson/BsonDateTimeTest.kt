@@ -28,7 +28,7 @@ class BsonDateTimeTest {
     @Test
     fun shouldHaveTheExpectedBsonType() {
         assertTrue { bsonDateTime.isDateTime() }
-        assertEquals(BsonType.DATE_TIME, bsonDateTime.getBsonType())
+        assertEquals(BsonType.DATE_TIME, bsonDateTime.bsonType)
     }
 
     @Test

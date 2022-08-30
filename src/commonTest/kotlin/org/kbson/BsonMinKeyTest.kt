@@ -27,7 +27,7 @@ class BsonMinKeyTest {
     @Test
     fun shouldHaveTheExpectedBsonType() {
         assertTrue { bsonValue.isMinKey() }
-        assertEquals(BsonType.MIN_KEY, bsonValue.getBsonType())
+        assertEquals(BsonType.MIN_KEY, bsonValue.bsonType)
     }
 
     @Test

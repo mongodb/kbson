@@ -26,7 +26,7 @@ class BsonUndefinedTest {
     @Test
     fun shouldHaveTheExpectedBsonType() {
         assertTrue { bsonValue.isUndefined() }
-        assertEquals(BsonType.UNDEFINED, bsonValue.getBsonType())
+        assertEquals(BsonType.UNDEFINED, bsonValue.bsonType)
     }
 
     @Test

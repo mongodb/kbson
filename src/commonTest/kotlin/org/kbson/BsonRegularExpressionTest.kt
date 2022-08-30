@@ -29,7 +29,7 @@ class BsonRegularExpressionTest {
     @Test
     fun shouldHaveTheExpectedBsonType() {
         assertTrue { bsonValue.isRegularExpression() }
-        assertEquals(BsonType.REGULAR_EXPRESSION, bsonValue.getBsonType())
+        assertEquals(BsonType.REGULAR_EXPRESSION, bsonValue.bsonType)
     }
 
     @Test

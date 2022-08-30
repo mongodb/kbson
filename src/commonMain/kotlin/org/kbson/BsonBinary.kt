@@ -53,9 +53,8 @@ public class BsonBinary(public val type: Byte, public val data: ByteArray) : Bso
         return BsonBinary(type, data.copyOf())
     }
 
-    override fun getBsonType(): BsonType {
-        return BsonType.BINARY
-    }
+    override val bsonType: BsonType
+        get() = BsonType.BINARY
 
     override fun toString(): String {
         return "BsonBinary{type=$type, data=$data}"

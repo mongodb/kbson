@@ -27,9 +27,8 @@ package org.kbson
 public class BsonDbPointer(public val namespace: String, public val id: BsonObjectId) :
     BsonValue() {
 
-    override fun getBsonType(): BsonType {
-        return BsonType.DB_POINTER
-    }
+    override val bsonType: BsonType
+        get() = BsonType.DB_POINTER
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

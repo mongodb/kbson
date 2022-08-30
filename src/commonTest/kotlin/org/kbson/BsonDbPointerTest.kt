@@ -29,7 +29,7 @@ class BsonDbPointerTest {
     @Test
     fun shouldHaveTheExpectedBsonType() {
         assertTrue { bsonValue.isDBPointer() }
-        assertEquals(BsonType.DB_POINTER, bsonValue.getBsonType())
+        assertEquals(BsonType.DB_POINTER, bsonValue.bsonType)
     }
 
     @Test

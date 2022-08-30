@@ -23,9 +23,9 @@ package org.kbson
  */
 public class BsonArray(initial: List<BsonValue> = emptyList()) :
     BsonValue(), MutableList<BsonValue> {
-    private val values: MutableList<BsonValue>
+    private val _values: MutableList<BsonValue>
     init {
-        values = initial.toMutableList()
+        _values = initial.toMutableList()
     }
 
     /**
@@ -36,16 +36,14 @@ public class BsonArray(initial: List<BsonValue> = emptyList()) :
      */
     public constructor(initialCapacity: Int) : this(ArrayList<BsonValue>(initialCapacity))
 
-    /**
-     * Gets the values in this array as a list of BsonValue objects.
-     * @return the BsonValues in this array
-     */
-    public fun getValues(): List<BsonValue> = values.toList()
+    /** The values in this array as a list of BsonValue objects. */
+    public val values: List<BsonValue>
+        get() = _values.toList()
 
     /** Creates and returns a deep copy of this object */
     public fun clone(): BsonArray {
         val clonedValues =
-            values.fold(ArrayList<BsonValue>(values.size)) { list, value ->
+            _values.fold(ArrayList<BsonValue>(_values.size)) { list, value ->
                 if (value.isArray()) {
                     list.add(value.asArray().clone())
                 } else if (value.isDocument()) {
@@ -58,95 +56,94 @@ public class BsonArray(initial: List<BsonValue> = emptyList()) :
         return BsonArray(clonedValues)
     }
 
-    override fun getBsonType(): BsonType {
-        return BsonType.ARRAY
-    }
+    override val bsonType: BsonType
+        get() = BsonType.ARRAY
 
     override fun contains(element: BsonValue): Boolean {
-        return values.contains(element)
+        return _values.contains(element)
     }
 
     override fun containsAll(elements: Collection<BsonValue>): Boolean {
-        return values.containsAll(elements)
+        return _values.containsAll(elements)
     }
 
     override fun get(index: Int): BsonValue {
-        return values[index]
+        return _values[index]
     }
 
     override fun isEmpty(): Boolean {
-        return values.isEmpty()
+        return _values.isEmpty()
     }
 
     override fun iterator(): MutableIterator<BsonValue> {
-        return values.iterator()
+        return _values.iterator()
     }
 
     override fun listIterator(): MutableListIterator<BsonValue> {
-        return values.listIterator()
+        return _values.listIterator()
     }
 
     override fun listIterator(index: Int): MutableListIterator<BsonValue> {
-        return values.listIterator(index)
+        return _values.listIterator(index)
     }
 
     override fun remove(element: BsonValue): Boolean {
-        return values.remove(element)
+        return _values.remove(element)
     }
 
     override fun removeAll(elements: Collection<BsonValue>): Boolean {
-        return values.removeAll(elements)
+        return _values.removeAll(elements)
     }
 
     override fun removeAt(index: Int): BsonValue {
-        return values.removeAt(index)
+        return _values.removeAt(index)
     }
 
     override fun retainAll(elements: Collection<BsonValue>): Boolean {
-        return values.retainAll(elements)
+        return _values.retainAll(elements)
     }
 
     override fun set(index: Int, element: BsonValue): BsonValue {
-        return values.set(index, element)
+        return _values.set(index, element)
     }
 
     override fun subList(fromIndex: Int, toIndex: Int): MutableList<BsonValue> {
-        return values.subList(fromIndex, toIndex)
+        return _values.subList(fromIndex, toIndex)
     }
 
     override fun lastIndexOf(element: BsonValue): Int {
-        return values.lastIndexOf(element)
+        return _values.lastIndexOf(element)
     }
 
     override fun indexOf(element: BsonValue): Int {
-        return values.indexOf(element)
+        return _values.indexOf(element)
     }
 
     override fun toString(): String {
-        return "BsonArray{values=$values}"
+        return "BsonArray{values=$_values}"
     }
 
     override val size: Int
-        get() = values.size
+        get() = _values.size
 
     override fun clear() {
-        values.clear()
+        _values.clear()
     }
 
     override fun addAll(elements: Collection<BsonValue>): Boolean {
-        return values.addAll(elements)
+        return _values.addAll(elements)
     }
 
     override fun addAll(index: Int, elements: Collection<BsonValue>): Boolean {
-        return values.addAll(index, elements)
+        return _values.addAll(index, elements)
     }
 
     override fun add(index: Int, element: BsonValue) {
-        values.add(index, element)
+        _values.add(index, element)
     }
 
     override fun add(element: BsonValue): Boolean {
-        return values.add(element)
+        return _values.add(element)
     }
 
     override fun equals(other: Any?): Boolean {
@@ -155,12 +152,12 @@ public class BsonArray(initial: List<BsonValue> = emptyList()) :
 
         other as BsonArray
 
-        if (values != other.values) return false
+        if (_values != other._values) return false
 
         return true
     }
 
     override fun hashCode(): Int {
-        return values.hashCode()
+        return _values.hashCode()
     }
 }

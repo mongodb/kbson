@@ -24,18 +24,12 @@ package org.kbson
  */
 public class BsonSymbol(public val value: String) : BsonValue() {
 
-    /**
-     * Gets the symbol value
-     *
-     * @return the symbol.
-     */
-    public fun getSymbol(): String {
-        return value
-    }
+    /** Gets the symbol value */
+    public val symbol: String
+        get() = value
 
-    override fun getBsonType(): BsonType {
-        return BsonType.SYMBOL
-    }
+    override val bsonType: BsonType
+        get() = BsonType.SYMBOL
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

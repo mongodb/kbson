@@ -24,9 +24,8 @@ package org.kbson
  */
 public class BsonJavaScriptWithScope(public val code: String, public val scope: BsonDocument) :
     BsonValue() {
-    override fun getBsonType(): BsonType {
-        return BsonType.JAVASCRIPT_WITH_SCOPE
-    }
+    override val bsonType: BsonType
+        get() = BsonType.JAVASCRIPT_WITH_SCOPE
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

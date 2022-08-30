@@ -23,7 +23,7 @@ public sealed class BsonValue {
      *
      * @return the BSON type
      */
-    public abstract fun getBsonType(): BsonType
+    public abstract val bsonType: BsonType
 
     /** @return true if this is a BsonNull, false otherwise */
     public fun isNull(): Boolean {
@@ -175,11 +175,11 @@ public sealed class BsonValue {
      * @throws org.kbson.BsonInvalidOperationException if this value is not of the expected type
      */
     public fun asNumber(): BsonNumber {
-        if (getBsonType() !== BsonType.INT32 &&
-            getBsonType() !== BsonType.INT64 &&
-            getBsonType() !== BsonType.DOUBLE) {
+        if (bsonType !== BsonType.INT32 &&
+            bsonType !== BsonType.INT64 &&
+            bsonType !== BsonType.DOUBLE) {
             throw BsonInvalidOperationException(
-                "Value expected to be of a numerical BSON type is of unexpected type ${getBsonType()}")
+                "Value expected to be of a numerical BSON type is of unexpected type $bsonType")
         }
         return this as BsonNumber
     }
@@ -339,9 +339,9 @@ public sealed class BsonValue {
     }
 
     private fun throwIfInvalidType(expectedType: BsonType) {
-        if (getBsonType() !== expectedType) {
+        if (bsonType !== expectedType) {
             throw BsonInvalidOperationException(
-                "Value expected to be of type $expectedType is of unexpected type ${getBsonType()}")
+                "Value expected to be of type $expectedType is of unexpected type ${bsonType}")
         }
     }
 }

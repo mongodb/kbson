@@ -27,7 +27,7 @@ class BsonMaxKeyTest {
     @Test
     fun shouldHaveTheExpectedBsonType() {
         assertTrue { bsonValue.isMaxKey() }
-        assertEquals(BsonType.MAX_KEY, bsonValue.getBsonType())
+        assertEquals(BsonType.MAX_KEY, bsonValue.bsonType)
     }
 
     @Test

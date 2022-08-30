@@ -21,14 +21,10 @@ package org.kbson
  * @constructor constructs a new instance with the given value
  * @property value the value
  */
-public class BsonInt32(public val value: Int) : BsonNumber(), Comparable<BsonInt32> {
-    override fun getNumber(): Number {
-        return value
-    }
+public class BsonInt32(public val value: Int) : BsonNumber(value), Comparable<BsonInt32> {
 
-    override fun getBsonType(): BsonType {
-        return BsonType.INT32
-    }
+    override val bsonType: BsonType
+        get() = BsonType.INT32
 
     override fun compareTo(other: BsonInt32): Int {
         return value.compareTo(other.value)

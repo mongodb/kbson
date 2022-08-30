@@ -38,9 +38,8 @@ public class BsonRegularExpression(public val pattern: String, options: String) 
      */
     public constructor(pattern: String) : this(pattern, "")
 
-    override fun getBsonType(): BsonType {
-        return BsonType.REGULAR_EXPRESSION
-    }
+    override val bsonType: BsonType
+        get() = BsonType.REGULAR_EXPRESSION
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

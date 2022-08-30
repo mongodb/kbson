@@ -17,9 +17,8 @@ package org.kbson
 
 /** A representation of the BSON the minimum key value regardless of the key's type */
 public object BsonMinKey : BsonValue() {
-    override fun getBsonType(): BsonType {
-        return BsonType.MIN_KEY
-    }
+    override val bsonType: BsonType
+        get() = BsonType.MIN_KEY
 
     override fun toString(): String {
         return "BsonMinKey()"

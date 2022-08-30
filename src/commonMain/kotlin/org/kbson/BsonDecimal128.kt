@@ -25,9 +25,8 @@ package org.kbson
  */
 public class BsonDecimal128(public val high: Long, public val low: Long) : BsonValue() {
 
-    override fun getBsonType(): BsonType {
-        return BsonType.DECIMAL128
-    }
+    override val bsonType: BsonType
+        get() = BsonType.DECIMAL128
 
     /**
      * Returns true if this Decimal128 is negative.

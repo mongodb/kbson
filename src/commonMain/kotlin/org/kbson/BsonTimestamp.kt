@@ -32,30 +32,23 @@ public class BsonTimestamp(public val value: Long = 0) : BsonValue(), Comparable
      * Construct a new instance for the given time and increment.
      *
      * @param seconds the number of seconds since the epoch
-     * @param increment the increment.
+     * @param increment the incrementing ordinal for operations within a given second.
      */
     public constructor(
         seconds: Int,
         increment: Int
     ) : this((seconds.toLong() shl 32) or (increment.toLong() and 0xFFFFFFFFL))
 
-    /**
-     * Gets the time in seconds since epoch.
-     *
-     * @return an int representing time in seconds since epoch
-     */
-    public fun getTime(): Int = (value shr 32).toInt()
+    /** Gets the time in seconds since epoch. */
+    public val time: Int
+        get() = (value shr 32).toInt()
 
-    /**
-     * Gets the increment value.
-     *
-     * @return an incrementing ordinal for operations within a given second
-     */
-    public fun getInc(): Int = value.toInt()
+    /** Gets the incrementing ordinal for operations within a given second */
+    public val inc: Int
+        get() = value.toInt()
 
-    override fun getBsonType(): BsonType {
-        return BsonType.TIMESTAMP
-    }
+    override val bsonType: BsonType
+        get() = BsonType.TIMESTAMP
 
     override fun compareTo(other: BsonTimestamp): Int {
         return value.compareTo(other.value)

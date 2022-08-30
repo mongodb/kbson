@@ -91,9 +91,8 @@ public class BsonObjectId(
         return chars.concatToString()
     }
 
-    override fun getBsonType(): BsonType {
-        return BsonType.OBJECT_ID
-    }
+    override val bsonType: BsonType
+        get() = BsonType.OBJECT_ID
 
     override fun toString(): String {
         return "BsonObjectId(${toHexString()})"

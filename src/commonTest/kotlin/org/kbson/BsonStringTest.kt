@@ -27,7 +27,7 @@ class BsonStringTest {
     @Test
     fun shouldHaveTheExpectedBsonType() {
         assertTrue { bsonValue.isString() }
-        assertEquals(BsonType.STRING, bsonValue.getBsonType())
+        assertEquals(BsonType.STRING, bsonValue.bsonType)
     }
 
     @Test

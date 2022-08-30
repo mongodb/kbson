@@ -28,7 +28,7 @@ class BsonDecimal128Test {
     @Test
     fun shouldHaveTheExpectedBsonType() {
         assertTrue { bsonValue.isDecimal128() }
-        assertEquals(BsonType.DECIMAL128, bsonValue.getBsonType())
+        assertEquals(BsonType.DECIMAL128, bsonValue.bsonType)
     }
 
     @Test

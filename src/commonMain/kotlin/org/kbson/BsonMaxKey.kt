@@ -17,9 +17,8 @@ package org.kbson
 
 /** A representation of the BSON the maximum key value regardless of the key's type */
 public object BsonMaxKey : BsonValue() {
-    override fun getBsonType(): BsonType {
-        return BsonType.MAX_KEY
-    }
+    override val bsonType: BsonType
+        get() = BsonType.MAX_KEY
 
     override fun toString(): String {
         return "BsonMaxKey()"

@@ -27,14 +27,14 @@ class BsonTimestampTest {
     @Test
     fun shouldHaveTheExpectedBsonType() {
         assertTrue { bsonValue.isTimestamp() }
-        assertEquals(BsonType.TIMESTAMP, bsonValue.getBsonType())
+        assertEquals(BsonType.TIMESTAMP, bsonValue.bsonType)
     }
 
     @Test
     fun shouldHaveAccessToTheUnderlyingValues() {
         val bsonValue = BsonTimestamp(120, 55)
-        assertEquals(120, bsonValue.getTime())
-        assertEquals(55, bsonValue.getInc())
+        assertEquals(120, bsonValue.time)
+        assertEquals(55, bsonValue.inc)
         assertEquals(515396075575, bsonValue.value)
     }
 

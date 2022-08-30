@@ -29,7 +29,7 @@ class BsonJavaScriptWithScopeTest {
     @Test
     fun shouldHaveTheExpectedBsonType() {
         assertTrue { bsonValue.isJavaScriptWithScope() }
-        assertEquals(BsonType.JAVASCRIPT_WITH_SCOPE, bsonValue.getBsonType())
+        assertEquals(BsonType.JAVASCRIPT_WITH_SCOPE, bsonValue.bsonType)
     }
 
     @Test

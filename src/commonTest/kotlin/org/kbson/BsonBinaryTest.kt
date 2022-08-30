@@ -30,7 +30,7 @@ class BsonBinaryTest {
     @Test
     fun shouldHaveTheExpectedBsonType() {
         assertTrue { BsonBinary(data).isBinary() }
-        assertEquals(BsonType.BINARY, BsonBinary(data).getBsonType())
+        assertEquals(BsonType.BINARY, BsonBinary(data).bsonType)
     }
 
     @Test

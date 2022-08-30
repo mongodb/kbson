@@ -19,9 +19,8 @@ import kotlin.jvm.JvmStatic
 
 /** A representation of the BSON Null type. */
 public object BsonNull : BsonValue() {
-    override fun getBsonType(): BsonType {
-        return BsonType.NULL
-    }
+    override val bsonType: BsonType
+        get() = BsonType.NULL
 
     override fun toString(): String {
         return "BsonNull()"

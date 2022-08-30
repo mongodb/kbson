@@ -28,7 +28,7 @@ class BsonDoubleTest {
     fun shouldHaveTheExpectedBsonType() {
         assertTrue { bsonValue.isDouble() }
         assertTrue { bsonValue.isNumber() }
-        assertEquals(BsonType.DOUBLE, bsonValue.getBsonType())
+        assertEquals(BsonType.DOUBLE, bsonValue.bsonType)
     }
 
     @Test

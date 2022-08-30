@@ -28,7 +28,7 @@ class BsonObjectIdTest {
     @Test
     fun shouldHaveTheExpectedBsonType() {
         assertTrue { bsonValue.isObjectId() }
-        assertEquals(BsonType.OBJECT_ID, bsonValue.getBsonType())
+        assertEquals(BsonType.OBJECT_ID, bsonValue.bsonType)
     }
 
     @Test

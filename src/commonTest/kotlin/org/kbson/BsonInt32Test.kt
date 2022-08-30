@@ -28,7 +28,7 @@ class BsonInt32Test {
     fun shouldHaveTheExpectedBsonType() {
         assertTrue { bsonValue.isInt32() }
         assertTrue { bsonValue.isNumber() }
-        assertEquals(BsonType.INT32, bsonValue.getBsonType())
+        assertEquals(BsonType.INT32, bsonValue.bsonType)
     }
 
     @Test

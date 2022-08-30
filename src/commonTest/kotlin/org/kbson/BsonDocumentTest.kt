@@ -60,7 +60,7 @@ class BsonDocumentTest {
     @Test
     fun shouldHaveTheExpectedBsonType() {
         assertTrue { bsonDocument.isDocument() }
-        assertEquals(BsonType.DOCUMENT, bsonDocument.getBsonType())
+        assertEquals(BsonType.DOCUMENT, bsonDocument.bsonType)
     }
 
     @Test
