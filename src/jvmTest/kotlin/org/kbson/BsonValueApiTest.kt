@@ -16,10 +16,11 @@
 package org.kbson
 
 import java.lang.reflect.Constructor
-import java.util.*
 import kotlin.jvm.internal.DefaultConstructorMarker
 import kotlin.test.assertEquals
 import org.junit.jupiter.api.Test
+import java.util.Collections
+import java.util.UUID
 
 class BsonValueApiTest {
 
