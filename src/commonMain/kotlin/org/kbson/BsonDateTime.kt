@@ -15,7 +15,7 @@
  */
 package org.kbson
 
-import org.kbson.internal.ext.getCurrentTimeInMillis
+import org.kbson.internal.CurrentTime.getCurrentTimeInMillis
 
 /**
  * A representation of the BSON DateTime type.

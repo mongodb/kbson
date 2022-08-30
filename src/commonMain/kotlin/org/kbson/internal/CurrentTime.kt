@@ -13,10 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.kbson.internal.ext
+package org.kbson.internal
 
-import kotlin.js.Date
+internal expect object CurrentTime {
 
-internal actual fun getCurrentTimeInMillis(): Long = Date.now().toLong()
+    /** @return the current time in milliseconds since epoch */
+    fun getCurrentTimeInMillis(): Long
 
-internal actual fun getCurrentTimeInSeconds(): Int = (getCurrentTimeInMillis() / 1000).toInt()
+    /** @return the current time in seconds since epoch */
+    fun getCurrentTimeInSeconds(): Int
+}

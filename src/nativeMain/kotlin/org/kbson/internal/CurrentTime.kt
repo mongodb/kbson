@@ -13,10 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.kbson.internal.ext
+package org.kbson.internal
 
-/** @return the current time in milliseconds since epoch */
-internal expect fun getCurrentTimeInMillis(): Long
+import kotlin.system.getTimeMillis
 
-/** @return the current time in seconds since epoch */
-internal expect fun getCurrentTimeInSeconds(): Int
+internal actual object CurrentTime {
+    /** @return the current time in milliseconds since epoch */
+    actual fun getCurrentTimeInMillis(): Long = getTimeMillis()
+
+    /** @return the current time in seconds since epoch */
+    actual fun getCurrentTimeInSeconds(): Int = (getCurrentTimeInMillis() / 1000).toInt()
+}

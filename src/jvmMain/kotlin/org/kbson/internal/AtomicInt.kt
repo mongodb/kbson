@@ -13,21 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.kbson.internal.ext
+package org.kbson.internal
 
-import kotlin.native.concurrent.AtomicInt
+import java.util.concurrent.atomic.AtomicInteger
 
-/** A Kotlin native wrapper of atomic integer */
+/** A Jvm wrapper of atomic integer */
 internal actual class AtomicInt actual constructor(value: Int) {
 
-    val atomicInt: AtomicInt
+    val atomicInt: AtomicInteger
 
     init {
-        atomicInt = AtomicInt(value)
+        atomicInt = AtomicInteger(value)
     }
 
     /** Gets the current value */
-    actual fun getValue(): Int = atomicInt.value
+    actual fun getValue(): Int = atomicInt.get()
 
     /**
      * Increments the value by [delta] and returns the new value.
@@ -48,8 +48,12 @@ internal actual class AtomicInt actual constructor(value: Int) {
         atomicInt.compareAndSet(expected, new)
 
     /** Increments value by one. */
-    actual fun increment() = atomicInt.increment()
+    actual fun increment() {
+        atomicInt.incrementAndGet()
+    }
 
     /** Decrements value by one. */
-    actual fun decrement() = atomicInt.decrement()
+    actual fun decrement() {
+        atomicInt.decrementAndGet()
+    }
 }

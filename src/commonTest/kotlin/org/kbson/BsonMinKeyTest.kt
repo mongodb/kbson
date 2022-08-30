@@ -23,6 +23,7 @@ import kotlin.test.assertTrue
 class BsonMinKeyTest {
 
     private val bsonValue = BsonMinKey
+
     @Test
     fun shouldHaveTheExpectedBsonType() {
         assertTrue { bsonValue.isMinKey() }

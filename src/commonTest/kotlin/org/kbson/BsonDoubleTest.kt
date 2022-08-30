@@ -20,7 +20,6 @@ import kotlin.test.assertEquals
 import kotlin.test.assertNotEquals
 import kotlin.test.assertTrue
 
-
 class BsonDoubleTest {
 
     private val bsonValue = BsonDouble(Double.MAX_VALUE)

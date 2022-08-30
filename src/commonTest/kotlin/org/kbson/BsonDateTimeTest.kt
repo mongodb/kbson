@@ -19,7 +19,7 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotEquals
 import kotlin.test.assertTrue
-import org.kbson.internal.ext.getCurrentTimeInMillis
+import org.kbson.internal.CurrentTime.getCurrentTimeInMillis
 
 class BsonDateTimeTest {
 

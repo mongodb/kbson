@@ -65,7 +65,6 @@ class BsonDocumentTest {
 
     @Test
     fun conversionMethodsShouldBehaveCorrectlyForTheHappyPath() {
-
         val document =
             BsonDocument(
                 Pair("null", bsonNull),

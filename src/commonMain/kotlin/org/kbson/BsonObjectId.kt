@@ -15,8 +15,8 @@
  */
 package org.kbson
 
-import org.kbson.internal.ext.AtomicInt
-import org.kbson.internal.ext.getCurrentTimeInSeconds
+import org.kbson.internal.AtomicInt
+import org.kbson.internal.CurrentTime.getCurrentTimeInSeconds
 
 /**
  * A representation of the BSON ObjectId type

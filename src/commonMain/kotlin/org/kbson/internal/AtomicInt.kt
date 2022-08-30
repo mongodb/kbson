@@ -13,34 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.kbson.internal.ext
+package org.kbson.internal
 
-/**
- * Js version of an atomic integer
- *
- * In JavaScript, a function always runs to completion, before any other function is called. So
- * there no locking required to protect the int.
- */
-internal actual class AtomicInt actual constructor(value: Int) {
-
-    private var atomicInt: Int
-
-    init {
-        atomicInt = value
-    }
+/** Cross-platform atomic integer */
+internal expect class AtomicInt(value: Int) {
 
     /** Gets the current value */
-    actual fun getValue(): Int = atomicInt
+    fun getValue(): Int
+
     /**
      * Increments the value by [delta] and returns the new value.
      *
      * @param delta the value to add
      * @return the new value
      */
-    actual fun addAndGet(delta: Int): Int {
-        atomicInt += delta
-        return atomicInt
-    }
+    fun addAndGet(delta: Int): Int
 
     /**
      * Compares value with [expected] and replaces it with [new] value if values matches.
@@ -49,21 +36,11 @@ internal actual class AtomicInt actual constructor(value: Int) {
      * @param new the new value
      * @return true if successful
      */
-    actual fun compareAndSet(expected: Int, new: Int): Boolean {
-        if (atomicInt == expected) {
-            atomicInt = new
-            return true
-        }
-        return false
-    }
+    fun compareAndSet(expected: Int, new: Int): Boolean
 
     /** Increments value by one. */
-    actual fun increment() {
-        atomicInt++
-    }
+    fun increment()
 
     /** Decrements value by one. */
-    actual fun decrement() {
-        atomicInt--
-    }
+    fun decrement()
 }
