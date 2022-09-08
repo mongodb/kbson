@@ -18,7 +18,7 @@ package org.kbson
 /**
  * Base class for the numeric BSON types.
  *
- * <p>This class mirrors the functionality provided by the java `Number` class.
+ * <p>This class mirrors the functionality provided by the Kotlin `Number` class.
  */
 public abstract class BsonNumber(private val number: Number) : BsonValue() {
 
