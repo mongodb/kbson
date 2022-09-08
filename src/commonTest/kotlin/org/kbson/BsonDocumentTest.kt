@@ -42,7 +42,8 @@ class BsonDocumentTest {
     private val bsonSymbol = BsonSymbol("ruby stuff")
     private val bsonTimestamp = BsonTimestamp(0x12345678, 5)
     private val bsonUndefined = BsonUndefined
-    private val bsonBinary = BsonBinary(80.toByte(), listOf(5.toByte(), 4.toByte(), 3.toByte(), 2.toByte(), 1.toByte()).toByteArray())
+    private val bsonBinary =
+        BsonBinary(80.toByte(), listOf(5.toByte(), 4.toByte(), 3.toByte(), 2.toByte(), 1.toByte()).toByteArray())
     private val bsonArray =
         BsonArray(
             listOf(

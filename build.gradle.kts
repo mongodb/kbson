@@ -79,7 +79,8 @@ kotlin {
 // Output summaries for all test environments (jvm, js and native)
 tasks.withType<AbstractTestTask> {
     testLogging {
-        events = setOf(TestLogEvent.FAILED, TestLogEvent.SKIPPED, TestLogEvent.STANDARD_OUT, TestLogEvent.STANDARD_ERROR)
+        events =
+            setOf(TestLogEvent.FAILED, TestLogEvent.SKIPPED, TestLogEvent.STANDARD_OUT, TestLogEvent.STANDARD_ERROR)
         exceptionFormat = TestExceptionFormat.FULL
         showExceptions = true
         showCauses = true
@@ -124,7 +125,7 @@ spotless {
     }
 
     kotlinGradle {
-        ktfmt("0.39").dropboxStyle().configure { it.setMaxWidth(140) }
+        ktfmt("0.39").dropboxStyle().configure { it.setMaxWidth(120) }
         trimTrailingWhitespace()
         indentWithSpaces()
         endWithNewline()
@@ -133,7 +134,7 @@ spotless {
 
     kotlin {
         target("**/*.kt")
-        ktfmt("0.39").dropboxStyle().configure { it.setMaxWidth(140) }
+        ktfmt("0.39").dropboxStyle().configure { it.setMaxWidth(120) }
         trimTrailingWhitespace()
         indentWithSpaces()
         endWithNewline()

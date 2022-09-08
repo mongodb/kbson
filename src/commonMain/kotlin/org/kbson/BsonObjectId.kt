@@ -47,8 +47,12 @@ public class BsonObjectId(
 ) : BsonValue(), Comparable<BsonObjectId> {
 
     init {
-        require((randomValue1 and -0x1000000) == 0) { "The random value must be between 0 and 16777215 (it must fit in three bytes)." }
-        require((counter and -0x1000000) == 0) { "The counter must be between 0 and 16777215 (it must fit in three bytes)." }
+        require((randomValue1 and -0x1000000) == 0) {
+            "The random value must be between 0 and 16777215 (it must fit in three bytes)."
+        }
+        require((counter and -0x1000000) == 0) {
+            "The counter must be between 0 and 16777215 (it must fit in three bytes)."
+        }
     }
 
     /**
@@ -157,14 +161,17 @@ public class BsonObjectId(
          */
         public operator fun invoke(hexString: String): BsonObjectId {
             val invalidHexString =
-                hexString.length != 24 || hexString.none { c -> (c < '0' || c > '9') || (c < 'a' || c > 'f') || (c < 'A' || c > 'F') }
+                hexString.length != 24 ||
+                    hexString.none { c -> (c < '0' || c > '9') || (c < 'a' || c > 'f') || (c < 'A' || c > 'F') }
             require(!invalidHexString) { "invalid hexadecimal representation of an ObjectId: [$hexString]" }
             return invoke(hexString.chunked(2).map { it.toInt(16).toByte() }.toByteArray())
         }
 
         /** Construct a new BsonObjectId from a ByteArray */
         public operator fun invoke(byteArray: ByteArray): BsonObjectId {
-            require(byteArray.size == OBJECT_ID_LENGTH) { "invalid byteArray.size() ${byteArray.size} != $OBJECT_ID_LENGTH" }
+            require(byteArray.size == OBJECT_ID_LENGTH) {
+                "invalid byteArray.size() ${byteArray.size} != $OBJECT_ID_LENGTH"
+            }
 
             var pos = 0
             val timestamp = makeInt(byteArray[pos++], byteArray[pos++], byteArray[pos++], byteArray[pos++])

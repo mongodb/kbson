@@ -285,7 +285,8 @@ public class BsonDocument(map: Map<String, BsonValue> = LinkedHashMap()) : BsonV
     }
 
     /**
-     * If the document does not contain the given key, return the given default value. Otherwise, gets the value of the key.
+     * If the document does not contain the given key, return the given default value. Otherwise, gets the value of the
+     * key.
      *
      * @param key the key
      * @param defaultValue the default value
@@ -297,175 +298,196 @@ public class BsonDocument(map: Map<String, BsonValue> = LinkedHashMap()) : BsonV
     }
 
     /**
-     * If the document does not contain the given key, return the given default value. Otherwise, gets the value of the key as a
-     * BsonDocument.
+     * If the document does not contain the given key, return the given default value. Otherwise, gets the value of the
+     * key as a BsonDocument.
      *
      * @param key the key
      * @param defaultValue the default value
      * @return the value of the key as a BsonDocument
-     * @throws org.kbson.BsonInvalidOperationException if the document contains the key but the value is not of the expected type
+     * @throws org.kbson.BsonInvalidOperationException if the document contains the key but the value is not of the
+     * expected type
      */
     public fun getDocument(key: String, defaultValue: BsonDocument): BsonDocument {
         return get(key)?.asDocument() ?: defaultValue
     }
 
     /**
-     * If the document does not contain the given key, return the given default value. Otherwise, gets the value of the key as a BsonArray.
+     * If the document does not contain the given key, return the given default value. Otherwise, gets the value of the
+     * key as a BsonArray.
      *
      * @param key the key
      * @param defaultValue the default value
      * @return the value of the key as a BsonArray
-     * @throws org.kbson.BsonInvalidOperationException if the document contains the key but the value is not of the expected type
+     * @throws org.kbson.BsonInvalidOperationException if the document contains the key but the value is not of the
+     * expected type
      */
     public fun getArray(key: String, defaultValue: BsonArray): BsonArray {
         return get(key)?.asArray() ?: defaultValue
     }
 
     /**
-     * If the document does not contain the given key, return the given default value. Otherwise, gets the value of the key as a BsonNumber.
+     * If the document does not contain the given key, return the given default value. Otherwise, gets the value of the
+     * key as a BsonNumber.
      *
      * @param key the key
      * @param defaultValue the default value
      * @return the value of the key as a BsonNumber
-     * @throws org.kbson.BsonInvalidOperationException if the document contains the key but the value is not of the expected type
+     * @throws org.kbson.BsonInvalidOperationException if the document contains the key but the value is not of the
+     * expected type
      */
     public fun getNumber(key: String, defaultValue: BsonNumber): BsonNumber {
         return get(key)?.asNumber() ?: defaultValue
     }
 
     /**
-     * If the document does not contain the given key, return the given default value. Otherwise, gets the value of the key as a BsonInt32.
+     * If the document does not contain the given key, return the given default value. Otherwise, gets the value of the
+     * key as a BsonInt32.
      *
      * @param key the key
      * @param defaultValue the default value
      * @return the value of the key as a BsonInt32
-     * @throws org.kbson.BsonInvalidOperationException if the document contains the key but the value is not of the expected type
+     * @throws org.kbson.BsonInvalidOperationException if the document contains the key but the value is not of the
+     * expected type
      */
     public fun getInt32(key: String, defaultValue: BsonInt32): BsonInt32 {
         return get(key)?.asInt32() ?: defaultValue
     }
 
     /**
-     * If the document does not contain the given key, return the given default value. Otherwise, gets the value of the key as a BsonInt64.
+     * If the document does not contain the given key, return the given default value. Otherwise, gets the value of the
+     * key as a BsonInt64.
      *
      * @param key the key
      * @param defaultValue the default value
      * @return the value of the key as a BsonInt64
-     * @throws org.kbson.BsonInvalidOperationException if the document contains the key but the value is not of the expected type
+     * @throws org.kbson.BsonInvalidOperationException if the document contains the key but the value is not of the
+     * expected type
      */
     public fun getInt64(key: String, defaultValue: BsonInt64): BsonInt64 {
         return get(key)?.asInt64() ?: defaultValue
     }
 
     /**
-     * If the document does not contain the given key, return the given default value. Otherwise, gets the value of the key as a
-     * BsonDecimal128.
+     * If the document does not contain the given key, return the given default value. Otherwise, gets the value of the
+     * key as a BsonDecimal128.
      *
      * @param key the key
      * @param defaultValue the default value
      * @return the value of the key as a BsonDecimal128
-     * @throws org.kbson.BsonInvalidOperationException if the document contains the key but the value is not of the expected type
+     * @throws org.kbson.BsonInvalidOperationException if the document contains the key but the value is not of the
+     * expected type
      */
     public fun getDecimal128(key: String, defaultValue: BsonDecimal128): BsonDecimal128 {
         return get(key)?.asDecimal128() ?: defaultValue
     }
 
     /**
-     * If the document does not contain the given key, return the given default value. Otherwise, gets the value of the key as a BsonDouble.
+     * If the document does not contain the given key, return the given default value. Otherwise, gets the value of the
+     * key as a BsonDouble.
      *
      * @param key the key
      * @param defaultValue the default value
      * @return the value of the key as a BsonDouble
-     * @throws org.kbson.BsonInvalidOperationException if the document contains the key but the value is not of the expected type
+     * @throws org.kbson.BsonInvalidOperationException if the document contains the key but the value is not of the
+     * expected type
      */
     public fun getDouble(key: String, defaultValue: BsonDouble): BsonDouble {
         return get(key)?.asDouble() ?: defaultValue
     }
 
     /**
-     * If the document does not contain the given key, return the given default value. Otherwise, gets the value of the key as a
-     * BsonBoolean.
+     * If the document does not contain the given key, return the given default value. Otherwise, gets the value of the
+     * key as a BsonBoolean.
      *
      * @param key the key
      * @param defaultValue the default value
      * @return the value of the key as a BsonBoolean
-     * @throws org.kbson.BsonInvalidOperationException if the document contains the key but the value is not of the expected type
+     * @throws org.kbson.BsonInvalidOperationException if the document contains the key but the value is not of the
+     * expected type
      */
     public fun getBoolean(key: String, defaultValue: BsonBoolean): BsonBoolean {
         return get(key)?.asBoolean() ?: defaultValue
     }
 
     /**
-     * If the document does not contain the given key, return the given default value. Otherwise, gets the value of the key as a BsonString.
+     * If the document does not contain the given key, return the given default value. Otherwise, gets the value of the
+     * key as a BsonString.
      *
      * @param key the key
      * @param defaultValue the default value
      * @return the value of the key as a BsonString
-     * @throws org.kbson.BsonInvalidOperationException if the document contains the key but the value is not of the expected type
+     * @throws org.kbson.BsonInvalidOperationException if the document contains the key but the value is not of the
+     * expected type
      */
     public fun getString(key: String, defaultValue: BsonString): BsonString {
         return get(key)?.asString() ?: defaultValue
     }
 
     /**
-     * If the document does not contain the given key, return the given default value. Otherwise, gets the value of the key as a
-     * BsonDateTime.
+     * If the document does not contain the given key, return the given default value. Otherwise, gets the value of the
+     * key as a BsonDateTime.
      *
      * @param key the key
      * @param defaultValue the default value
      * @return the value of the key as a BsonDateTime
-     * @throws org.kbson.BsonInvalidOperationException if the document contains the key but the value is not of the expected type
+     * @throws org.kbson.BsonInvalidOperationException if the document contains the key but the value is not of the
+     * expected type
      */
     public fun getDateTime(key: String, defaultValue: BsonDateTime): BsonDateTime {
         return get(key)?.asDateTime() ?: defaultValue
     }
 
     /**
-     * If the document does not contain the given key, return the given default value. Otherwise, gets the value of the key as a
-     * BsonTimestamp.
+     * If the document does not contain the given key, return the given default value. Otherwise, gets the value of the
+     * key as a BsonTimestamp.
      *
      * @param key the key
      * @param defaultValue the default value
      * @return the value of the key as a BsonTimestamp
-     * @throws org.kbson.BsonInvalidOperationException if the document contains the key but the value is not of the expected type
+     * @throws org.kbson.BsonInvalidOperationException if the document contains the key but the value is not of the
+     * expected type
      */
     public fun getTimestamp(key: String, defaultValue: BsonTimestamp): BsonTimestamp {
         return get(key)?.asTimestamp() ?: defaultValue
     }
 
     /**
-     * If the document does not contain the given key, return the given default value. Otherwise, gets the value of the key as a
-     * BsonObjectId.
+     * If the document does not contain the given key, return the given default value. Otherwise, gets the value of the
+     * key as a BsonObjectId.
      *
      * @param key the key
      * @param defaultValue the default value
      * @return the value of the key as a BsonObjectId
-     * @throws org.kbson.BsonInvalidOperationException if the document contains the key but the value is not of the expected type
+     * @throws org.kbson.BsonInvalidOperationException if the document contains the key but the value is not of the
+     * expected type
      */
     public fun getObjectId(key: String, defaultValue: BsonObjectId): BsonObjectId {
         return get(key)?.asObjectId() ?: defaultValue
     }
 
     /**
-     * If the document does not contain the given key, return the given default value. Otherwise, gets the value of the key as a BsonBinary.
+     * If the document does not contain the given key, return the given default value. Otherwise, gets the value of the
+     * key as a BsonBinary.
      *
      * @param key the key
      * @param defaultValue the default value
      * @return the value of the key as a BsonBinary
-     * @throws org.kbson.BsonInvalidOperationException if the document contains the key but the value is not of the expected type
+     * @throws org.kbson.BsonInvalidOperationException if the document contains the key but the value is not of the
+     * expected type
      */
     public fun getBinary(key: String, defaultValue: BsonBinary): BsonBinary {
         return get(key)?.asBinary() ?: defaultValue
     }
 
     /**
-     * If the document does not contain the given key, return the given default value. Otherwise, gets the value of the key as a
-     * BsonRegularExpression.
+     * If the document does not contain the given key, return the given default value. Otherwise, gets the value of the
+     * key as a BsonRegularExpression.
      *
      * @param key the key
      * @param defaultValue the default value
      * @return the value of the key as a BsonRegularExpression
-     * @throws org.kbson.BsonInvalidOperationException if the document contains the key but the value is not of the expected type
+     * @throws org.kbson.BsonInvalidOperationException if the document contains the key but the value is not of the
+     * expected type
      */
     public fun getRegularExpression(key: String, defaultValue: BsonRegularExpression): BsonRegularExpression {
         return get(key)?.asRegularExpression() ?: defaultValue
@@ -476,7 +498,8 @@ public class BsonDocument(map: Map<String, BsonValue> = LinkedHashMap()) : BsonV
      *
      * @param key the key
      * @return the value of the key as a BsonDocument
-     * @throws org.kbson.BsonInvalidOperationException if the document does not contain the key or the value is not a BsonDocument
+     * @throws org.kbson.BsonInvalidOperationException if the document does not contain the key or the value is not a
+     * BsonDocument
      */
     public fun getDocument(key: String): BsonDocument {
         throwIfKeyAbsent(key)
@@ -488,7 +511,8 @@ public class BsonDocument(map: Map<String, BsonValue> = LinkedHashMap()) : BsonV
      *
      * @param key the key
      * @return the value of the key as a BsonArray
-     * @throws org.kbson.BsonInvalidOperationException if the document does not contain the key or the value is not of the expected type
+     * @throws org.kbson.BsonInvalidOperationException if the document does not contain the key or the value is not of
+     * the expected type
      */
     public fun getArray(key: String): BsonArray {
         throwIfKeyAbsent(key)
@@ -500,7 +524,8 @@ public class BsonDocument(map: Map<String, BsonValue> = LinkedHashMap()) : BsonV
      *
      * @param key the key
      * @return the value of the key as a BsonNumber
-     * @throws org.kbson.BsonInvalidOperationException if the document does not contain the key or the value is not of the expected type
+     * @throws org.kbson.BsonInvalidOperationException if the document does not contain the key or the value is not of
+     * the expected type
      */
     public fun getNumber(key: String): BsonNumber {
         throwIfKeyAbsent(key)
@@ -512,7 +537,8 @@ public class BsonDocument(map: Map<String, BsonValue> = LinkedHashMap()) : BsonV
      *
      * @param key the key
      * @return the value of the key as a BsonInt32
-     * @throws org.kbson.BsonInvalidOperationException if the document does not contain the key or the value is not of the expected type
+     * @throws org.kbson.BsonInvalidOperationException if the document does not contain the key or the value is not of
+     * the expected type
      */
     public fun getInt32(key: String): BsonInt32 {
         throwIfKeyAbsent(key)
@@ -524,7 +550,8 @@ public class BsonDocument(map: Map<String, BsonValue> = LinkedHashMap()) : BsonV
      *
      * @param key the key
      * @return the value of the key as a BsonInt64
-     * @throws org.kbson.BsonInvalidOperationException if the document does not contain the key or the value is not of the expected type
+     * @throws org.kbson.BsonInvalidOperationException if the document does not contain the key or the value is not of
+     * the expected type
      */
     public fun getInt64(key: String): BsonInt64 {
         throwIfKeyAbsent(key)
@@ -536,7 +563,8 @@ public class BsonDocument(map: Map<String, BsonValue> = LinkedHashMap()) : BsonV
      *
      * @param key the key
      * @return the value of the key as a BsonDecimal128
-     * @throws org.kbson.BsonInvalidOperationException if the document does not contain the key or the value is not of the expected type
+     * @throws org.kbson.BsonInvalidOperationException if the document does not contain the key or the value is not of
+     * the expected type
      */
     public fun getDecimal128(key: String): BsonDecimal128 {
         throwIfKeyAbsent(key)
@@ -548,7 +576,8 @@ public class BsonDocument(map: Map<String, BsonValue> = LinkedHashMap()) : BsonV
      *
      * @param key the key
      * @return the value of the key as a BsonDouble
-     * @throws org.kbson.BsonInvalidOperationException if the document does not contain the key or the value is not of the expected type
+     * @throws org.kbson.BsonInvalidOperationException if the document does not contain the key or the value is not of
+     * the expected type
      */
     public fun getDouble(key: String): BsonDouble {
         throwIfKeyAbsent(key)
@@ -560,7 +589,8 @@ public class BsonDocument(map: Map<String, BsonValue> = LinkedHashMap()) : BsonV
      *
      * @param key the key
      * @return the value of the key as a BsonBoolean
-     * @throws org.kbson.BsonInvalidOperationException if the document does not contain the key or the value is not of the expected type
+     * @throws org.kbson.BsonInvalidOperationException if the document does not contain the key or the value is not of
+     * the expected type
      */
     public fun getBoolean(key: String): BsonBoolean {
         throwIfKeyAbsent(key)
@@ -572,7 +602,8 @@ public class BsonDocument(map: Map<String, BsonValue> = LinkedHashMap()) : BsonV
      *
      * @param key the key
      * @return the value of the key as a BsonString
-     * @throws org.kbson.BsonInvalidOperationException if the document does not contain the key or the value is not of the expected type
+     * @throws org.kbson.BsonInvalidOperationException if the document does not contain the key or the value is not of
+     * the expected type
      */
     public fun getString(key: String): BsonString {
         throwIfKeyAbsent(key)
@@ -584,7 +615,8 @@ public class BsonDocument(map: Map<String, BsonValue> = LinkedHashMap()) : BsonV
      *
      * @param key the key
      * @return the value of the key as a BsonDateTime
-     * @throws org.kbson.BsonInvalidOperationException if the document does not contain the key or the value is not of the expected type
+     * @throws org.kbson.BsonInvalidOperationException if the document does not contain the key or the value is not of
+     * the expected type
      */
     public fun getDateTime(key: String): BsonDateTime {
         throwIfKeyAbsent(key)
@@ -596,7 +628,8 @@ public class BsonDocument(map: Map<String, BsonValue> = LinkedHashMap()) : BsonV
      *
      * @param key the key
      * @return the value of the key as a BsonTimestamp
-     * @throws org.kbson.BsonInvalidOperationException if the document does not contain the key or the value is not of the expected type
+     * @throws org.kbson.BsonInvalidOperationException if the document does not contain the key or the value is not of
+     * the expected type
      */
     public fun getTimestamp(key: String): BsonTimestamp {
         throwIfKeyAbsent(key)
@@ -608,7 +641,8 @@ public class BsonDocument(map: Map<String, BsonValue> = LinkedHashMap()) : BsonV
      *
      * @param key the key
      * @return the value of the key as a BsonObjectId
-     * @throws org.kbson.BsonInvalidOperationException if the document does not contain the key or the value is not of the expected type
+     * @throws org.kbson.BsonInvalidOperationException if the document does not contain the key or the value is not of
+     * the expected type
      */
     public fun getObjectId(key: String): BsonObjectId {
         throwIfKeyAbsent(key)
@@ -620,7 +654,8 @@ public class BsonDocument(map: Map<String, BsonValue> = LinkedHashMap()) : BsonV
      *
      * @param key the key
      * @return the value of the key as a BsonRegularExpression
-     * @throws org.kbson.BsonInvalidOperationException if the document does not contain the key or the value is not of the expected type
+     * @throws org.kbson.BsonInvalidOperationException if the document does not contain the key or the value is not of
+     * the expected type
      */
     public fun getRegularExpression(key: String): BsonRegularExpression {
         throwIfKeyAbsent(key)
@@ -632,7 +667,8 @@ public class BsonDocument(map: Map<String, BsonValue> = LinkedHashMap()) : BsonV
      *
      * @param key the key
      * @return the value of the key as a BsonBinary
-     * @throws org.kbson.BsonInvalidOperationException if the document does not contain the key or the value is not of the expected type
+     * @throws org.kbson.BsonInvalidOperationException if the document does not contain the key or the value is not of
+     * the expected type
      */
     public fun getBinary(key: String): BsonBinary {
         throwIfKeyAbsent(key)

@@ -18,8 +18,8 @@ package org.kbson
 /**
  * A representation the BSON timestamp type.
  *
- * Note: BSON has a special timestamp type for internal MongoDB use and is not associated with the regular [BsonDateTime]. This internal
- * timestamp type is a 64 bit value where:
+ * Note: BSON has a special timestamp type for internal MongoDB use and is not associated with the regular
+ * [BsonDateTime]. This internal timestamp type is a 64 bit value where:
  * - the most significant 32 bits are a time_t value (seconds since the Unix epoch)
  * - the least significant 32 bits are an incrementing ordinal for operations within a given second.
  *
@@ -35,7 +35,10 @@ public class BsonTimestamp(public val value: Long = 0) : BsonValue(), Comparable
      * @param seconds the number of seconds since the epoch
      * @param increment the incrementing ordinal for operations within a given second.
      */
-    public constructor(seconds: Int, increment: Int) : this((seconds.toLong() shl 32) or (increment.toLong() and 0xFFFFFFFFL))
+    public constructor(
+        seconds: Int,
+        increment: Int
+    ) : this((seconds.toLong() shl 32) or (increment.toLong() and 0xFFFFFFFFL))
 
     /** Gets the time in seconds since epoch. */
     public val time: Int
