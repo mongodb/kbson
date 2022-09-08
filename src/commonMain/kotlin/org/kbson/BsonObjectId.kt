@@ -30,8 +30,7 @@ import org.kbson.internal.CurrentTime.getCurrentTimeInSeconds
  *     <td>0</td><td>1</td><td>2</td><td>3</td><td>4</td><td>5</td><td>6</td><td>7</td><td>8</td><td>9</td><td>10</td>
  *     <td>11</td>
  * ```
- * </tr> <tr><td colspan="4">time</td><td colspan="5">random value</td><td colspan="3">inc</td></tr>
- * </table>
+ * </tr> <tr><td colspan="4">time</td><td colspan="5">random value</td><td colspan="3">inc</td></tr> </table>
  *
  * @constructor constructs a new instance with the given timestamp, random values and counter
  * @property timestamp the timestamp seconds since epoch
@@ -48,12 +47,8 @@ public class BsonObjectId(
 ) : BsonValue(), Comparable<BsonObjectId> {
 
     init {
-        require((randomValue1 and -0x1000000) == 0) {
-            "The random value must be between 0 and 16777215 (it must fit in three bytes)."
-        }
-        require((counter and -0x1000000) == 0) {
-            "The counter must be between 0 and 16777215 (it must fit in three bytes)."
-        }
+        require((randomValue1 and -0x1000000) == 0) { "The random value must be between 0 and 16777215 (it must fit in three bytes)." }
+        require((counter and -0x1000000) == 0) { "The counter must be between 0 and 16777215 (it must fit in three bytes)." }
     }
 
     /**
@@ -105,8 +100,7 @@ public class BsonObjectId(
         val otherByteArray = other.toByteArray()
         for (i in 0 until OBJECT_ID_LENGTH) {
             if (byteArray[i] != otherByteArray[i]) {
-                return if (byteArray[i].toInt() and 0xff < otherByteArray[i].toInt() and 0xff) -1
-                else 1
+                return if (byteArray[i].toInt() and 0xff < otherByteArray[i].toInt() and 0xff) -1 else 1
             }
         }
         return 0
@@ -153,8 +147,7 @@ public class BsonObjectId(
 
         /** Create a new BsonObjectId */
         public operator fun invoke(): BsonObjectId {
-            return BsonObjectId(
-                getCurrentTimeInSeconds(), RANDOM_VALUE1, RANDOM_VALUE2, nextCounter())
+            return BsonObjectId(getCurrentTimeInSeconds(), RANDOM_VALUE1, RANDOM_VALUE2, nextCounter())
         }
 
         /**
@@ -164,27 +157,18 @@ public class BsonObjectId(
          */
         public operator fun invoke(hexString: String): BsonObjectId {
             val invalidHexString =
-                hexString.length != 24 ||
-                    hexString.none { c ->
-                        (c < '0' || c > '9') || (c < 'a' || c > 'f') || (c < 'A' || c > 'F')
-                    }
-            require(!invalidHexString) {
-                "invalid hexadecimal representation of an ObjectId: [$hexString]"
-            }
+                hexString.length != 24 || hexString.none { c -> (c < '0' || c > '9') || (c < 'a' || c > 'f') || (c < 'A' || c > 'F') }
+            require(!invalidHexString) { "invalid hexadecimal representation of an ObjectId: [$hexString]" }
             return invoke(hexString.chunked(2).map { it.toInt(16).toByte() }.toByteArray())
         }
 
         /** Construct a new BsonObjectId from a ByteArray */
         public operator fun invoke(byteArray: ByteArray): BsonObjectId {
-            require(byteArray.size == OBJECT_ID_LENGTH) {
-                "invalid byteArray.size() ${byteArray.size} != $OBJECT_ID_LENGTH"
-            }
+            require(byteArray.size == OBJECT_ID_LENGTH) { "invalid byteArray.size() ${byteArray.size} != $OBJECT_ID_LENGTH" }
 
             var pos = 0
-            val timestamp =
-                makeInt(byteArray[pos++], byteArray[pos++], byteArray[pos++], byteArray[pos++])
-            val randomValue1 =
-                makeInt(0.toByte(), byteArray[pos++], byteArray[pos++], byteArray[pos++])
+            val timestamp = makeInt(byteArray[pos++], byteArray[pos++], byteArray[pos++], byteArray[pos++])
+            val randomValue1 = makeInt(0.toByte(), byteArray[pos++], byteArray[pos++], byteArray[pos++])
             val randomValue2 = makeShort(byteArray[pos++], byteArray[pos++])
             val counter = makeInt(0.toByte(), byteArray[pos++], byteArray[pos++], byteArray[pos])
             return BsonObjectId(timestamp, randomValue1, randomValue2, counter)

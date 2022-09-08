@@ -18,9 +18,8 @@ package org.kbson
 /**
  * A representation of the BSON Binary type.
  *
- * Note: that for performance reasons instances of this class are not immutable, so care should be
- * taken to only modify the underlying byte array if you know what you're doing, or else make a
- * defensive copy: [BsonBinary.clone].
+ * Note: that for performance reasons instances of this class are not immutable, so care should be taken to only modify the underlying byte
+ * array if you know what you're doing, or else make a defensive copy: [BsonBinary.clone].
  *
  * @constructor constructs a new instance with the given subtype and data
  * @property type the [BsonBinarySubType] byte value
@@ -29,8 +28,7 @@ package org.kbson
 public class BsonBinary(public val type: Byte, public val data: ByteArray) : BsonValue() {
 
     /**
-     * Construct a new instance with the given data and the default subtype
-     * [BsonBinarySubType.BINARY].
+     * Construct a new instance with the given data and the default subtype [BsonBinarySubType.BINARY].
      *
      * @param data the data
      */

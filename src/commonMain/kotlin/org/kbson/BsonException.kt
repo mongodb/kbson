@@ -23,11 +23,8 @@ package org.kbson
  * @param cause the error cause
  * @param errorCode the error code
  */
-public open class BsonException(
-    message: String? = null,
-    cause: Throwable? = null,
-    private val errorCode: Int? = null
-) : RuntimeException(message, cause) {
+public open class BsonException(message: String? = null, cause: Throwable? = null, private val errorCode: Int? = null) :
+    RuntimeException(message, cause) {
 
     /**
      * Returns if the error code is set (i.e., not null).

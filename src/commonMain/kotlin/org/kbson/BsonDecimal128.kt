@@ -18,8 +18,8 @@ package org.kbson
 /**
  * A representation of the BSON Decimal128 type.
  *
- * @constructor Create an instance with the given high and low order bits representing this
- * BsonDecimal128 as an IEEE 754-2008 128-bit decimal floating point using the BID encoding scheme.
+ * @constructor Create an instance with the given high and low order bits representing this BsonDecimal128 as an IEEE 754-2008 128-bit
+ * decimal floating point using the BID encoding scheme.
  * @property high the high-order 64 bits
  * @property low the low-order 64 bits
  */

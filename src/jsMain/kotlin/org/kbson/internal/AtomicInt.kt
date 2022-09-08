@@ -18,8 +18,8 @@ package org.kbson.internal
 /**
  * Js version of an atomic integer
  *
- * In JavaScript, a function always runs to completion, before any other function is called. So
- * there no locking required to protect the int.
+ * In JavaScript, a function always runs to completion, before any other function is called. So there no locking required to protect the
+ * int.
  */
 internal actual class AtomicInt actual constructor(initial: Int) {
 

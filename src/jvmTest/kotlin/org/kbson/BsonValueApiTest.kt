@@ -43,8 +43,7 @@ class BsonValueApiTest {
         val bsonClass = org.bson.BsonBinary::class.java
         val kBsonClass = BsonBinary::class.java
 
-        val bsonConstructors =
-            getConstructorParams(bsonClass) { c -> c.parameterTypes.contains(UUID::class.java) }
+        val bsonConstructors = getConstructorParams(bsonClass) { c -> c.parameterTypes.contains(UUID::class.java) }
         val kBsonConstructors = getConstructorParams(kBsonClass)
 
         assertEquals(bsonConstructors, kBsonConstructors)
@@ -107,14 +106,8 @@ class BsonValueApiTest {
         // Note: Constructors differ as no Decimal128 underlying class or BigDecimal so not
         // asserting.
 
-        val bsonMethods =
-            getMethodNames(
-                bsonClass,
-                listOf("intValue", "longValue", "doubleValue", "getValue", "decimal128Value"))
-        val kBsonMethods =
-            getMethodNames(
-                kBsonClass,
-                listOf("isNaN", "isInfinite", "isFinite", "isNegative", "getHigh", "getLow"))
+        val bsonMethods = getMethodNames(bsonClass, listOf("intValue", "longValue", "doubleValue", "getValue", "decimal128Value"))
+        val kBsonMethods = getMethodNames(kBsonClass, listOf("isNaN", "isInfinite", "isFinite", "isNegative", "getHigh", "getLow"))
         assertEquals(bsonMethods, kBsonMethods)
     }
 
@@ -126,23 +119,13 @@ class BsonValueApiTest {
         val bsonConstructors = getConstructorParams(bsonClass)
         val kBsonConstructors =
             getConstructorParams(kBsonClass) { c ->
-                c.parameterTypes.contains(Map::class.java) ||
-                    c.parameterTypes.map { p -> p.componentType }.contains(Pair::class.java)
+                c.parameterTypes.contains(Map::class.java) || c.parameterTypes.map { p -> p.componentType }.contains(Pair::class.java)
             }
         assertEquals(bsonConstructors, kBsonConstructors)
 
         val bsonMethods =
-            getMethodNames(
-                bsonClass,
-                listOf(
-                    "parse",
-                    "toJson",
-                    "toBsonDocument",
-                    "asBsonReader",
-                    "readObject",
-                    "writeReplace"))
-        val kBsonMethods =
-            getMethodNames(kBsonClass, listOf("getSize", "getEntries", "getKeys", "getValues"))
+            getMethodNames(bsonClass, listOf("parse", "toJson", "toBsonDocument", "asBsonReader", "readObject", "writeReplace"))
+        val kBsonMethods = getMethodNames(kBsonClass, listOf("getSize", "getEntries", "getKeys", "getValues"))
         assertEquals(bsonMethods, kBsonMethods)
     }
 
@@ -262,14 +245,7 @@ class BsonValueApiTest {
         val bsonMethods = getMethodNames(bsonClass, listOf("getValue"))
         val kBsonMethods =
             getMethodNames(
-                kBsonClass,
-                listOf(
-                    "toHexString",
-                    "toByteArray",
-                    "getTimestamp",
-                    "getRandomValue1",
-                    "getRandomValue2",
-                    "getCounter"))
+                kBsonClass, listOf("toHexString", "toByteArray", "getTimestamp", "getRandomValue1", "getRandomValue2", "getCounter"))
         assertEquals(bsonMethods, kBsonMethods)
     }
 
@@ -338,15 +314,11 @@ class BsonValueApiTest {
         // No constructor as it's a singleton object
 
         val bsonMethods = getMethodNames(bsonClass)
-        val kBsonMethods =
-            getMethodNames(kBsonClass, listOf("getUNDEFINED", "getUNDEFINED\$annotations"))
+        val kBsonMethods = getMethodNames(kBsonClass, listOf("getUNDEFINED", "getUNDEFINED\$annotations"))
         assertEquals(bsonMethods, kBsonMethods)
     }
 
-    private fun getConstructorParams(
-        clazz: Class<*>,
-        exclusions: (Constructor<*>) -> Boolean = { false }
-    ): List<List<String>> {
+    private fun getConstructorParams(clazz: Class<*>, exclusions: (Constructor<*>) -> Boolean = { false }): List<List<String>> {
         return clazz.constructors
             .filterNot { it.parameterTypes.contains(DefaultConstructorMarker::class.java) }
             .filterNot { exclusions.invoke(it) }
@@ -358,11 +330,7 @@ class BsonValueApiTest {
         val kotlinExtraBsonValueMethods = listOf("isMaxKey", "isMinKey", "isUndefined")
         return clazz.methods
             .map { it.name }
-            .filterNot {
-                it.startsWith("access\$get") ||
-                    exclusions.contains(it) ||
-                    kotlinExtraBsonValueMethods.contains(it)
-            }
+            .filterNot { it.startsWith("access\$get") || exclusions.contains(it) || kotlinExtraBsonValueMethods.contains(it) }
             .toSet()
     }
 }

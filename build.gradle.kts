@@ -24,7 +24,7 @@ plugins {
     kotlin("multiplatform") version "1.7.0"
 
     id("com.diffplug.spotless") version "6.10.0"
-    id("io.gitlab.arturbosch.detekt").version("1.21.0")
+    id("io.gitlab.arturbosch.detekt") version "1.21.0"
     id("org.jetbrains.dokka") version "1.7.10"
 }
 
@@ -79,12 +79,7 @@ kotlin {
 // Output summaries for all test environments (jvm, js and native)
 tasks.withType<AbstractTestTask> {
     testLogging {
-        events =
-            setOf(
-                TestLogEvent.FAILED,
-                TestLogEvent.SKIPPED,
-                TestLogEvent.STANDARD_OUT,
-                TestLogEvent.STANDARD_ERROR)
+        events = setOf(TestLogEvent.FAILED, TestLogEvent.SKIPPED, TestLogEvent.STANDARD_OUT, TestLogEvent.STANDARD_ERROR)
         exceptionFormat = TestExceptionFormat.FULL
         showExceptions = true
         showCauses = true
@@ -129,18 +124,16 @@ spotless {
     }
 
     kotlinGradle {
-        ktfmt("0.39").dropboxStyle()
+        ktfmt("0.39").dropboxStyle().configure { it.setMaxWidth(140) }
         trimTrailingWhitespace()
         indentWithSpaces()
         endWithNewline()
-        licenseHeaderFile(
-            rootProject.file("config/mongodb.license"),
-            "(group|plugins|import|buildscript|rootProject)")
+        licenseHeaderFile(rootProject.file("config/mongodb.license"), "(group|plugins|import|buildscript|rootProject)")
     }
 
     kotlin {
         target("**/*.kt")
-        ktfmt("0.39").dropboxStyle()
+        ktfmt("0.39").dropboxStyle().configure { it.setMaxWidth(140) }
         trimTrailingWhitespace()
         indentWithSpaces()
         endWithNewline()
@@ -158,13 +151,9 @@ spotless {
 detekt {
     allRules = true // fail build on any finding
     buildUponDefaultConfig = true // preconfigure defaults
-    config =
-        rootProject.files(
-            "config/detekt/detekt.yml") // point to your custom config defining rules to run,
+    config = rootProject.files("config/detekt/detekt.yml") // point to your custom config defining rules to run,
     // overwriting default behavior
-    baseline =
-        rootProject.file(
-            "config/detekt/baseline.xml") // a way of suppressing issues before introducing detekt
+    baseline = rootProject.file("config/detekt/baseline.xml") // a way of suppressing issues before introducing detekt
     source =
         files(
             file("src/commonMain/kotlin"),
@@ -173,15 +162,14 @@ detekt {
             file("src/jvmTest/kotlin"),
             file("src/nativeMain/kotlin"),
             file("src/nativeTest/kotlin"),
-            file("src/jsMain/kotlin"),
-            file("src/jsTest/kotlin"))
+        )
+}
 
+tasks.withType<io.gitlab.arturbosch.detekt.Detekt>().configureEach {
     reports {
-        html.enabled = true // observe findings in your browser with structure and code snippets
-        xml.enabled = false // checkstyle like format mainly for integrations like Jenkins
-        txt.enabled =
-            false // similar to the console output, contains issue signature to manually edit
-        // baseline files
+        html.required.set(true) // observe findings in your browser with structure and code snippets
+        xml.required.set(true) // checkstyle like format mainly for integrations like Jenkins
+        txt.required.set(false) // similar to the console output, contains issue signature to manually edit
     }
 }
 

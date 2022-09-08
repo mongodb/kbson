@@ -48,10 +48,7 @@ class BsonDoubleTest {
         assertEquals(0, BsonDouble(Double.MIN_VALUE).compareTo(BsonDouble(Double.MIN_VALUE)))
         assertEquals(1, BsonDouble(Double.MAX_VALUE).compareTo(BsonDouble(Double.MIN_VALUE)))
 
-        assertEquals(
-            -1,
-            BsonDouble(Double.NEGATIVE_INFINITY).compareTo(BsonDouble(Double.POSITIVE_INFINITY)))
-        assertEquals(
-            1, BsonDouble(Double.POSITIVE_INFINITY).compareTo(BsonDouble(Double.NEGATIVE_INFINITY)))
+        assertEquals(-1, BsonDouble(Double.NEGATIVE_INFINITY).compareTo(BsonDouble(Double.POSITIVE_INFINITY)))
+        assertEquals(1, BsonDouble(Double.POSITIVE_INFINITY).compareTo(BsonDouble(Double.NEGATIVE_INFINITY)))
     }
 }

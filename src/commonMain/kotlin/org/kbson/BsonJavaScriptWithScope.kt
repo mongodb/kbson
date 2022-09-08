@@ -22,8 +22,7 @@ package org.kbson
  * @property code the javascript code as a string
  * @property scope the javascript scope
  */
-public class BsonJavaScriptWithScope(public val code: String, public val scope: BsonDocument) :
-    BsonValue() {
+public class BsonJavaScriptWithScope(public val code: String, public val scope: BsonDocument) : BsonValue() {
     override val bsonType: BsonType
         get() = BsonType.JAVASCRIPT_WITH_SCOPE
 

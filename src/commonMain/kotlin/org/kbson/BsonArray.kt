@@ -22,8 +22,7 @@ package org.kbson
  * @param initial the initial list of [BsonValue]s in the array
  */
 @Suppress("TooManyFunctions")
-public class BsonArray(initial: List<BsonValue> = emptyList()) :
-    BsonValue(), MutableList<BsonValue> {
+public class BsonArray(initial: List<BsonValue> = emptyList()) : BsonValue(), MutableList<BsonValue> {
     private val _values: MutableList<BsonValue>
     init {
         _values = initial.toMutableList()

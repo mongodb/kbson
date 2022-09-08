@@ -101,10 +101,7 @@ class BsonArrayTest {
         assertFalse(subListIterator.hasNext())
 
         assertEquals(mutableListOf<BsonValue>(BsonBoolean.FALSE), bsonValue.subList(1, 2))
-        assertEquals(
-            2,
-            BsonArray(listOf(BsonBoolean.TRUE, BsonBoolean.TRUE, BsonBoolean.TRUE))
-                .lastIndexOf(BsonBoolean.TRUE))
+        assertEquals(2, BsonArray(listOf(BsonBoolean.TRUE, BsonBoolean.TRUE, BsonBoolean.TRUE)).lastIndexOf(BsonBoolean.TRUE))
         assertEquals(1, bsonValue.indexOf(BsonBoolean.FALSE))
     }
 
@@ -134,8 +131,7 @@ class BsonArrayTest {
         assertEquals(BsonNull, mutableList.set(0, BsonMinKey))
         assertEquals(BsonMinKey, mutableList.first())
 
-        val expected =
-            listOf(BsonMinKey, BsonBoolean.TRUE, BsonBoolean.FALSE, BsonUndefined, BsonMaxKey)
+        val expected = listOf(BsonMinKey, BsonBoolean.TRUE, BsonBoolean.FALSE, BsonUndefined, BsonMaxKey)
         assertContentEquals(expected, mutableList.values)
 
         assertTrue(mutableList.retainAll(listOf(BsonMinKey, BsonMaxKey, BsonUndefined)))

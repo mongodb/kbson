@@ -176,11 +176,8 @@ public sealed class BsonValue {
      * @throws org.kbson.BsonInvalidOperationException if this value is not of the expected type
      */
     public fun asNumber(): BsonNumber {
-        if (bsonType !== BsonType.INT32 &&
-            bsonType !== BsonType.INT64 &&
-            bsonType !== BsonType.DOUBLE) {
-            throw BsonInvalidOperationException(
-                "Value expected to be of a numerical BSON type is of unexpected type $bsonType")
+        if (bsonType !== BsonType.INT32 && bsonType !== BsonType.INT64 && bsonType !== BsonType.DOUBLE) {
+            throw BsonInvalidOperationException("Value expected to be of a numerical BSON type is of unexpected type $bsonType")
         }
         return this as BsonNumber
     }
@@ -341,8 +338,7 @@ public sealed class BsonValue {
 
     private fun throwIfInvalidType(expectedType: BsonType) {
         if (bsonType !== expectedType) {
-            throw BsonInvalidOperationException(
-                "Value expected to be of type $expectedType is of unexpected type ${bsonType}")
+            throw BsonInvalidOperationException("Value expected to be of type $expectedType is of unexpected type ${bsonType}")
         }
     }
 }

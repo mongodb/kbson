@@ -23,8 +23,7 @@ package org.kbson
 public abstract class BsonNumber(private val number: Number) : BsonValue() {
 
     /**
-     * Returns the value of the specified number as an `int`, which may involve rounding or
-     * truncation.
+     * Returns the value of the specified number as an `int`, which may involve rounding or truncation.
      *
      * @return the numeric value represented by this object after conversion to type `int`.
      */
@@ -33,8 +32,7 @@ public abstract class BsonNumber(private val number: Number) : BsonValue() {
     }
 
     /**
-     * Returns the value of the specified number as an `long`, which may involve rounding or
-     * truncation.
+     * Returns the value of the specified number as an `long`, which may involve rounding or truncation.
      *
      * @return the numeric value represented by this object after conversion to type `long`.
      */

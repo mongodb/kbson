@@ -21,8 +21,7 @@ package org.kbson
  * @param message the message
  * @param cause the cause
  */
-public class BsonInvalidOperationException(message: String? = null, cause: Throwable? = null) :
-    BsonException(message, cause) {
+public class BsonInvalidOperationException(message: String? = null, cause: Throwable? = null) : BsonException(message, cause) {
     override fun toString(): String {
         return "BsonInvalidOperationException(message=$message, cause=$cause)"
     }

@@ -22,10 +22,7 @@ import kotlin.test.assertTrue
 
 class BsonBinaryTest {
 
-    private val data =
-        listOf(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16)
-            .map { it.toByte() }
-            .toByteArray()
+    private val data = listOf(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16).map { it.toByte() }.toByteArray()
 
     @Test
     fun shouldHaveTheExpectedBsonType() {
@@ -83,11 +80,8 @@ class BsonBinaryTest {
 
     @Test
     fun shouldOverrideEquals() {
-        assertEquals(
-            BsonBinary(BsonBinarySubType.BINARY, data), BsonBinary(BsonBinarySubType.BINARY, data))
-        assertNotEquals(
-            BsonBinary(BsonBinarySubType.BINARY, data),
-            BsonBinary(BsonBinarySubType.USER_DEFINED, data))
+        assertEquals(BsonBinary(BsonBinarySubType.BINARY, data), BsonBinary(BsonBinarySubType.BINARY, data))
+        assertNotEquals(BsonBinary(BsonBinarySubType.BINARY, data), BsonBinary(BsonBinarySubType.USER_DEFINED, data))
     }
 
     @Test

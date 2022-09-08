@@ -39,12 +39,8 @@ class BsonObjectIdTest {
 
     @Test
     fun testFromBytes() {
-        assertFailsWith<IllegalArgumentException>("state should be: bytes has length of 12") {
-            BsonObjectId(ByteArray(11))
-        }
-        assertFailsWith<IllegalArgumentException>("state should be: bytes has length of 12") {
-            BsonObjectId(ByteArray(13))
-        }
+        assertFailsWith<IllegalArgumentException>("state should be: bytes has length of 12") { BsonObjectId(ByteArray(11)) }
+        assertFailsWith<IllegalArgumentException>("state should be: bytes has length of 12") { BsonObjectId(ByteArray(13)) }
 
         val bytes = byteArrayOf(81, 6, -4, -102, -68, -126, 55, 85, -127, 54, -46, -119)
         val objectId = BsonObjectId(bytes)
@@ -72,9 +68,6 @@ class BsonObjectIdTest {
     @Test
     fun testToHexString() {
         assertEquals("000000000000000000000000", BsonObjectId(ByteArray(12)).toHexString())
-        assertEquals(
-            "7fffffff007fff7fff007fff",
-            BsonObjectId(byteArrayOf(127, -1, -1, -1, 0, 127, -1, 127, -1, 0, 127, -1))
-                .toHexString())
+        assertEquals("7fffffff007fff7fff007fff", BsonObjectId(byteArrayOf(127, -1, -1, -1, 0, 127, -1, 127, -1, 0, 127, -1)).toHexString())
     }
 }

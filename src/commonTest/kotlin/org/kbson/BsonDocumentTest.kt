@@ -37,16 +37,12 @@ class BsonDocumentTest {
     private val bsonMaxKey = BsonMaxKey
     private val bsonJavaScript = BsonJavaScript("int i = 0;")
     private val bsonObjectId = BsonObjectId()
-    private val bsonJavaScriptWithScope =
-        BsonJavaScriptWithScope("int x = y", BsonDocument("y", BsonInt32(1)))
+    private val bsonJavaScriptWithScope = BsonJavaScriptWithScope("int x = y", BsonDocument("y", BsonInt32(1)))
     private val bsonRegularExpression = BsonRegularExpression("^test.*regex.*xyz$", "i")
     private val bsonSymbol = BsonSymbol("ruby stuff")
     private val bsonTimestamp = BsonTimestamp(0x12345678, 5)
     private val bsonUndefined = BsonUndefined
-    private val bsonBinary =
-        BsonBinary(
-            80.toByte(),
-            listOf(5.toByte(), 4.toByte(), 3.toByte(), 2.toByte(), 1.toByte()).toByteArray())
+    private val bsonBinary = BsonBinary(80.toByte(), listOf(5.toByte(), 4.toByte(), 3.toByte(), 2.toByte(), 1.toByte()).toByteArray())
     private val bsonArray =
         BsonArray(
             listOf(
@@ -115,12 +111,8 @@ class BsonDocumentTest {
         assertEquals(bsonDateTime, document.getDateTime("date", BsonDateTime(3453)))
         assertEquals(bsonString, document.getString("string", BsonString("df")))
         assertEquals(bsonObjectId, document.getObjectId("objectId", BsonObjectId()))
-        assertEquals(
-            bsonRegularExpression,
-            document.getRegularExpression("regex", BsonRegularExpression("^foo", "i")))
-        assertEquals(
-            bsonBinary,
-            document.getBinary("bsonBinary", BsonBinary(listOf(5.toByte()).toByteArray())))
+        assertEquals(bsonRegularExpression, document.getRegularExpression("regex", BsonRegularExpression("^foo", "i")))
+        assertEquals(bsonBinary, document.getBinary("bsonBinary", BsonBinary(listOf(5.toByte()).toByteArray())))
         assertEquals(bsonTimestamp, document.getTimestamp("timestamp", BsonTimestamp(343, 23)))
         assertEquals(bsonArray, document.getArray("array", BsonArray()))
         assertEquals(bsonDocument, document.getDocument("document", BsonDocument()))
@@ -196,8 +188,7 @@ class BsonDocumentTest {
         assertEquals(bsonString, document.getString("m", bsonString))
         assertEquals(bsonTimestamp, document.getTimestamp("m", bsonTimestamp))
         assertEquals(bsonInt32, document.getNumber("m", bsonInt32))
-        assertEquals(
-            bsonRegularExpression, document.getRegularExpression("m", bsonRegularExpression))
+        assertEquals(bsonRegularExpression, document.getRegularExpression("m", bsonRegularExpression))
         assertEquals(bsonBinary, document.getBinary("m", bsonBinary))
     }
 
@@ -283,8 +274,7 @@ class BsonDocumentTest {
         assertEquals(emptyDocument, BsonDocument(0))
         assertEquals(emptyDocument, BsonDocument(mapOf()))
         assertEquals(emptyDocument, BsonDocument(listOf()))
-        assertEquals(
-            emptyDocument, BsonDocument(*arrayListOf<Pair<String, BsonValue>>().toTypedArray()))
+        assertEquals(emptyDocument, BsonDocument(*arrayListOf<Pair<String, BsonValue>>().toTypedArray()))
 
         val expectedDocument =
             BsonDocument("null", bsonNull)

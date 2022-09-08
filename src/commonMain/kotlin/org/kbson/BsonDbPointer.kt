@@ -24,8 +24,7 @@ package org.kbson
  * @property namespace the namespace
  * @property id the id
  */
-public class BsonDbPointer(public val namespace: String, public val id: BsonObjectId) :
-    BsonValue() {
+public class BsonDbPointer(public val namespace: String, public val id: BsonObjectId) : BsonValue() {
 
     override val bsonType: BsonType
         get() = BsonType.DB_POINTER
