@@ -23,15 +23,19 @@ version = "1.0-SNAPSHOT"
 plugins {
     kotlin("multiplatform") version "1.7.0"
 
-    id("com.diffplug.spotless") version "6.9.0"
+    id("com.diffplug.spotless") version "6.10.0"
+    id("io.gitlab.arturbosch.detekt").version("1.21.0")
+    id("org.jetbrains.dokka") version "1.7.10"
 }
 
 repositories { mavenCentral() }
 
+@Suppress("UNUSED_VARIABLE")
 kotlin {
     jvm {
         compilations.all { kotlinOptions.jvmTarget = "1.8" }
         withJava()
+        tasks.withType<Test> { useJUnitPlatform() }
     }
 
     js(IR) { nodejs {} }
@@ -50,7 +54,15 @@ kotlin {
         val commonMain by getting
         val commonTest by getting { dependencies { implementation(kotlin("test")) } }
         val jvmMain by getting
-        val jvmTest by getting
+        val jvmTest by getting {
+            dependencies {
+                implementation(kotlin("test"))
+                implementation("org.jetbrains.kotlin:kotlin-reflect:1.7.10")
+                implementation("org.junit.jupiter:junit-jupiter:5.9.0")
+                implementation("org.reflections:reflections:0.10.2")
+                implementation("org.mongodb:bson:4.7.0")
+            }
+        }
 
         val jsMain by getting
         val jsTest by getting
@@ -58,6 +70,10 @@ kotlin {
         val nativeMain by getting
         val nativeTest by getting
     }
+
+    // Require that all methods in the API have visibility modifiers and return types.
+    // Anything inside `org.kbson.internal.*` is considered internal
+    explicitApi = org.jetbrains.kotlin.gradle.dsl.ExplicitApiMode.Strict
 }
 
 // Output summaries for all test environments (jvm, js and native)
@@ -138,5 +154,37 @@ spotless {
         endWithNewline()
     }
 }
+
+detekt {
+    allRules = true // fail build on any finding
+    buildUponDefaultConfig = true // preconfigure defaults
+    config =
+        rootProject.files(
+            "config/detekt/detekt.yml") // point to your custom config defining rules to run,
+    // overwriting default behavior
+    baseline =
+        rootProject.file(
+            "config/detekt/baseline.xml") // a way of suppressing issues before introducing detekt
+    source =
+        files(
+            file("src/commonMain/kotlin"),
+            file("src/commonTest/kotlin"),
+            file("src/jvmMain/kotlin"),
+            file("src/jvmTest/kotlin"),
+            file("src/nativeMain/kotlin"),
+            file("src/nativeTest/kotlin"),
+            file("src/jsMain/kotlin"),
+            file("src/jsTest/kotlin"))
+
+    reports {
+        html.enabled = true // observe findings in your browser with structure and code snippets
+        xml.enabled = false // checkstyle like format mainly for integrations like Jenkins
+        txt.enabled =
+            false // similar to the console output, contains issue signature to manually edit
+        // baseline files
+    }
+}
+
+tasks.named("check") { dependsOn(":spotlessApply") }
 
 tasks.named("compileKotlinMetadata") { dependsOn(":spotlessApply") }
