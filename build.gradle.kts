@@ -175,5 +175,3 @@ tasks.withType<io.gitlab.arturbosch.detekt.Detekt>().configureEach {
 }
 
 tasks.named("check") { dependsOn(":spotlessApply") }
-
-tasks.named("compileKotlinMetadata") { dependsOn(":spotlessApply") }

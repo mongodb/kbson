@@ -11,5 +11,6 @@ export JAVA_HOME=/opt/java/jdk11
 
 echo "Compiling and running checks"
 
+./gradlew --stop
 ./gradlew -version
 ./gradlew --info clean check -x allTests
