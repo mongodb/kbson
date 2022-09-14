@@ -24,7 +24,7 @@ package org.kbson
  * @property namespace the namespace
  * @property id the id
  */
-public class BsonDbPointer(public val namespace: String, public val id: BsonObjectId) : BsonValue() {
+public class BsonDBPointer(public val namespace: String, public val id: BsonObjectId) : BsonValue() {
 
     override val bsonType: BsonType
         get() = BsonType.DB_POINTER
@@ -33,7 +33,7 @@ public class BsonDbPointer(public val namespace: String, public val id: BsonObje
         if (this === other) return true
         if (other == null || this::class != other::class) return false
 
-        other as BsonDbPointer
+        other as BsonDBPointer
 
         if (namespace != other.namespace) return false
         if (id != other.id) return false
@@ -48,6 +48,6 @@ public class BsonDbPointer(public val namespace: String, public val id: BsonObje
     }
 
     override fun toString(): String {
-        return "BsonDbPointer(namespace='$namespace', id=$id)"
+        return "BsonDBPointer(namespace='$namespace', id=$id)"
     }
 }

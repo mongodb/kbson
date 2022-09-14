@@ -84,9 +84,9 @@ class BsonValueApiTest {
     }
 
     @Test
-    fun bsonDbPointerTest() {
+    fun bsonDBPointerTest() {
         val bsonClass = org.bson.BsonDbPointer::class.java
-        val kBsonClass = BsonDbPointer::class.java
+        val kBsonClass = BsonDBPointer::class.java
 
         val bsonConstructors = getConstructorParams(bsonClass)
         bsonConstructors.forEach { Collections.replaceAll(it, "ObjectId", "BsonObjectId") }
@@ -336,7 +336,9 @@ class BsonValueApiTest {
     }
 
     private fun getMethodNames(clazz: Class<*>, exclusions: List<String> = listOf()): Set<String> {
-        val kotlinExtraBsonValueMethods = listOf("isMaxKey", "isMinKey", "isUndefined")
+        val kotlinExtraBsonValueMethods =
+            listOf(
+                "isMaxKey", "isMinKey", "isUndefined", "asBsonNull", "asBsonMinKey", "asBsonMaxKey", "asBsonUndefined")
         return clazz.methods
             .map { it.name }
             .filterNot {

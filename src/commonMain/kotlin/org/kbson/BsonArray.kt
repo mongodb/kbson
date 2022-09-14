@@ -120,7 +120,7 @@ public class BsonArray(initial: List<BsonValue> = emptyList()) : BsonValue(), Mu
     }
 
     override fun toString(): String {
-        return "BsonArray{values=$_values}"
+        return "BsonArray(values=${_values.joinToString(",", "[", "]")})"
     }
 
     override val size: Int

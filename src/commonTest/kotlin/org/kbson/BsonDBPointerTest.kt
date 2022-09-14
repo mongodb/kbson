@@ -20,11 +20,11 @@ import kotlin.test.assertEquals
 import kotlin.test.assertNotEquals
 import kotlin.test.assertTrue
 
-class BsonDbPointerTest {
+class BsonDBPointerTest {
 
     private val namespace = "namespace"
     private val id = BsonObjectId()
-    private val bsonValue = BsonDbPointer(namespace, id)
+    private val bsonValue = BsonDBPointer(namespace, id)
 
     @Test
     fun shouldHaveTheExpectedBsonType() {
@@ -40,7 +40,7 @@ class BsonDbPointerTest {
 
     @Test
     fun shouldOverrideEquals() {
-        assertEquals(bsonValue, BsonDbPointer(namespace, id))
-        assertNotEquals(bsonValue, BsonDbPointer("altNamespace", id))
+        assertEquals(bsonValue, BsonDBPointer(namespace, id))
+        assertNotEquals(bsonValue, BsonDBPointer("altNamespace", id))
     }
 }

@@ -19,13 +19,15 @@ package org.kbson
  * A type-safe container for a BSON document.
  *
  * @constructor constructs the bson document with the initial values, defaults to an empty document
- * @param map the initial values
+ * @param initial the initial values
  */
 @Suppress("TooManyFunctions")
-public class BsonDocument(map: Map<String, BsonValue> = LinkedHashMap()) : BsonValue(), MutableMap<String, BsonValue> {
-    private val wrapped: LinkedHashMap<String, BsonValue>
+public class BsonDocument(initial: Map<String, BsonValue> = LinkedHashMap()) :
+    BsonValue(), MutableMap<String, BsonValue> {
+    private val _values: LinkedHashMap<String, BsonValue>
+
     init {
-        wrapped = if (map is LinkedHashMap) map else LinkedHashMap(map)
+        _values = if (initial is LinkedHashMap) initial else LinkedHashMap(initial)
     }
 
     /**
@@ -54,35 +56,35 @@ public class BsonDocument(map: Map<String, BsonValue> = LinkedHashMap()) : BsonV
     public constructor(vararg pairs: Pair<String, BsonValue>) : this(pairs.toMap())
 
     override val entries: MutableSet<MutableMap.MutableEntry<String, BsonValue>>
-        get() = wrapped.entries
+        get() = _values.entries
     override val keys: MutableSet<String>
-        get() = wrapped.keys
+        get() = _values.keys
     override val size: Int
-        get() = wrapped.size
+        get() = _values.size
     override val values: MutableCollection<BsonValue>
-        get() = wrapped.values
+        get() = _values.values
 
     override fun clear() {
-        wrapped.clear()
+        _values.clear()
     }
 
-    override fun containsKey(key: String): Boolean = wrapped.containsKey(key)
+    override fun containsKey(key: String): Boolean = _values.containsKey(key)
 
-    override fun containsValue(value: BsonValue): Boolean = wrapped.containsValue(value)
+    override fun containsValue(value: BsonValue): Boolean = _values.containsValue(value)
 
-    override fun get(key: String): BsonValue? = wrapped[key]
+    override fun get(key: String): BsonValue? = _values[key]
 
-    override fun isEmpty(): Boolean = wrapped.isEmpty()
+    override fun isEmpty(): Boolean = _values.isEmpty()
     override fun remove(key: String): BsonValue? {
-        return wrapped.remove(key)
+        return _values.remove(key)
     }
 
     override fun putAll(from: Map<out String, BsonValue>) {
-        wrapped.putAll(from)
+        _values.putAll(from)
     }
 
     override fun put(key: String, value: BsonValue): BsonValue? {
-        return wrapped.put(key, value)
+        return _values.put(key, value)
     }
 
     override val bsonType: BsonType
@@ -90,27 +92,23 @@ public class BsonDocument(map: Map<String, BsonValue> = LinkedHashMap()) : BsonV
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
-        if (other == null || this::class != other::class) return false
-
-        other as BsonDocument
-
-        if (wrapped != other.wrapped) return false
-
-        return true
+        if (other == null || other !is BsonDocument) return false
+        // Use entries to force other BsonDocument implementations to decode
+        return entries == other.entries
     }
 
     override fun hashCode(): Int {
-        return wrapped.hashCode()
+        return _values.hashCode()
     }
 
     override fun toString(): String {
-        return "BsonDocument(wrapped=$wrapped)"
+        return "BsonDocument($_values)"
     }
 
     /** Clone the document */
     public fun clone(): BsonDocument {
         val clonedValues = HashMap<String, BsonValue>()
-        wrapped.onEach { entry ->
+        _values.onEach { entry ->
             if (entry.value.isArray()) {
                 clonedValues[entry.key] = entry.value.asArray().clone()
             } else if (entry.value.isDocument()) {

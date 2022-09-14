@@ -81,9 +81,9 @@ public sealed class BsonValue {
         return this is BsonObjectId
     }
 
-    /** @return true if this is a BsonDbPointer, false otherwise */
+    /** @return true if this is a BsonDBPointer, false otherwise */
     public fun isDBPointer(): Boolean {
-        return this is BsonDbPointer
+        return this is BsonDBPointer
     }
 
     /** @return true if this is a BsonTimestamp, false otherwise */
@@ -250,14 +250,14 @@ public sealed class BsonValue {
     }
 
     /**
-     * Gets this value as a BsonDbPointer if it is one, otherwise throws exception
+     * Gets this value as a BsonDBPointer if it is one, otherwise throws exception
      *
-     * @return an BsonDbPointer
+     * @return an BsonDBPointer
      * @throws org.kbson.BsonInvalidOperationException if this value is not of the expected type
      */
-    public fun asDBPointer(): BsonDbPointer {
+    public fun asDBPointer(): BsonDBPointer {
         throwIfInvalidType(BsonType.DB_POINTER)
-        return this as BsonDbPointer
+        return this as BsonDBPointer
     }
 
     /**
@@ -335,6 +335,50 @@ public sealed class BsonValue {
     public fun asJavaScriptWithScope(): BsonJavaScriptWithScope {
         throwIfInvalidType(BsonType.JAVASCRIPT_WITH_SCOPE)
         return this as BsonJavaScriptWithScope
+    }
+
+    /**
+     * Gets this value as a BsonNull if it is one, otherwise throws exception
+     *
+     * @return a BsonNull
+     * @throws org.kbson.BsonInvalidOperationException if this value is not of the expected type
+     */
+    public fun asBsonNull(): BsonNull {
+        throwIfInvalidType(BsonType.NULL)
+        return this as BsonNull
+    }
+
+    /**
+     * Gets this value as a BsonMinKey if it is one, otherwise throws exception
+     *
+     * @return a BsonMinKey
+     * @throws org.kbson.BsonInvalidOperationException if this value is not of the expected type
+     */
+    public fun asBsonMinKey(): BsonMinKey {
+        throwIfInvalidType(BsonType.MIN_KEY)
+        return this as BsonMinKey
+    }
+
+    /**
+     * Gets this value as a BsonMaxKey if it is one, otherwise throws exception
+     *
+     * @return a BsonMaxKey
+     * @throws org.kbson.BsonInvalidOperationException if this value is not of the expected type
+     */
+    public fun asBsonMaxKey(): BsonMaxKey {
+        throwIfInvalidType(BsonType.MAX_KEY)
+        return this as BsonMaxKey
+    }
+
+    /**
+     * Gets this value as a BsonUndefined if it is one, otherwise throws exception
+     *
+     * @return a BsonUndefined
+     * @throws org.kbson.BsonInvalidOperationException if this value is not of the expected type
+     */
+    public fun asBsonUndefined(): BsonUndefined {
+        throwIfInvalidType(BsonType.UNDEFINED)
+        return this as BsonUndefined
     }
 
     private fun throwIfInvalidType(expectedType: BsonType) {

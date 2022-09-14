@@ -55,7 +55,7 @@ public class BsonBinary(public val type: Byte, public val data: ByteArray) : Bso
         get() = BsonType.BINARY
 
     override fun toString(): String {
-        return "BsonBinary{type=$type, data=$data}"
+        return "BsonBinary(type=$type, data=${data.joinToString(",", "[", "]")})"
     }
 
     override fun equals(other: Any?): Boolean {
