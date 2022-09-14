@@ -129,7 +129,8 @@ class BsonValueApiTest {
         val bsonMethods =
             getMethodNames(
                 bsonClass, listOf("parse", "toJson", "toBsonDocument", "asBsonReader", "readObject", "writeReplace"))
-        val kBsonMethods = getMethodNames(kBsonClass, listOf("getSize", "getEntries", "getKeys", "getValues"))
+        val kBsonMethods =
+            getMethodNames(kBsonClass, listOf("getSize", "getEntries", "getKeys", "getValues", "toByteArray"))
         assertEquals(bsonMethods, kBsonMethods)
     }
 

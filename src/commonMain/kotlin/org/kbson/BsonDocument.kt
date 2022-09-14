@@ -15,6 +15,11 @@
  */
 package org.kbson
 
+import org.kbson.internal.io.BsonBinaryReader
+import org.kbson.internal.io.BsonBinaryWriter
+import org.kbson.internal.io.BsonDocumentWriter
+import org.kbson.internal.use
+
 /**
  * A type-safe container for a BSON document.
  *
@@ -54,6 +59,18 @@ public class BsonDocument(initial: Map<String, BsonValue> = LinkedHashMap()) :
      * @param pairs the initial pairs of values
      */
     public constructor(vararg pairs: Pair<String, BsonValue>) : this(pairs.toMap())
+
+    /**
+     * Returns the Bson bytes for this document
+     *
+     * @return the raw bson bytes
+     */
+    public fun toByteArray(): ByteArray {
+        return BsonBinaryWriter().use { w ->
+            w.pipeDocument(this)
+            w.bsonOutput.toByteArray()
+        }
+    }
 
     override val entries: MutableSet<MutableMap.MutableEntry<String, BsonValue>>
         get() = _values.entries
@@ -671,6 +688,26 @@ public class BsonDocument(initial: Map<String, BsonValue> = LinkedHashMap()) :
     public fun getBinary(key: String): BsonBinary {
         throwIfKeyAbsent(key)
         return get(key)!!.asBinary()
+    }
+
+    /**
+     * BsonDocument companion object
+     */
+    public companion object {
+
+        /**
+         * Create a BsonDocument from a ByteArray
+         *
+         * @param byteArray the source bson
+         * @return a BsonDocument
+         * @see [BsonDocument.toByteArray]
+         */
+        public operator fun invoke(byteArray: ByteArray): BsonDocument {
+            return BsonDocumentWriter().use { w ->
+                w.pipe(BsonBinaryReader(byteArray))
+                w.bsonDocument
+            }
+        }
     }
 
     private fun throwIfKeyAbsent(key: Any) {

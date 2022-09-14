@@ -20,7 +20,7 @@ package org.kbson
  *
  * @property value the int value of this BSON type.
  */
-public enum class BsonType(public val value: Int) {
+public enum class BsonType(public val value: Byte) {
     /** Not a real BSON type. Used to signal the end of a document. */
     END_OF_DOCUMENT(0x00), // no values of this type exist it marks the end of a document
 
@@ -82,7 +82,7 @@ public enum class BsonType(public val value: Int) {
     DECIMAL128(0x13),
 
     /** A BSON MinKey value. */
-    MIN_KEY(0xff),
+    MIN_KEY(0xff.toByte()),
 
     /** A BSON MaxKey value. */
     MAX_KEY(0x7f);

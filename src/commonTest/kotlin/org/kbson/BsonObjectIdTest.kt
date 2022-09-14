@@ -73,7 +73,7 @@ class BsonObjectIdTest {
     fun testToHexString() {
         assertEquals("000000000000000000000000", BsonObjectId(ByteArray(12)).toHexString())
         assertEquals(
-            "7fffffff007fff7fff007fff",
+            "7FFFFFFF007FFF7FFF007FFF",
             BsonObjectId(byteArrayOf(127, -1, -1, -1, 0, 127, -1, 127, -1, 0, 127, -1)).toHexString())
     }
 }
