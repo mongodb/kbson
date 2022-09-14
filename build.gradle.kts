@@ -21,11 +21,14 @@ group = "org.mongodb"
 version = "1.0-SNAPSHOT"
 
 plugins {
-    kotlin("multiplatform") version "1.7.0"
+    kotlin("multiplatform") version "1.7.10"
+    kotlin("plugin.serialization") version "1.7.10"
 
+    // Test based plugins
     id("com.diffplug.spotless") version "6.10.0"
     id("io.gitlab.arturbosch.detekt") version "1.21.0"
     id("org.jetbrains.dokka") version "1.7.10"
+    id("com.goncalossilva.resources") version "0.2.2" // kotlinx-resources
 }
 
 repositories { mavenCentral() }
@@ -52,7 +55,13 @@ kotlin {
 
     sourceSets {
         val commonMain by getting
-        val commonTest by getting { dependencies { implementation(kotlin("test")) } }
+        val commonTest by getting {
+            dependencies {
+                implementation(kotlin("test"))
+                implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.4.0")
+                implementation("com.goncalossilva:resources:0.2.1") // kotlinx-resources
+            }
+        }
         val jvmMain by getting
         val jvmTest by getting {
             dependencies {
