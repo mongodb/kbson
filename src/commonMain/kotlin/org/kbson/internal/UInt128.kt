@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.kbson
+package org.kbson.internal
 
 @Suppress("MagicNumber")
 internal class UInt128(val high: ULong, val low: ULong) : Comparable<UInt128> {

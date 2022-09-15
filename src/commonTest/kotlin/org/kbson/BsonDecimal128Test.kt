@@ -23,7 +23,7 @@ import kotlin.test.assertTrue
 
 class BsonDecimal128Test {
 
-    private val bsonValue = BsonDecimal128(1, 2)
+    private val bsonValue = BsonDecimal128.fromIEEE754BIDEncoding(1uL, 2uL)
 
     @Test
     fun shouldHaveTheExpectedBsonType() {
@@ -32,26 +32,31 @@ class BsonDecimal128Test {
     }
 
     @Test
-    fun shouldHaveAccessToTheUnderlyingValues() {
-        assertEquals(1, bsonValue.high)
-        assertEquals(2, bsonValue.low)
+    fun shouldHaveDecimalSpecificMethods() {
+        assertFalse(BsonDecimal128("1").isNegative)
+        assertTrue(BsonDecimal128("-1.0000000000001").isNegative)
+        assertTrue(BsonDecimal128("-Infinity").isNegative)
+        assertTrue(BsonDecimal128("-0").isNegative)
+        assertTrue(BsonDecimal128("12").isFinite)
+        assertTrue(BsonDecimal128.POSITIVE_INFINITY.isInfinite)
+        assertTrue(BsonDecimal128.NEGATIVE_INFINITY.isInfinite)
+        assertFalse(BsonDecimal128.NaN.isFinite)
+        assertTrue(BsonDecimal128.NaN.isNaN)
     }
 
     @Test
-    fun shouldHaveDecimalSpecificMethods() {
-        assertFalse(BsonDecimal128(1, 1).isNegative())
-        assertTrue(BsonDecimal128(-1, 0x0000000000000000L).isNegative())
-        assertTrue(BsonDecimal128(-0x4fc0000000000000L, 0x0000000000000000L).isNegative())
-        assertTrue(BsonDecimal128(-0x800000000000000L, 0x0000000000000000L).isNegative())
-        assertTrue(BsonDecimal128(1, 0x0000000000000000L).isFinite())
-        assertTrue(BsonDecimal128(0x7800000000000000L, 0x0000000000000000L).isInfinite())
-        assertTrue(BsonDecimal128(-0x800000000000000L, 0x0000000000000000L).isInfinite())
-        assertTrue(BsonDecimal128(0x7c00000000000000L, 0x0000000000000000L).isNaN())
+    fun shouldHaveCompanionHelpersForSpecialTypes() {
+        assertEquals(BsonDecimal128.NaN, BsonDecimal128("NaN"))
+        assertEquals(BsonDecimal128.NEGATIVE_NaN, BsonDecimal128("-NaN"))
+        assertEquals(BsonDecimal128.POSITIVE_INFINITY, BsonDecimal128("Infinity"))
+        assertEquals(BsonDecimal128.NEGATIVE_INFINITY, BsonDecimal128("-Infinity"))
+        assertEquals(BsonDecimal128.POSITIVE_ZERO, BsonDecimal128("0"))
+        assertEquals(BsonDecimal128.NEGATIVE_ZERO, BsonDecimal128("-0"))
     }
 
     @Test
     fun shouldOverrideEquals() {
-        assertEquals(bsonValue, BsonDecimal128(1L, 2L))
-        assertNotEquals(bsonValue, BsonDecimal128(2, 2))
+        assertEquals(bsonValue, BsonDecimal128("1.8446744073709551618E-6157"))
+        assertNotEquals(bsonValue, BsonDecimal128("2.2"))
     }
 }

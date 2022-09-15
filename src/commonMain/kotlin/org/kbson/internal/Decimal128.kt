@@ -13,17 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.kbson
+package org.kbson.internal
 
 import kotlin.math.abs
-import org.kbson.Decimal128.Flags.FirstFormExponentBits
-import org.kbson.Decimal128.Flags.SecondFormExponentBits
-import org.kbson.Decimal128.Flags.isFirstForm
-import org.kbson.Decimal128.Flags.isNaN
-import org.kbson.Decimal128.Flags.isNegative
-import org.kbson.Decimal128.Flags.isNegativeInfinity
-import org.kbson.Decimal128.Flags.isPositiveInfinity
-import org.kbson.Decimal128.Flags.isSecondForm
+import org.kbson.internal.Decimal128.Flags.FirstFormExponentBits
+import org.kbson.internal.Decimal128.Flags.SecondFormExponentBits
+import org.kbson.internal.Decimal128.Flags.isFirstForm
+import org.kbson.internal.Decimal128.Flags.isNaN
+import org.kbson.internal.Decimal128.Flags.isNegative
+import org.kbson.internal.Decimal128.Flags.isNegativeInfinity
+import org.kbson.internal.Decimal128.Flags.isPositiveInfinity
+import org.kbson.internal.Decimal128.Flags.isSecondForm
 
 /**
  * A binary integer decimal representation of a 128-bit decimal value, supporting 34 decimal digits of significand and
@@ -31,11 +31,8 @@ import org.kbson.Decimal128.Flags.isSecondForm
  *
  * @see [BSON Decimal128
  * specification](https://github.com/mongodb/specifications/blob/master/source/bson-decimal128/decimal128.rst)
- *
  * @see [binary integer decimal](https://en.wikipedia.org/wiki/Binary_Integer_Decimal)
- *
  * @see [decimal128 floating-point format](https://en.wikipedia.org/wiki/Decimal128_floating-point_format)
- *
  * @see [754-2008 - IEEE Standard for Floating-Point Arithmetic](http://ieeexplore.ieee.org/document/4610935/)
  */
 @Suppress("MagicNumber")
@@ -95,7 +92,7 @@ private constructor(
      *
      * @return the String representation
      * @see [To-String
-     * Specification](https://github.com/mongodb/specifications/blob/master/source/bson-decimal128/decimal128.rst.to-string-representation)
+     * Specification](https://github.com/mongodb/specifications/blob/master/source/bson-decimal128/decimal128.rst#to-string-representation)
      */
     @Suppress("MaxLineLength")
     override fun toString(): String {
@@ -106,7 +103,7 @@ private constructor(
             isSecondForm(high) -> secondFormToString(high)
             isNegativeInfinity(high) -> "-Infinity"
             isPositiveInfinity(high) -> "Infinity"
-            isNaN(high) -> "NaN"
+            isNaN(high) -> if (isNegative) "-NaN" else "NaN"
             else -> error("Unsupported Decimal128 string conversion. This is a bug.")
         }
     }
@@ -238,37 +235,37 @@ private constructor(
 
         /**
          * A constant holding the positive infinity of type `Decimal128`. It is equal to the value return by
-         * `Decimal128.valueOf("Infinity")`.
+         * `Decimal128("Infinity")`.
          */
         public val POSITIVE_INFINITY: Decimal128 = fromIEEE754BIDEncoding(INFINITY_MASK, 0uL)
 
         /**
          * A constant holding the negative infinity of type `Decimal128`. It is equal to the value return by
-         * `Decimal128.valueOf("-Infinity")`.
+         * `Decimal128("-Infinity")`.
          */
         public val NEGATIVE_INFINITY: Decimal128 = fromIEEE754BIDEncoding(INFINITY_MASK or SIGN_BIT_MASK, 0uL)
 
         /**
          * A constant holding a negative Not-a-Number (-NaN) value of type `Decimal128`. It is equal to the value return
-         * by `Decimal128.valueOf("-NaN")`.
+         * by `Decimal128("-NaN")`.
          */
         public val NEGATIVE_NaN: Decimal128 = fromIEEE754BIDEncoding(NaN_MASK or SIGN_BIT_MASK, 0uL)
 
         /**
          * A constant holding a Not-a-Number (NaN) value of type `Decimal128`. It is equal to the value return by
-         * `Decimal128.valueOf("NaN")`.
+         * `Decimal128("NaN")`.
          */
         public val NaN: Decimal128 = fromIEEE754BIDEncoding(NaN_MASK, 0uL)
 
         /**
          * A constant holding a positive zero value of type `Decimal128`. It is equal to the value return by
-         * `Decimal128.valueOf("0")`.
+         * `Decimal128("0")`.
          */
         public val POSITIVE_ZERO: Decimal128 = fromIEEE754BIDEncoding(0x3040000000000000uL, 0x0000000000000000uL)
 
         /**
          * A constant holding a negative zero value of type `Decimal128`. It is equal to the value return by
-         * `Decimal128.valueOf("-0")`.
+         * `Decimal128("-0")`.
          */
         public val NEGATIVE_ZERO: Decimal128 = fromIEEE754BIDEncoding(0xb040000000000000uL, 0x0000000000000000uL)
 
@@ -292,7 +289,7 @@ private constructor(
          * Specification](https://github.com/mongodb/specifications/blob/master/source/bson-decimal128/decimal128.rst.from-string-representation)
          */
         @Suppress("MaxLineLength", "ComplexMethod", "ThrowsCount")
-        public fun parse(value: String): Decimal128 {
+        public operator fun invoke(value: String): Decimal128 {
             if (value.isEmpty()) {
                 throw NumberFormatException()
             }

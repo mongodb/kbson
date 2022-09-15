@@ -28,7 +28,7 @@ class BsonDocumentTest {
     private val bsonNull = BsonNull
     private val bsonInt32 = BsonInt32(42)
     private val bsonInt64 = BsonInt64(52L)
-    private val bsonDecimal128 = BsonDecimal128(1, 0)
+    private val bsonDecimal128 = BsonDecimal128("1.002")
     private val bsonBoolean = BsonBoolean(true)
     private val bsonDateTime = BsonDateTime()
     private val bsonDouble = BsonDouble(62.0)
@@ -106,7 +106,7 @@ class BsonDocumentTest {
 
         assertEquals(bsonInt32, document.getInt32("int32", BsonInt32(2)))
         assertEquals(bsonInt64, document.getInt64("int64", BsonInt64(4)))
-        assertEquals(bsonDecimal128, document.getDecimal128("decimal128", BsonDecimal128(1, 2)))
+        assertEquals(bsonDecimal128, document.getDecimal128("decimal128", BsonDecimal128("1.002")))
         assertEquals(bsonDouble, document.getDouble("double", BsonDouble(343.0)))
         assertEquals(bsonBoolean, document.getBoolean("boolean", BsonBoolean(false)))
         assertEquals(bsonDateTime, document.getDateTime("date", BsonDateTime(3453)))

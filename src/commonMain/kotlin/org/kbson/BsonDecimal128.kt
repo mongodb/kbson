@@ -15,57 +15,61 @@
  */
 package org.kbson
 
-/**
- * A representation of the BSON Decimal128 type.
- *
- * @constructor Create an instance with the given high and low order bits representing this BsonDecimal128 as an IEEE
- * 754-2008 128-bit decimal floating point using the BID encoding scheme.
- * @property high the high-order 64 bits
- * @property low the low-order 64 bits
- */
-public class BsonDecimal128(public val high: Long, public val low: Long) : BsonValue() {
+import org.kbson.internal.Decimal128
 
+/**
+ * A binary integer decimal representation of a 128-bit decimal value, supporting 34 decimal digits of significand and
+ * an exponent range of -6143 to +6144.
+ *
+ * @see [BSON Decimal128
+ * specification](https://github.com/mongodb/specifications/blob/master/source/bson-decimal128/decimal128.rst)
+ *
+ * @see [binary integer decimal](https://en.wikipedia.org/wiki/Binary_Integer_Decimal)
+ *
+ * @see [decimal128 floating-point format](https://en.wikipedia.org/wiki/Decimal128_floating-point_format)
+ *
+ * @see [754-2008 - IEEE Standard for Floating-Point Arithmetic](http://ieeexplore.ieee.org/document/4610935/)
+ *
+ * @property value the Decimal128 value
+ */
+public class BsonDecimal128 private constructor(private val value: Decimal128) : BsonValue() {
     override val bsonType: BsonType
         get() = BsonType.DECIMAL128
 
     /**
-     * Returns true if this Decimal128 is negative.
+     * Returns true if this BsonDecimal128 is negative.
      *
-     * @return true if this Decimal128 is negative
+     * @return true if this BsonDecimal128 is negative
      */
-    public fun isNegative(): Boolean {
-        return (high and SIGN_BIT_MASK) == SIGN_BIT_MASK
-    }
+    public val isNegative: Boolean
+        get() = value.isNegative
 
     /**
-     * Returns true if this Decimal128 is infinite.
+     * Returns true if this BsonDecimal128 is infinite.
      *
-     * @return true if this Decimal128 is infinite
+     * @return true if this BsonDecimal128 is infinite
      */
-    public fun isInfinite(): Boolean {
-        return (high and INFINITY_MASK) == INFINITY_MASK
-    }
+    public val isInfinite: Boolean
+        get() = value.isInfinite
 
     /**
-     * Returns true if this Decimal128 is finite.
+     * Returns true if this BsonDecimal128 is finite.
      *
-     * @return true if this Decimal128 is finite
+     * @return true if this BsonDecimal128 is finite
      */
-    public fun isFinite(): Boolean {
-        return !isInfinite()
-    }
+    public val isFinite: Boolean
+        get() = value.isFinite
 
     /**
-     * Returns true if this Decimal128 is Not-A-Number (NaN).
+     * Returns true if this BsonDecimal128 is Not-A-Number (NaN).
      *
-     * @return true if this Decimal128 is Not-A-Number
+     * @return true if this BsonDecimal128 is Not-A-Number
      */
-    public fun isNaN(): Boolean {
-        return (high and NaN_MASK) == NaN_MASK
-    }
+    public val isNaN: Boolean
+        get() = value.isNaN
 
     override fun toString(): String {
-        return "BsonDecimal128(high=$high, low=$low)"
+        return "BsonDecimal128(value=${value})"
     }
 
     override fun equals(other: Any?): Boolean {
@@ -74,21 +78,72 @@ public class BsonDecimal128(public val high: Long, public val low: Long) : BsonV
 
         other as BsonDecimal128
 
-        if (high != other.high) return false
-        if (low != other.low) return false
-
-        return true
+        return this.value == other.value
     }
 
-    override fun hashCode(): Int {
-        var result = high.hashCode()
-        result = 31 * result + low.hashCode()
-        return result
-    }
+    override fun hashCode(): Int = value.hashCode()
 
-    private companion object {
-        private const val INFINITY_MASK = 0x7800000000000000L
-        private const val NaN_MASK = 0x7c00000000000000L
-        private const val SIGN_BIT_MASK = 1L shl 63
+    public companion object {
+
+        /**
+         * A constant holding the positive infinity of type `BsonDecimal128`. It is equal to the value return by
+         * `BsonDecimal128("Infinity")`.
+         */
+        public val POSITIVE_INFINITY: BsonDecimal128 = BsonDecimal128(Decimal128.POSITIVE_INFINITY)
+
+        /**
+         * A constant holding the negative infinity of type `BsonDecimal128`. It is equal to the value return by
+         * `BsonDecimal128("-Infinity")`.
+         */
+        public val NEGATIVE_INFINITY: BsonDecimal128 = BsonDecimal128(Decimal128.NEGATIVE_INFINITY)
+
+        /**
+         * A constant holding a negative Not-a-Number (-NaN) value of type `BsonDecimal128`. It is equal to the value
+         * return by `BsonDecimal128("-NaN")`.
+         */
+        public val NEGATIVE_NaN: BsonDecimal128 = BsonDecimal128(Decimal128.NEGATIVE_NaN)
+
+        /**
+         * A constant holding a Not-a-Number (NaN) value of type `BsonDecimal128`. It is equal to the value return by
+         * `BsonDecimal128("NaN")`.
+         */
+        public val NaN: BsonDecimal128 = BsonDecimal128(Decimal128.NaN)
+
+        /**
+         * A constant holding a positive zero value of type `BsonDecimal128`. It is equal to the value return by
+         * `BsonDecimal128("0")`.
+         */
+        public val POSITIVE_ZERO: BsonDecimal128 = BsonDecimal128(Decimal128.POSITIVE_ZERO)
+
+        /**
+         * A constant holding a negative zero value of type `BsonDecimal128`. It is equal to the value return by
+         * `BsonDecimal128("-0")`.
+         */
+        public val NEGATIVE_ZERO: BsonDecimal128 = BsonDecimal128(Decimal128.NEGATIVE_ZERO)
+
+        /**
+         * Create an instance with the given high and low order bits representing this BsonDecimal128 as an IEEE
+         * 754-2008 128-bit decimal floating point using the BID encoding scheme.
+         *
+         * @param high the high-order 64 bits
+         * @param low the low-order 64 bits
+         * @return the BsonDecimal128 value representing the given high and low order bits
+         */
+        public fun fromIEEE754BIDEncoding(high: ULong, low: ULong): BsonDecimal128 =
+            BsonDecimal128(Decimal128.fromIEEE754BIDEncoding(high, low))
+
+        /**
+         * Returns a BsonDecimal128 value representing the given String.
+         *
+         * @param value the BsonDecimal128 value represented as a String
+         * @return the BsonDecimal128 value representing the given String
+         * @throws NumberFormatException if the value is out of the BsonDecimal128 range
+         * @see [From-String
+         * Specification](https://github.com/mongodb/specifications/blob/master/source/bson-decimal128/decimal128.rst.from-string-representation)
+         */
+        @Suppress("MaxLineLength")
+        public operator fun invoke(value: String): BsonDecimal128 {
+            return BsonDecimal128(Decimal128(value))
+        }
     }
 }
