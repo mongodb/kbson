@@ -66,7 +66,6 @@ public class BsonBinaryReader(private val bsonInput: ByteArrayBsonInput) : Abstr
     override fun doReadBinaryData(): BsonBinary {
         var numBytes: Int = readSize()
         val type = bsonInput.readByte()
-
         if (type == BsonBinarySubType.OLD_BINARY.value) {
             val repeatedNumBytes = bsonInput.readInt32()
             validateSerialization(repeatedNumBytes == numBytes - 4) {

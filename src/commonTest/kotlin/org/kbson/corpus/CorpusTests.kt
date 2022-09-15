@@ -13,6 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+@file:Suppress("UNUSED")
+
 package org.kbson.corpus
 
 import com.goncalossilva.resources.Resource
@@ -24,10 +26,12 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
+import org.kbson.BsonDecimal128
 import org.kbson.BsonDocument
 import org.kbson.BsonSerializationException
 import org.kbson.BsonType
 import org.kbson.BsonValue
+import org.kbson.internal.Assertions.assertThrows
 import org.kbson.internal.HexUtils
 
 class ArrayTest : CorpusTest("array.json")
@@ -105,6 +109,7 @@ abstract class CorpusTest(filename: String) {
         val lossy: Boolean = false
     )
     @Serializable data class InvalidBson(val description: String, @SerialName("bson") val invalidBson: String)
+    @Serializable data class ParseError(val description: String, @SerialName("string") val invalidString: String)
 
     @Serializable
     data class TestData(
@@ -112,6 +117,7 @@ abstract class CorpusTest(filename: String) {
         @SerialName("bson_type") val bsonType: String,
         @SerialName("valid") val validBsonScenarios: List<ValidBson> = emptyList(),
         @SerialName("decodeErrors") val invalidBsonScenarios: List<InvalidBson> = emptyList(),
+        @SerialName("parseErrors") val parseErrorScenarios: List<ParseError> = emptyList(),
         val deprecated: Boolean = false
     )
 
@@ -131,6 +137,7 @@ abstract class CorpusTest(filename: String) {
     fun shouldPassAllOutcomes() {
         data.validBsonScenarios.forEach { testValid(it) }
         data.invalidBsonScenarios.forEach { testDecodeError(it) }
+        data.parseErrorScenarios.forEach { testParseError(it) }
     }
 
     private fun testValid(scenario: ValidBson) {
@@ -149,6 +156,30 @@ abstract class CorpusTest(filename: String) {
                 HexUtils.toHexString(decodedDegenerateDocument.toByteArray()),
                 "Failed to create expected canonical BSON from degenerate BSON for document with description:" +
                     " ${scenario.description}.")
+        }
+
+        val parsedCanonicalJsonDocument = BsonDocument(scenario.canonicalJson)
+
+        if (shouldCompareJson(scenario.canonicalJson)) {
+            // native_to_canonical_extended_json( bson_to_native(cB) ) = cEJ
+            assertEquals(
+                scenario.canonicalJson.stripWhiteSpace(),
+                decodedDocument.toJson().stripWhiteSpace(),
+                "Failed to create expected canonical JSON for document with description  ${scenario.description}.")
+
+            // native_to_canonical_extended_json( json_to_native(cEJ) ) = cEJ
+            assertEquals(
+                scenario.canonicalJson.stripWhiteSpace(),
+                parsedCanonicalJsonDocument.toJson().stripWhiteSpace(),
+                "Failed to create expected canonical JSON from parsing canonical JSON")
+        }
+
+        if (!scenario.lossy) {
+            // native_to_bson( json_to_native(cEJ) ) = cB
+            assertEquals(
+                scenario.canonicalBsonHex.uppercase(),
+                HexUtils.toHexString(parsedCanonicalJsonDocument.toByteArray()),
+                "Failed to create expected canonical BSON from parsing canonical JSON")
         }
     }
 
@@ -185,11 +216,43 @@ abstract class CorpusTest(filename: String) {
         }
     }
 
+    private fun testParseError(scenario: ParseError) {
+        val ignored =
+            listOf(
+                "Bad \$timestamp ('t' type is string, not number)", "Bad \$timestamp ('i' type is string, not number)")
+
+        if (ignored.contains(scenario.description))
+            return // Json is quite lenient and coerces the string values to ints
+        if (scenario.description.contains("\$uuid")) return // $uuid currently not supported
+
+        if (data.description.startsWith("Decimal")) {
+            assertThrows(NumberFormatException::class) { BsonDecimal128(scenario.invalidString) }
+        } else {
+            assertThrows(BsonSerializationException::class) { BsonDocument(scenario.invalidString) }
+        }
+    }
+
     private fun hexStringToBsonDocument(hexString: String, description: String): BsonDocument {
         try {
-            return BsonDocument.invoke(HexUtils.toByteArray(hexString))
+            return BsonDocument(HexUtils.toByteArray(hexString))
         } catch (e: Exception) {
             fail("$description: Failed to decode Document: ${e.message} :: ${e.stackTraceToString()}")
+        }
+    }
+
+    private fun String.stripWhiteSpace(): String = this.replace(" ", "")
+
+    @Suppress("RedundantIf")
+    private fun shouldCompareJson(canonicalJson: String): Boolean {
+        return if (canonicalJson.contains("\\u")) {
+            // The corpus escapes all non-ascii characters but kotlinx.serialization doesn't
+            false
+        } else if (1.0.toString() != "1.0" &&
+            listOf("Double type", "Multiple types within the same document").contains(data.description)) {
+            // Node has different string representations for Doubles
+            false
+        } else {
+            true
         }
     }
 }

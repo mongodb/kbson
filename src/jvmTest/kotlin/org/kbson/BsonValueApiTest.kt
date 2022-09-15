@@ -33,7 +33,7 @@ class BsonValueApiTest {
         val kBsonConstructors = getConstructorParams(kBsonClass)
         assertEquals(bsonConstructors, kBsonConstructors)
 
-        val bsonMethods = getMethodNames(bsonClass, listOf("parse", "toJson", "asBsonReader"))
+        val bsonMethods = getMethodNames(bsonClass, listOf("parse", "asBsonReader"))
         val kBsonMethods = getMethodNames(kBsonClass, listOf("getSize", "removeAt"))
         assertEquals(bsonMethods, kBsonMethods)
     }
@@ -109,7 +109,8 @@ class BsonValueApiTest {
         val bsonMethods =
             getMethodNames(bsonClass, listOf("intValue", "longValue", "doubleValue", "getValue", "decimal128Value"))
         val kBsonMethods =
-            getMethodNames(kBsonClass, listOf("isNaN", "isInfinite", "isFinite", "isNegative", "getHigh", "getLow"))
+            getMethodNames(
+                kBsonClass, listOf("isNaN", "isInfinite", "isFinite", "isNegative", "getHigh", "getLow", "getValue"))
         assertEquals(bsonMethods, kBsonMethods)
     }
 
@@ -127,8 +128,7 @@ class BsonValueApiTest {
         assertEquals(bsonConstructors, kBsonConstructors)
 
         val bsonMethods =
-            getMethodNames(
-                bsonClass, listOf("parse", "toJson", "toBsonDocument", "asBsonReader", "readObject", "writeReplace"))
+            getMethodNames(bsonClass, listOf("parse", "toBsonDocument", "asBsonReader", "readObject", "writeReplace"))
         val kBsonMethods =
             getMethodNames(kBsonClass, listOf("getSize", "getEntries", "getKeys", "getValues", "toByteArray"))
         assertEquals(bsonMethods, kBsonMethods)
@@ -339,7 +339,14 @@ class BsonValueApiTest {
     private fun getMethodNames(clazz: Class<*>, exclusions: List<String> = listOf()): Set<String> {
         val kotlinExtraBsonValueMethods =
             listOf(
-                "isMaxKey", "isMinKey", "isUndefined", "asBsonNull", "asBsonMinKey", "asBsonMaxKey", "asBsonUndefined")
+                "isMaxKey",
+                "isMinKey",
+                "isUndefined",
+                "asBsonNull",
+                "asBsonMinKey",
+                "asBsonMaxKey",
+                "asBsonUndefined",
+                "toJson")
         return clazz.methods
             .map { it.name }
             .filterNot {
