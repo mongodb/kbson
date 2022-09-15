@@ -150,7 +150,7 @@ class Decimal128Test {
     fun shouldConvertDecimal128NaNToString() {
         // expect
         assertEquals("NaN", Decimal128.NaN.toString())
-        assertEquals("-NaN", Decimal128.NEGATIVE_NaN.toString())
+        assertEquals("NaN", Decimal128.NEGATIVE_NaN.toString())
     }
 
     @Test

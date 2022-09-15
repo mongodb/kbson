@@ -103,7 +103,7 @@ private constructor(
             isSecondForm(high) -> secondFormToString(high)
             isNegativeInfinity(high) -> "-Infinity"
             isPositiveInfinity(high) -> "Infinity"
-            isNaN(high) -> if (isNegative) "-NaN" else "NaN"
+            isNaN(high) -> "NaN"
             else -> error("Unsupported Decimal128 string conversion. This is a bug.")
         }
     }
