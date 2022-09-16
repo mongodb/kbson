@@ -20,7 +20,7 @@ import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertNotEquals
 import kotlin.test.assertTrue
-import kotlin.test.fail
+import org.kbson.internal.Assertions.assertThrows
 
 class Decimal128Test {
 
@@ -248,159 +248,39 @@ class Decimal128Test {
     @Test
     @Suppress("SwallowedException", "LongMethod")
     fun shouldNotRoundInexactly() {
-        try {
-            Decimal128("12345678901234567890123456789012345E+6111")
-            fail()
-        } catch (e: IllegalArgumentException) {
-            // pass
-        }
-        try {
-            Decimal128("123456789012345678901234567890123456E+6111")
-            fail()
-        } catch (e: IllegalArgumentException) {
-            // pass
-        }
-        try {
-            Decimal128("1234567890123456789012345678901234567E+6111")
-            fail()
-        } catch (e: IllegalArgumentException) {
-            // pass
-        }
-        try {
-            Decimal128("12345678901234567890123456789012345E-6176")
-            fail()
-        } catch (e: IllegalArgumentException) {
-            // pass
-        }
-        try {
-            Decimal128("123456789012345678901234567890123456E-6176")
-            fail()
-        } catch (e: IllegalArgumentException) {
-            // pass
-        }
-        try {
-            Decimal128("1234567890123456789012345678901234567E-6176")
-            fail()
-        } catch (e: IllegalArgumentException) {
-            // pass
-        }
-        try {
-            Decimal128("-12345678901234567890123456789012345E+6111")
-            fail()
-        } catch (e: IllegalArgumentException) {
-            // pass
-        }
-        try {
-            Decimal128("-123456789012345678901234567890123456E+6111")
-            fail()
-        } catch (e: IllegalArgumentException) {
-            // pass
-        }
-        try {
-            Decimal128("-1234567890123456789012345678901234567E+6111")
-            fail()
-        } catch (e: IllegalArgumentException) {
-            // pass
-        }
-        try {
-            Decimal128("-12345678901234567890123456789012345E-6176")
-            fail()
-        } catch (e: IllegalArgumentException) {
-            // pass
-        }
-        try {
-            Decimal128("-123456789012345678901234567890123456E-6176")
-            fail()
-        } catch (e: IllegalArgumentException) {
-            // pass
-        }
-        try {
-            Decimal128("-1234567890123456789012345678901234567E-6176")
-            fail()
-        } catch (e: IllegalArgumentException) {
-            // pass
-        }
+        assertThrows(IllegalArgumentException::class) { Decimal128("12345678901234567890123456789012345E+6111") }
+        assertThrows(IllegalArgumentException::class) { Decimal128("123456789012345678901234567890123456E+6111") }
+        assertThrows(IllegalArgumentException::class) { Decimal128("1234567890123456789012345678901234567E+6111") }
+        assertThrows(IllegalArgumentException::class) { Decimal128("12345678901234567890123456789012345E-6176") }
+        assertThrows(IllegalArgumentException::class) { Decimal128("123456789012345678901234567890123456E-6176") }
+        assertThrows(IllegalArgumentException::class) { Decimal128("1234567890123456789012345678901234567E-6176") }
+        assertThrows(IllegalArgumentException::class) { Decimal128("-12345678901234567890123456789012345E+6111") }
+        assertThrows(IllegalArgumentException::class) { Decimal128("-123456789012345678901234567890123456E+6111") }
+        assertThrows(IllegalArgumentException::class) { Decimal128("-1234567890123456789012345678901234567E+6111") }
+        assertThrows(IllegalArgumentException::class) { Decimal128("-12345678901234567890123456789012345E-6176") }
+        assertThrows(IllegalArgumentException::class) { Decimal128("-123456789012345678901234567890123456E-6176") }
+        assertThrows(IllegalArgumentException::class) { Decimal128("-1234567890123456789012345678901234567E-6176") }
     }
 
     @Test
     @Suppress("SwallowedException")
     fun shouldNotClampLargeExponentsIfNoExtraPrecisionIsAvailable() {
-        try {
-            Decimal128("1234567890123456789012345678901234E+6112")
-            fail()
-        } catch (e: IllegalArgumentException) {
-            // pass
-        }
-        try {
-            Decimal128("1234567890123456789012345678901234E+6113")
-            fail()
-        } catch (e: IllegalArgumentException) {
-            // pass
-        }
-        try {
-            Decimal128("1234567890123456789012345678901234E+6114")
-            fail()
-        } catch (e: IllegalArgumentException) {
-            // pass
-        }
-        try {
-            Decimal128("-1234567890123456789012345678901234E+6112")
-            fail()
-        } catch (e: IllegalArgumentException) {
-            // pass
-        }
-        try {
-            Decimal128("-1234567890123456789012345678901234E+6113")
-            fail()
-        } catch (e: IllegalArgumentException) {
-            // pass
-        }
-        try {
-            Decimal128("-1234567890123456789012345678901234E+6114")
-            fail()
-        } catch (e: IllegalArgumentException) {
-            // pass
-        }
+        assertThrows(IllegalArgumentException::class) { Decimal128("1234567890123456789012345678901234E+6112") }
+        assertThrows(IllegalArgumentException::class) { Decimal128("1234567890123456789012345678901234E+6113") }
+        assertThrows(IllegalArgumentException::class) { Decimal128("1234567890123456789012345678901234E+6114") }
+        assertThrows(IllegalArgumentException::class) { Decimal128("-1234567890123456789012345678901234E+6112") }
+        assertThrows(IllegalArgumentException::class) { Decimal128("-1234567890123456789012345678901234E+6113") }
+        assertThrows(IllegalArgumentException::class) { Decimal128("-1234567890123456789012345678901234E+6114") }
     }
 
     @Test
     @Suppress("SwallowedException")
     fun shouldNotClampSmallExponentsIfNoExtraPrecisionCanBeDiscarded() {
-        try {
-            Decimal128("1234567890123456789012345678901234E-6177")
-            fail()
-        } catch (e: IllegalArgumentException) {
-            // pass
-        }
-        try {
-            Decimal128("1234567890123456789012345678901234E-6178")
-            fail()
-        } catch (e: IllegalArgumentException) {
-            // pass
-        }
-        try {
-            Decimal128("1234567890123456789012345678901234E-6179")
-            fail()
-        } catch (e: IllegalArgumentException) {
-            // pass
-        }
-        try {
-            Decimal128("-1234567890123456789012345678901234E-6177")
-            fail()
-        } catch (e: IllegalArgumentException) {
-            // pass
-        }
-        try {
-            Decimal128("-1234567890123456789012345678901234E-6178")
-            fail()
-        } catch (e: IllegalArgumentException) {
-            // pass
-        }
-        try {
-            Decimal128("-1234567890123456789012345678901234E-6179")
-            fail()
-        } catch (e: IllegalArgumentException) {
-            // pass
-        }
+        assertThrows(IllegalArgumentException::class) { Decimal128("1234567890123456789012345678901234E-6177") }
+        assertThrows(IllegalArgumentException::class) { Decimal128("1234567890123456789012345678901234E-6178") }
+        assertThrows(IllegalArgumentException::class) { Decimal128("1234567890123456789012345678901234E-6179") }
+        assertThrows(IllegalArgumentException::class) { Decimal128("-1234567890123456789012345678901234E-6177") }
+        assertThrows(IllegalArgumentException::class) { Decimal128("-1234567890123456789012345678901234E-6178") }
+        assertThrows(IllegalArgumentException::class) { Decimal128("-1234567890123456789012345678901234E-6179") }
     }
 }
