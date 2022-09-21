@@ -260,7 +260,7 @@ private object BsonDocumentKeySerializer : KSerializer<String> {
     override val descriptor: SerialDescriptor = PrimitiveSerialDescriptor("BsonDocumentKey", PrimitiveKind.STRING)
 
     override fun deserialize(decoder: Decoder): String {
-        TODO("Not yet implemented")
+        return String.serializer().deserialize(decoder)
     }
 
     override fun serialize(encoder: Encoder, value: String) {

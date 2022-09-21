@@ -328,7 +328,7 @@ class BsonDocumentTest {
     }
 
     @Test
-    fun shouldRoundTripToFromBytes() {
+    fun shouldRoundTrip() {
         val expectedDocument =
             BsonDocument()
                 .append("null", bsonNull)
@@ -353,5 +353,6 @@ class BsonDocumentTest {
                 .append("document", bsonDocument)
 
         assertEquals(expectedDocument, BsonDocument(expectedDocument.toByteArray()))
+        assertEquals(expectedDocument, BsonDocument(expectedDocument.toJson()))
     }
 }
