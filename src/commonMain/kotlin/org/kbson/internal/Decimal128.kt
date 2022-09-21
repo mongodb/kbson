@@ -224,7 +224,6 @@ private constructor(
         }
     }
 
-    @Suppress("TooManyFunctions")
     public companion object {
         private const val EXPONENT_MAX: Int = 6111
         private const val EXPONENT_MIN: Int = -6176
