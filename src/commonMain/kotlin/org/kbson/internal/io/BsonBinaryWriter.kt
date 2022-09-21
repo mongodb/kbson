@@ -29,7 +29,7 @@ import org.kbson.BsonType
  * A BsonWriter implementation that writes to a binary stream of data. This is the most commonly used implementation.
  */
 @Suppress("TooManyFunctions", "MagicNumber")
-public class BsonBinaryWriter(public val bsonOutput: ByteArrayBsonOutput) : AbstractBsonWriter() {
+internal class BsonBinaryWriter(public val bsonOutput: ByteArrayBsonOutput) : AbstractBsonWriter() {
 
     private var context: BsonBinaryWriterContext = BsonBinaryWriterContext(null, BsonContextType.TOP_LEVEL, null, 0)
         set(context) {

@@ -19,7 +19,7 @@ import kotlin.experimental.and
 
 /** Base64 utils to convert to and from a Base64 encoded string and ByteArray */
 @Suppress("MagicNumber")
-public object Base64Utils {
+internal object Base64Utils {
     private const val BASE64_ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"
 
     private const val BASE64_MASK: Byte = 0x3f
@@ -34,7 +34,7 @@ public object Base64Utils {
      * @return the Base64 string representation
      * @see [toByteArray] to decode the string back to a byte array
      */
-    public fun toBase64String(byteArray: ByteArray): String {
+    fun toBase64String(byteArray: ByteArray): String {
         val output = mutableListOf<Byte>()
         var padding = 0
         var position = 0
@@ -61,7 +61,7 @@ public object Base64Utils {
      * @param base64 the Base64 String
      * @return the byteArray
      */
-    public fun toByteArray(base64: String): ByteArray {
+    fun toByteArray(base64: String): ByteArray {
         val byteArray = base64.trimEnd(BASE64_PAD).encodeToByteArray()
         val bytes = ArrayList<Byte>()
         byteArray.toList().chunked(4).forEach { data ->

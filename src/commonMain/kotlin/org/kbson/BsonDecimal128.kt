@@ -32,7 +32,7 @@ import org.kbson.internal.Decimal128
  *
  * @property value the Decimal128 value
  */
-public class BsonDecimal128 private constructor(public val value: Decimal128) : BsonValue() {
+public class BsonDecimal128 private constructor(internal val value: Decimal128) : BsonValue() {
     override val bsonType: BsonType
         get() = BsonType.DECIMAL128
 

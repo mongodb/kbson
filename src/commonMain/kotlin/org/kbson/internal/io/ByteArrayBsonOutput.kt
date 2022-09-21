@@ -19,14 +19,14 @@ import org.kbson.BsonObjectId
 import org.kbson.internal.validateSerialization
 
 @Suppress("MagicNumber", "TooManyFunctions", "EmptyFunctionBlock")
-public class ByteArrayBsonOutput(initialSize: Int = DEFAULT_BYTE_ARRAY_SIZE) : BsonOutput {
+internal class ByteArrayBsonOutput(initialSize: Int = DEFAULT_BYTE_ARRAY_SIZE) : BsonOutput {
 
     override var position: Int = 0
     override val size: Int
         get() = position
     private var array: ByteArray = ByteArray(initialSize)
 
-    public fun toByteArray(): ByteArray {
+    fun toByteArray(): ByteArray {
         val byteArray = ByteArray(position)
         array.copyInto(destination = byteArray, destinationOffset = 0, startIndex = 0, endIndex = position)
         return byteArray

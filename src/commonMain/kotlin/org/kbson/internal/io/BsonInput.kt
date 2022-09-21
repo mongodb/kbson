@@ -19,7 +19,7 @@ import org.kbson.BsonObjectId
 
 /** A Bson Input stream */
 @Suppress("TooManyFunctions")
-public interface BsonInput {
+internal interface BsonInput {
 
     /** The current position in the stream */
     public val position: Int
@@ -29,7 +29,7 @@ public interface BsonInput {
      *
      * @return the byte value
      */
-    public fun readByte(): Byte
+    fun readByte(): Byte
 
     /**
      * Reads the specified number of bytes into the given byte array. This is equivalent to `readBytes(bytes, 0,
@@ -38,7 +38,7 @@ public interface BsonInput {
      * @param bytes the byte array to write into
      * @return the bytes byte array that has been written to
      */
-    public fun readBytes(bytes: ByteArray): ByteArray
+    fun readBytes(bytes: ByteArray): ByteArray
 
     /**
      * Reads the specified number of bytes into the given byte array starting at the specified offset.
@@ -48,57 +48,57 @@ public interface BsonInput {
      * @param length the number of bytes to write
      * @return the bytes byte array that has been written to
      */
-    public fun readBytes(bytes: ByteArray, offset: Int, length: Int): ByteArray
+    fun readBytes(bytes: ByteArray, offset: Int, length: Int): ByteArray
 
     /**
      * Reads a BSON Int64 value from the stream.
      *
      * @return the Int64 value
      */
-    public fun readInt64(): Long
+    fun readInt64(): Long
 
     /**
      * Reads a BSON Double value from the stream.
      *
      * @return the double value
      */
-    public fun readDouble(): Double
+    fun readDouble(): Double
 
     /**
      * Reads a BSON Int32 value from the stream.
      *
      * @return the Int32 value
      */
-    public fun readInt32(): Int
+    fun readInt32(): Int
 
     /**
      * Reads a BSON String value from the stream.
      *
      * @return the string
      */
-    public fun readString(): String
+    fun readString(): String
 
     /**
      * Reads a BSON ObjectId value from the stream.
      *
      * @return the ObjectId
      */
-    public fun readObjectId(): BsonObjectId
+    fun readObjectId(): BsonObjectId
 
     /**
      * Reads a BSON CString value from the stream.
      *
      * @return the CString
      */
-    public fun readCString(): String
+    fun readCString(): String
 
     /**
      * Skips the specified number of bytes in the stream.
      *
      * @param numBytes the number of bytes to skip
      */
-    public fun skip(numBytes: Int)
+    fun skip(numBytes: Int)
 
     /** Skips a BSON CString value from the stream. */
-    public fun skipCString()
+    fun skipCString()
 }

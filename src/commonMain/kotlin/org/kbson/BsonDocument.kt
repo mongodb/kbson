@@ -691,9 +691,7 @@ public class BsonDocument(initial: Map<String, BsonValue> = LinkedHashMap()) :
         return get(key)!!.asBinary()
     }
 
-    /**
-     * BsonDocument companion object
-     */
+    /** BsonDocument companion object */
     public companion object {
 
         /**

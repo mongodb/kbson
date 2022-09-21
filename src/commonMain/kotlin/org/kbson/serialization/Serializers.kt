@@ -83,10 +83,7 @@ public val BsonSerializersModule: SerializersModule = SerializersModule {
     contextual(BsonValue::class, BsonValueSerializer)
 }
 
-
-/**
- * The Bson companion object
- */
+/** The Bson companion object */
 public object Bson {
 
     private val extendedJson = Json { BsonSerializersModule }

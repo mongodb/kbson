@@ -17,14 +17,14 @@ package org.kbson.internal
 
 /** Hex utils to convert to and from a hex encoded string and ByteArray */
 @Suppress("MagicNumber")
-public object HexUtils {
+internal object HexUtils {
     /**
      * Converts byteArray to hex string
      *
      * @param byteArray the byte array
      * @return the hex string
      */
-    public fun toHexString(byteArray: ByteArray): String {
+    fun toHexString(byteArray: ByteArray): String {
         return byteArray.joinToString("") { (0xFF and it.toInt()).toString(16).padStart(2, '0').uppercase() }
     }
 
@@ -34,7 +34,7 @@ public object HexUtils {
      * @param hexString the hex string
      * @return the byte array
      */
-    public fun toByteArray(hexString: String): ByteArray {
+    fun toByteArray(hexString: String): ByteArray {
         require(
             hexString.length % 2 == 0 &&
                 hexString.all { c -> (c < '0' || c > '9') || (c < 'a' || c > 'f') || (c < 'A' || c > 'F') }) {

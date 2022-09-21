@@ -30,7 +30,7 @@ import org.kbson.internal.validateSerialization
  * A BsonReader implementation that reads from a binary stream of data. This is the most commonly used implementation.
  */
 @Suppress("TooManyFunctions", "EmptyFunctionBlock", "MagicNumber")
-public class BsonBinaryReader(private val bsonInput: ByteArrayBsonInput) : AbstractBsonReader() {
+internal class BsonBinaryReader(private val bsonInput: ByteArrayBsonInput) : AbstractBsonReader() {
 
     private var context: BsonBinaryReaderContext = BsonBinaryReaderContext(null, BsonContextType.TOP_LEVEL, 0, 0)
         set(context) {

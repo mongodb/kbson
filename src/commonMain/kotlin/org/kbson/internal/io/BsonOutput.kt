@@ -19,7 +19,7 @@ import org.kbson.BsonObjectId
 import org.kbson.internal.Closeable
 
 /** An output stream that is optimized for writing BSON values directly to the underlying stream. */
-public interface BsonOutput : Closeable {
+internal interface BsonOutput : Closeable {
     /**
      * Gets the current position in the stream.
      *
@@ -38,7 +38,7 @@ public interface BsonOutput : Closeable {
      * Writes all the bytes in the byte array to the stream.
      * @param bytes the non-null byte array
      */
-    public fun writeBytes(bytes: ByteArray)
+    fun writeBytes(bytes: ByteArray)
 
     /**
      * Writes `length` bytes from the byte array, starting at `offset`.
@@ -46,7 +46,7 @@ public interface BsonOutput : Closeable {
      * @param offset the offset to start writing from
      * @param length the number of bytes to write
      */
-    public fun writeBytes(bytes: ByteArray, offset: Int, length: Int)
+    fun writeBytes(bytes: ByteArray, offset: Int, length: Int)
 
     /**
      * Write a single byte to the stream. The byte to be written is the eight low-order bits of the specified value. The
@@ -54,35 +54,35 @@ public interface BsonOutput : Closeable {
      *
      * @param value the value
      */
-    public fun writeByte(value: Byte)
+    fun writeByte(value: Byte)
 
     /**
      * Writes a BSON CString to the stream.
      *
      * @param value the value
      */
-    public fun writeCString(value: String)
+    fun writeCString(value: String)
 
     /**
      * Writes a BSON String to the stream.
      *
      * @param value the value
      */
-    public fun writeString(value: String)
+    fun writeString(value: String)
 
     /**
      * Writes a BSON double to the stream.
      *
      * @param value the value
      */
-    public fun writeDouble(value: Double)
+    fun writeDouble(value: Double)
 
     /**
      * Writes a 32-bit BSON integer to the stream.
      *
      * @param value the value
      */
-    public fun writeInt32(value: Int)
+    fun writeInt32(value: Int)
 
     /**
      * Writes a 32-bit BSON integer to the stream at the given position. This is useful for patching in the size of a
@@ -92,19 +92,19 @@ public interface BsonOutput : Closeable {
      * to the current size
      * @param value the value
      */
-    public fun writeInt32(position: Int, value: Int)
+    fun writeInt32(position: Int, value: Int)
 
     /**
      * Writes a 64-bit BSON integer to the stream.
      *
      * @param value the value
      */
-    public fun writeInt64(value: Long)
+    fun writeInt64(value: Long)
 
     /**
      * Writes a BSON ObjectId to the stream.
      *
      * @param value the value
      */
-    public fun writeObjectId(value: BsonObjectId)
+    fun writeObjectId(value: BsonObjectId)
 }

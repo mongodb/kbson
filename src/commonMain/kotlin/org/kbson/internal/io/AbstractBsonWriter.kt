@@ -32,7 +32,7 @@ import org.kbson.internal.validateSerialization
 
 /** Represents a BSON writer for some external format (see subclasses). */
 @Suppress("TooManyFunctions")
-public abstract class AbstractBsonWriter(private val maxSerializationDepth: Int = 1024) : BsonWriter {
+internal abstract class AbstractBsonWriter(private val maxSerializationDepth: Int = 1024) : BsonWriter {
 
     /**
      * The current state of this writer. The current state determines what sort of actions are valid for this writer at
@@ -195,7 +195,7 @@ public abstract class AbstractBsonWriter(private val maxSerializationDepth: Int 
      */
     protected abstract fun doWriteName(name: String)
 
-    public override fun writeStartDocument() {
+    override fun writeStartDocument() {
         checkPreconditions("writeStartDocument", State.INITIAL, State.VALUE, State.SCOPE_DOCUMENT, State.DONE)
         serializationDepth++
         validateSerialization(serializationDepth <= maxSerializationDepth) {
@@ -205,7 +205,7 @@ public abstract class AbstractBsonWriter(private val maxSerializationDepth: Int 
         state = State.NAME
     }
 
-    public override fun writeEndDocument() {
+    override fun writeEndDocument() {
         checkPreconditions("writeEndDocument", State.NAME)
         val contextType: BsonContextType = _context!!.contextType
         validateOperation(contextType == BsonContextType.DOCUMENT || contextType == BsonContextType.SCOPE_DOCUMENT) {
@@ -222,7 +222,7 @@ public abstract class AbstractBsonWriter(private val maxSerializationDepth: Int 
         }
     }
 
-    public override fun writeStartArray() {
+    override fun writeStartArray() {
         checkPreconditions("writeStartArray", State.VALUE)
         serializationDepth++
         validateSerialization(serializationDepth <= maxSerializationDepth) {
@@ -232,7 +232,7 @@ public abstract class AbstractBsonWriter(private val maxSerializationDepth: Int 
         state = State.VALUE
     }
 
-    public override fun writeEndArray() {
+    override fun writeEndArray() {
         checkPreconditions("writeEndArray", State.VALUE)
         val contextType = _context!!.contextType
         validateOperation(contextType == BsonContextType.ARRAY) {
@@ -243,79 +243,79 @@ public abstract class AbstractBsonWriter(private val maxSerializationDepth: Int 
         state = nextState
     }
 
-    public override fun writeBinaryData(value: BsonBinary) {
+    override fun writeBinaryData(value: BsonBinary) {
         checkPreconditions("writeBinaryData", State.VALUE, State.INITIAL)
         doWriteBinaryData(value)
         state = nextState
     }
 
-    public override fun writeBoolean(value: Boolean) {
+    override fun writeBoolean(value: Boolean) {
         checkPreconditions("writeBoolean", State.VALUE, State.INITIAL)
         doWriteBoolean(value)
         state = nextState
     }
 
-    public override fun writeDateTime(value: Long) {
+    override fun writeDateTime(value: Long) {
         checkPreconditions("writeDateTime", State.VALUE, State.INITIAL)
         doWriteDateTime(value)
         state = nextState
     }
 
-    public override fun writeDBPointer(value: BsonDBPointer) {
+    override fun writeDBPointer(value: BsonDBPointer) {
         checkPreconditions("writeDBPointer", State.VALUE, State.INITIAL)
         doWriteDBPointer(value)
         state = nextState
     }
 
-    public override fun writeDouble(value: Double) {
+    override fun writeDouble(value: Double) {
         checkPreconditions("writeDBPointer", State.VALUE, State.INITIAL)
         doWriteDouble(value)
         state = nextState
     }
 
-    public override fun writeInt32(value: Int) {
+    override fun writeInt32(value: Int) {
         checkPreconditions("writeInt32", State.VALUE)
         doWriteInt32(value)
         state = nextState
     }
 
-    public override fun writeInt64(value: Long) {
+    override fun writeInt64(value: Long) {
         checkPreconditions("writeInt64", State.VALUE)
         doWriteInt64(value)
         state = nextState
     }
 
-    public override fun writeDecimal128(value: BsonDecimal128) {
+    override fun writeDecimal128(value: BsonDecimal128) {
         checkPreconditions("writeInt64", State.VALUE)
         doWriteDecimal128(value)
         state = nextState
     }
 
-    public override fun writeJavaScript(value: BsonJavaScript) {
+    override fun writeJavaScript(value: BsonJavaScript) {
         checkPreconditions("writeJavaScript", State.VALUE)
         doWriteJavaScript(value)
         state = nextState
     }
 
-    public override fun writeJavaScriptWithScope(value: String) {
+    override fun writeJavaScriptWithScope(value: String) {
         checkPreconditions("writeJavaScriptWithScope", State.VALUE)
         doWriteJavaScriptWithScope(value)
         state = State.SCOPE_DOCUMENT
     }
 
-    public override fun writeMaxKey() {
+    override fun writeMaxKey() {
         checkPreconditions("writeMaxKey", State.VALUE)
         doWriteMaxKey()
         state = nextState
     }
 
-    public override fun writeMinKey() {
+    override fun writeMinKey() {
         checkPreconditions("writeMinKey", State.VALUE)
         doWriteMinKey()
         state = nextState
     }
 
-    public override fun writeName(name: String) {
+    override fun writeName(name: String) {
         validateOperation(state == State.NAME) {
             "writeName can only be called when State is ${State.NAME}, not when State is $state"
         }
@@ -323,43 +323,43 @@ public abstract class AbstractBsonWriter(private val maxSerializationDepth: Int 
         state = State.VALUE
     }
 
-    public override fun writeNull() {
+    override fun writeNull() {
         checkPreconditions("writeNull", State.VALUE)
         doWriteNull()
         state = nextState
     }
 
-    public override fun writeObjectId(value: BsonObjectId) {
+    override fun writeObjectId(value: BsonObjectId) {
         checkPreconditions("writeObjectId", State.VALUE)
         doWriteObjectId(value)
         state = nextState
     }
 
-    public override fun writeRegularExpression(value: BsonRegularExpression) {
+    override fun writeRegularExpression(value: BsonRegularExpression) {
         checkPreconditions("writeRegularExpression", State.VALUE)
         doWriteRegularExpression(value)
         state = nextState
     }
 
-    public override fun writeString(value: String) {
+    override fun writeString(value: String) {
         checkPreconditions("writeString", State.VALUE)
         doWriteString(value)
         state = nextState
     }
 
-    public override fun writeSymbol(value: String) {
+    override fun writeSymbol(value: String) {
         checkPreconditions("writeSymbol", State.VALUE)
         doWriteSymbol(value)
         state = nextState
     }
 
-    public override fun writeTimestamp(value: BsonTimestamp) {
+    override fun writeTimestamp(value: BsonTimestamp) {
         checkPreconditions("writeTimestamp", State.VALUE)
         doWriteTimestamp(value)
         state = nextState
     }
 
-    public override fun writeUndefined() {
+    override fun writeUndefined() {
         checkPreconditions("writeUndefined", State.VALUE)
         doWriteUndefined()
         state = nextState
@@ -407,11 +407,11 @@ public abstract class AbstractBsonWriter(private val maxSerializationDepth: Int 
         }
     }
 
-    public override fun close() {
+    override fun close() {
         isClosed = true
     }
 
-    public override fun pipe(reader: BsonReader) {
+    override fun pipe(reader: BsonReader) {
         pipeDocument(reader)
     }
 
@@ -483,7 +483,7 @@ public abstract class AbstractBsonWriter(private val maxSerializationDepth: Int 
         }
     }
 
-    public fun pipeDocument(value: BsonDocument) {
+    fun pipeDocument(value: BsonDocument) {
         writeStartDocument()
         value.entries.forEach {
             writeName(it.key)
@@ -574,11 +574,7 @@ public abstract class AbstractBsonWriter(private val maxSerializationDepth: Int 
      * array, or other complex sub-structure.
      */
     @Suppress("ConstructorParameterNaming")
-    public open inner class Context(
-        public val _parentContext: Context?,
-        public val contextType: BsonContextType,
-        public val name: String? = null
-    )
+    open inner class Context(val _parentContext: Context?, val contextType: BsonContextType, val name: String? = null)
 
     /** Capture the current state of this writer - its [Context], [ ], field name and depth. */
     protected open inner class Mark {
@@ -593,7 +589,7 @@ public abstract class AbstractBsonWriter(private val maxSerializationDepth: Int 
             serializationDepth = this@AbstractBsonWriter.serializationDepth
         }
 
-        public fun reset() {
+        fun reset() {
             this@AbstractBsonWriter.state = state
             this@AbstractBsonWriter._context = context
             this@AbstractBsonWriter.serializationDepth = serializationDepth

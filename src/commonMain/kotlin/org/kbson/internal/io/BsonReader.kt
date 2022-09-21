@@ -38,7 +38,7 @@ import org.kbson.internal.Closeable
 
 /** An interface for reading a logical BSON document using a pull-oriented API. */
 @Suppress("TooManyFunctions")
-public interface BsonReader : Closeable {
+internal interface BsonReader : Closeable {
     /** @return The current BsonType. */
     public var currentBsonType: BsonType?
 
@@ -50,147 +50,147 @@ public interface BsonReader : Closeable {
      *
      * @return The name of the element.
      */
-    public fun readName(): String
+    fun readName(): String
 
     /**
      * Reads a BSON type from the reader.
      *
      * @return A BSON type.
      */
-    public fun readBsonType(): BsonType
+    fun readBsonType(): BsonType
 
     /** Reads the start of a BSON document. */
-    public fun readStartDocument()
+    fun readStartDocument()
 
     /** Reads the end of a BSON document from the reader. */
-    public fun readEndDocument()
+    fun readEndDocument()
 
     /** Reads the start of a BSON array. */
-    public fun readStartArray()
+    fun readStartArray()
 
     /** Reads the end of a BSON array from the reader. */
-    public fun readEndArray()
+    fun readEndArray()
 
     /**
      * Reads BSON Binary data from the reader.
      *
      * @return A Binary.
      */
-    public fun readBinary(): BsonBinary
+    fun readBinary(): BsonBinary
 
     /**
      * Reads a BSON Boolean from the reader.
      *
      * @return A Boolean.
      */
-    public fun readBoolean(): BsonBoolean
+    fun readBoolean(): BsonBoolean
 
     /**
      * Reads a BSON DateTime from the reader.
      *
      * @return The number of milliseconds since the Unix epoch.
      */
-    public fun readDateTime(): BsonDateTime
+    fun readDateTime(): BsonDateTime
 
     /**
      * Reads a BSON Double from the reader.
      *
      * @return A Double.
      */
-    public fun readDouble(): BsonDouble
+    fun readDouble(): BsonDouble
 
     /**
      * Reads a BSON Int32 from the reader.
      *
      * @return An Int32.
      */
-    public fun readInt32(): BsonInt32
+    fun readInt32(): BsonInt32
 
     /**
      * Reads a BSON Int64 from the reader.
      *
      * @return An Int64.
      */
-    public fun readInt64(): BsonInt64
+    fun readInt64(): BsonInt64
 
     /**
      * Reads a BSON Decimal128 from the reader.
      *
      * @return A Decimal128
      */
-    public fun readDecimal128(): BsonDecimal128
+    fun readDecimal128(): BsonDecimal128
 
     /**
      * Reads a BSON JavaScript from the reader.
      *
      * @return A string.
      */
-    public fun readJavaScript(): BsonJavaScript
+    fun readJavaScript(): BsonJavaScript
 
     /**
      * Reads a BSON JavaScript with scope from the reader (call readStartDocument next to read the scope).
      *
      * @return A string.
      */
-    public fun readJavaScriptWithScope(): String
+    fun readJavaScriptWithScope(): String
 
     /** Reads a BSON MaxKey from the reader. */
-    public fun readMaxKey(): BsonMaxKey
+    fun readMaxKey(): BsonMaxKey
 
     /** Reads a BSON MinKey from the reader. */
-    public fun readMinKey(): BsonMinKey
+    fun readMinKey(): BsonMinKey
 
     /** Reads a BSON null from the reader. */
-    public fun readNull(): BsonNull
+    fun readNull(): BsonNull
 
     /**
      * Reads a BSON ObjectId from the reader.
      *
      * @return the `ObjectId` value
      */
-    public fun readObjectId(): BsonObjectId
+    fun readObjectId(): BsonObjectId
 
     /**
      * Reads a BSON regular expression from the reader.
      *
      * @return A regular expression.
      */
-    public fun readRegularExpression(): BsonRegularExpression
+    fun readRegularExpression(): BsonRegularExpression
 
     /**
      * Reads a BSON DBPointer from the reader.
      *
      * @return A DBPointer.
      */
-    public fun readDBPointer(): BsonDBPointer
+    fun readDBPointer(): BsonDBPointer
 
     /**
      * Reads a BSON String from the reader.
      *
      * @return A String.
      */
-    public fun readString(): BsonString
+    fun readString(): BsonString
 
     /**
      * Reads a BSON symbol from the reader.
      *
      * @return A string.
      */
-    public fun readSymbol(): BsonSymbol
+    fun readSymbol(): BsonSymbol
 
     /**
      * Reads a BSON timestamp from the reader.
      *
      * @return The combined timestamp/increment.
      */
-    public fun readTimestamp(): BsonTimestamp
+    fun readTimestamp(): BsonTimestamp
 
     /** Reads a BSON undefined from the reader. */
-    public fun readUndefined(): BsonUndefined
+    fun readUndefined(): BsonUndefined
 
     /** Skips the name (reader must be positioned on a name). */
-    public fun skipName()
+    fun skipName()
 
     /** Skips the value (reader must be positioned on a value). */
-    public fun skipValue()
+    fun skipValue()
 }

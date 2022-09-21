@@ -41,7 +41,7 @@ import org.kbson.BsonValue
 
 /** A BsonWriter implementation that writes to a binary stream of data to a BsonDocument */
 @Suppress("TooManyFunctions")
-public class BsonDocumentWriter : AbstractBsonWriter() {
+internal class BsonDocumentWriter : AbstractBsonWriter() {
     public val bsonDocument: BsonDocument = BsonDocument()
     private var context: BsonDocumentWriterContext =
         BsonDocumentWriterContext(null, BsonContextType.TOP_LEVEL, bsonDocument)

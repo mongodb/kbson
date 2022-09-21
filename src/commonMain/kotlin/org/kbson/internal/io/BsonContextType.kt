@@ -16,7 +16,7 @@
 package org.kbson.internal.io
 
 /** Used by BsonReader and BsonWriter implementations to represent the current context. */
-public enum class BsonContextType {
+internal enum class BsonContextType {
     /** The top level of a BSON document. */
     TOP_LEVEL,
 

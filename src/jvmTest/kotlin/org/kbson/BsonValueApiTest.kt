@@ -110,7 +110,8 @@ class BsonValueApiTest {
             getMethodNames(bsonClass, listOf("intValue", "longValue", "doubleValue", "getValue", "decimal128Value"))
         val kBsonMethods =
             getMethodNames(
-                kBsonClass, listOf("isNaN", "isInfinite", "isFinite", "isNegative", "getHigh", "getLow", "getValue"))
+                kBsonClass,
+                listOf("isNaN", "isInfinite", "isFinite", "isNegative", "getHigh", "getLow", "getValue\$kbson"))
         assertEquals(bsonMethods, kBsonMethods)
     }
 

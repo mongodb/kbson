@@ -20,7 +20,7 @@ import org.kbson.BsonSerializationException
 import org.kbson.internal.validateSerialization
 
 @Suppress("MagicNumber", "TooManyFunctions")
-public class ByteArrayBsonInput(private val bytes: ByteArray, private val endIndex: Int = bytes.size) : BsonInput {
+internal class ByteArrayBsonInput(private val bytes: ByteArray, private val endIndex: Int = bytes.size) : BsonInput {
     override var position: Int = 0
     public val availableBytes: Int
         get() = endIndex - position
@@ -133,7 +133,7 @@ public class ByteArrayBsonInput(private val bytes: ByteArray, private val endInd
         }
     }
 
-    public fun slice(size: Int): ByteArrayBsonInput {
+    fun slice(size: Int): ByteArrayBsonInput {
         validateSerialization(availableBytes >= size) {
             "Unexpected EOF, only $availableBytes bytes available. Requested $size."
         }

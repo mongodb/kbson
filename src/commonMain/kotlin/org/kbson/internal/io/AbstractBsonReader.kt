@@ -39,13 +39,13 @@ import org.kbson.internal.validateOperation
 
 /** Abstract base class for BsonReader implementations. */
 @Suppress("TooManyFunctions")
-public abstract class AbstractBsonReader : BsonReader {
+internal abstract class AbstractBsonReader : BsonReader {
 
     /** @return The current BsonType. */
-    public override var currentBsonType: BsonType? = null
+    override var currentBsonType: BsonType? = null
 
     /** The current state of this reader. */
-    public var state: State = State.INITIAL
+    var state: State = State.INITIAL
 
     /**
      * The context, which will indicate which state the reader is in, for example which part of a document it's
@@ -61,7 +61,7 @@ public abstract class AbstractBsonReader : BsonReader {
     protected var isClosed: Boolean = false
 
     /** @return the most recently read name. */
-    public override var currentName: String? = null
+    override var currentName: String? = null
 
     /** Handles the logic to read the start of a document */
     protected abstract fun doReadStartDocument()
@@ -204,7 +204,7 @@ public abstract class AbstractBsonReader : BsonReader {
         state = State.TYPE
     }
 
-    public override fun readEndDocument() {
+    override fun readEndDocument() {
         check(!isClosed && _context != null) { "BinaryWriter is closed" }
         validateOperation(
             _context?.contextType == BsonContextType.DOCUMENT ||
@@ -228,7 +228,7 @@ public abstract class AbstractBsonReader : BsonReader {
         state = State.TYPE
     }
 
-    public override fun readEndArray() {
+    override fun readEndArray() {
         check(!isClosed) { "BinaryWriter is closed" }
         validateOperation(_context?.contextType == BsonContextType.ARRAY) {
             "readEndArray can only be called when contextType is ${BsonContextType.ARRAY}, " +
@@ -244,125 +244,125 @@ public abstract class AbstractBsonReader : BsonReader {
         setStateOnEnd()
     }
 
-    public override fun readBinary(): BsonBinary {
+    override fun readBinary(): BsonBinary {
         checkPreconditions("readBinaryData", BsonType.BINARY)
         state = nextState
         return doReadBinaryData()
     }
 
-    public override fun readBoolean(): BsonBoolean {
+    override fun readBoolean(): BsonBoolean {
         checkPreconditions("readBoolean", BsonType.BOOLEAN)
         state = nextState
         return BsonBoolean(doReadBoolean())
     }
 
-    public override fun readDateTime(): BsonDateTime {
+    override fun readDateTime(): BsonDateTime {
         checkPreconditions("readDateTime", BsonType.DATE_TIME)
         state = nextState
         return BsonDateTime(doReadDateTime())
     }
 
-    public override fun readDouble(): BsonDouble {
+    override fun readDouble(): BsonDouble {
         checkPreconditions("readDouble", BsonType.DOUBLE)
         state = nextState
         return BsonDouble(doReadDouble())
     }
 
-    public override fun readInt32(): BsonInt32 {
+    override fun readInt32(): BsonInt32 {
         checkPreconditions("readInt32", BsonType.INT32)
         state = nextState
         return BsonInt32(doReadInt32())
     }
 
-    public override fun readInt64(): BsonInt64 {
+    override fun readInt64(): BsonInt64 {
         checkPreconditions("readInt64", BsonType.INT64)
         state = nextState
         return BsonInt64(doReadInt64())
     }
 
-    public override fun readDecimal128(): BsonDecimal128 {
+    override fun readDecimal128(): BsonDecimal128 {
         checkPreconditions("readDecimal", BsonType.DECIMAL128)
         state = nextState
         return doReadDecimal128()
     }
 
-    public override fun readJavaScript(): BsonJavaScript {
+    override fun readJavaScript(): BsonJavaScript {
         checkPreconditions("readJavaScript", BsonType.JAVASCRIPT)
         state = nextState
         return BsonJavaScript(doReadJavaScript())
     }
 
-    public override fun readJavaScriptWithScope(): String {
+    override fun readJavaScriptWithScope(): String {
         checkPreconditions("readJavaScriptWithScope", BsonType.JAVASCRIPT_WITH_SCOPE)
         state = State.SCOPE_DOCUMENT
         return doReadJavaScriptWithScope()
     }
 
-    public override fun readMaxKey(): BsonMaxKey {
+    override fun readMaxKey(): BsonMaxKey {
         checkPreconditions("readMaxKey", BsonType.MAX_KEY)
         state = nextState
         doReadMaxKey()
         return BsonMaxKey
     }
 
-    public override fun readMinKey(): BsonMinKey {
+    override fun readMinKey(): BsonMinKey {
         checkPreconditions("readMinKey", BsonType.MIN_KEY)
         state = nextState
         doReadMinKey()
         return BsonMinKey
     }
 
-    public override fun readNull(): BsonNull {
+    override fun readNull(): BsonNull {
         checkPreconditions("readNull", BsonType.NULL)
         state = nextState
         doReadNull()
         return BsonNull
     }
 
-    public override fun readObjectId(): BsonObjectId {
+    override fun readObjectId(): BsonObjectId {
         checkPreconditions("readObjectId", BsonType.OBJECT_ID)
         state = nextState
         return doReadObjectId()
     }
 
-    public override fun readRegularExpression(): BsonRegularExpression {
+    override fun readRegularExpression(): BsonRegularExpression {
         checkPreconditions("readRegularExpression", BsonType.REGULAR_EXPRESSION)
         state = nextState
         return doReadRegularExpression()
     }
 
-    public override fun readDBPointer(): BsonDBPointer {
+    override fun readDBPointer(): BsonDBPointer {
         checkPreconditions("readDBPointer", BsonType.DB_POINTER)
         state = nextState
         return doReadDBPointer()
     }
 
-    public override fun readString(): BsonString {
+    override fun readString(): BsonString {
         checkPreconditions("readString", BsonType.STRING)
         state = nextState
         return BsonString(doReadString())
     }
 
-    public override fun readSymbol(): BsonSymbol {
+    override fun readSymbol(): BsonSymbol {
         checkPreconditions("readSymbol", BsonType.SYMBOL)
         state = nextState
         return BsonSymbol(doReadSymbol())
     }
 
-    public override fun readTimestamp(): BsonTimestamp {
+    override fun readTimestamp(): BsonTimestamp {
         checkPreconditions("readTimestamp", BsonType.TIMESTAMP)
         state = nextState
         return BsonTimestamp(doReadTimestamp())
     }
 
-    public override fun readUndefined(): BsonUndefined {
+    override fun readUndefined(): BsonUndefined {
         checkPreconditions("readUndefined", BsonType.UNDEFINED)
         state = nextState
         doReadUndefined()
         return BsonUndefined
     }
 
-    public override fun skipName() {
+    override fun skipName() {
         check(!isClosed) { "BsonReader is closed" }
         validateOperation(state == State.NAME) {
             "skipName can only be called when State is ${State.NAME}, not when State is $state."
@@ -371,7 +371,7 @@ public abstract class AbstractBsonReader : BsonReader {
         doSkipName()
     }
 
-    public override fun skipValue() {
+    override fun skipValue() {
         check(!isClosed) { "BsonReader is closed" }
         validateOperation(state == State.VALUE) {
             "skipValue can only be called when State is ${State.VALUE}, not when State is $state."
@@ -380,7 +380,7 @@ public abstract class AbstractBsonReader : BsonReader {
         state = State.TYPE
     }
 
-    public override fun readName(): String {
+    override fun readName(): String {
         check(!isClosed) { "BsonReader is closed" }
         if (state == State.TYPE) {
             readBsonType()
@@ -393,7 +393,7 @@ public abstract class AbstractBsonReader : BsonReader {
     }
 
     /** Closes the reader. */
-    public override fun close() {
+    override fun close() {
         isClosed = true
     }
 
@@ -458,10 +458,10 @@ public abstract class AbstractBsonReader : BsonReader {
      * array, or other complex sub-structure.
      */
     @Suppress("ConstructorParameterNaming")
-    public open inner class Context(public val _parentContext: Context?, public val contextType: BsonContextType)
+    open inner class Context(val _parentContext: Context?, val contextType: BsonContextType)
 
     /** The state of a reader. Indicates where in a document the reader is. */
-    public enum class State {
+    enum class State {
         /** The initial state. */
         INITIAL,
 
