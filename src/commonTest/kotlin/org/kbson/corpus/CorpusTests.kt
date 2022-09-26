@@ -18,6 +18,10 @@
 package org.kbson.corpus
 
 import com.goncalossilva.resources.Resource
+import kotlin.test.Test
+import kotlin.test.assertEquals
+import kotlin.test.assertFailsWith
+import kotlin.test.fail
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString
@@ -29,10 +33,6 @@ import org.kbson.BsonType
 import org.kbson.BsonValue
 import org.kbson.internal.Assertions.assertThrows
 import org.kbson.internal.HexUtils
-import kotlin.test.Test
-import kotlin.test.assertEquals
-import kotlin.test.assertFailsWith
-import kotlin.test.fail
 
 class ArrayTest : CorpusTest("array.json")
 
@@ -148,7 +148,7 @@ abstract class CorpusTest(filename: String) {
             scenario.canonicalBsonHex.uppercase(),
             HexUtils.toHexString(decodedDocument.toByteArray()),
             "Failed to create expected BSON for document with description: " +
-                    "${data.description}:${scenario.description}")
+                "${data.description}:${scenario.description}")
 
         scenario.degenerateBsonHex?.let {
             val decodedDegenerateDocument: BsonDocument = BsonDocument.invoke(HexUtils.toByteArray(it))
@@ -167,14 +167,13 @@ abstract class CorpusTest(filename: String) {
                 scenario.canonicalJson.stripWhiteSpace(),
                 decodedDocument.toJson().stripWhiteSpace(),
                 "Failed to create expected canonical JSON for document with description " +
-                        "${data.description}:${scenario.description}.")
+                    "${data.description}:${scenario.description}.")
 
             // native_to_canonical_extended_json( json_to_native(cEJ) ) = cEJ
             assertEquals(
                 scenario.canonicalJson.stripWhiteSpace(),
                 parsedCanonicalJsonDocument.toJson().stripWhiteSpace(),
                 "Failed to create expected canonical JSON from parsing canonical JSON")
-
 
             scenario.degenerateJson?.let {
                 // native_to_bson( json_to_native(dEJ) ) = cB
@@ -183,8 +182,7 @@ abstract class CorpusTest(filename: String) {
                         scenario.canonicalBsonHex.uppercase(),
                         HexUtils.toHexString(BsonDocument(scenario.degenerateJson).toByteArray()),
                         "Failed to create expected canonical BSON from degenerate JSON for document with description:" +
-                                " ${data.description}:${scenario.description}."
-                    )
+                            " ${data.description}:${scenario.description}.")
                 }
             }
         }
@@ -195,7 +193,7 @@ abstract class CorpusTest(filename: String) {
                 scenario.canonicalBsonHex.uppercase(),
                 HexUtils.toHexString(parsedCanonicalJsonDocument.toByteArray()),
                 "Failed to create expected canonical BSON from parsing canonical JSON. " +
-                        "${data.description}:${scenario.description}")
+                    "${data.description}:${scenario.description}")
         }
     }
 
