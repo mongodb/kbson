@@ -39,7 +39,7 @@ internal class BsonBinaryWriter(public val bsonOutput: ByteArrayBsonOutput) : Ab
 
     override fun doWriteStartDocument() {
         if (state == State.VALUE) {
-            bsonOutput.writeByte(BsonType.DOCUMENT.value)
+            bsonOutput.writeByte(BsonType.DOCUMENT.toByte())
             writeCurrentName()
         }
         context = BsonBinaryWriterContext(context, BsonContextType.DOCUMENT, context.name, bsonOutput.position)
@@ -58,7 +58,7 @@ internal class BsonBinaryWriter(public val bsonOutput: ByteArrayBsonOutput) : Ab
     }
 
     override fun doWriteStartArray() {
-        bsonOutput.writeByte(BsonType.ARRAY.value)
+        bsonOutput.writeByte(BsonType.ARRAY.toByte())
         writeCurrentName()
         context = BsonBinaryWriterContext(context, BsonContextType.ARRAY, context.name, bsonOutput.position)
         bsonOutput.writeInt32(0) // reserve space for size
@@ -71,7 +71,7 @@ internal class BsonBinaryWriter(public val bsonOutput: ByteArrayBsonOutput) : Ab
     }
 
     override fun doWriteBinaryData(value: BsonBinary) {
-        bsonOutput.writeByte(BsonType.BINARY.value)
+        bsonOutput.writeByte(BsonType.BINARY.toByte())
         writeCurrentName()
 
         var totalLength: Int = value.data.size
@@ -88,19 +88,19 @@ internal class BsonBinaryWriter(public val bsonOutput: ByteArrayBsonOutput) : Ab
     }
 
     override fun doWriteBoolean(value: Boolean) {
-        bsonOutput.writeByte(BsonType.BOOLEAN.value)
+        bsonOutput.writeByte(BsonType.BOOLEAN.toByte())
         writeCurrentName()
         bsonOutput.writeByte(if (value) 1 else 0)
     }
 
     override fun doWriteDateTime(value: Long) {
-        bsonOutput.writeByte(BsonType.DATE_TIME.value)
+        bsonOutput.writeByte(BsonType.DATE_TIME.toByte())
         writeCurrentName()
         bsonOutput.writeInt64(value)
     }
 
     override fun doWriteDBPointer(value: BsonDBPointer) {
-        bsonOutput.writeByte(BsonType.DB_POINTER.value)
+        bsonOutput.writeByte(BsonType.DB_POINTER.toByte())
         writeCurrentName()
 
         bsonOutput.writeString(value.namespace)
@@ -108,38 +108,38 @@ internal class BsonBinaryWriter(public val bsonOutput: ByteArrayBsonOutput) : Ab
     }
 
     override fun doWriteDouble(value: Double) {
-        bsonOutput.writeByte(BsonType.DOUBLE.value)
+        bsonOutput.writeByte(BsonType.DOUBLE.toByte())
         writeCurrentName()
         bsonOutput.writeDouble(value)
     }
 
     override fun doWriteInt32(value: Int) {
-        bsonOutput.writeByte(BsonType.INT32.value)
+        bsonOutput.writeByte(BsonType.INT32.toByte())
         writeCurrentName()
         bsonOutput.writeInt32(value)
     }
 
     override fun doWriteInt64(value: Long) {
-        bsonOutput.writeByte(BsonType.INT64.value)
+        bsonOutput.writeByte(BsonType.INT64.toByte())
         writeCurrentName()
         bsonOutput.writeInt64(value)
     }
 
     override fun doWriteDecimal128(value: BsonDecimal128) {
-        bsonOutput.writeByte(BsonType.DECIMAL128.value)
+        bsonOutput.writeByte(BsonType.DECIMAL128.toByte())
         writeCurrentName()
         bsonOutput.writeInt64(value.value.low.toLong())
         bsonOutput.writeInt64(value.value.high.toLong())
     }
 
     override fun doWriteJavaScript(value: BsonJavaScript) {
-        bsonOutput.writeByte(BsonType.JAVASCRIPT.value)
+        bsonOutput.writeByte(BsonType.JAVASCRIPT.toByte())
         writeCurrentName()
         bsonOutput.writeString(value.code)
     }
 
     override fun doWriteJavaScriptWithScope(value: String) {
-        bsonOutput.writeByte(BsonType.JAVASCRIPT_WITH_SCOPE.value)
+        bsonOutput.writeByte(BsonType.JAVASCRIPT_WITH_SCOPE.toByte())
         writeCurrentName()
         context =
             BsonBinaryWriterContext(context, BsonContextType.JAVASCRIPT_WITH_SCOPE, context.name, bsonOutput.position)
@@ -148,53 +148,53 @@ internal class BsonBinaryWriter(public val bsonOutput: ByteArrayBsonOutput) : Ab
     }
 
     override fun doWriteMaxKey() {
-        bsonOutput.writeByte(BsonType.MAX_KEY.value)
+        bsonOutput.writeByte(BsonType.MAX_KEY.toByte())
         writeCurrentName()
     }
 
     override fun doWriteMinKey() {
-        bsonOutput.writeByte(BsonType.MIN_KEY.value)
+        bsonOutput.writeByte(BsonType.MIN_KEY.toByte())
         writeCurrentName()
     }
 
     override fun doWriteNull() {
-        bsonOutput.writeByte(BsonType.NULL.value)
+        bsonOutput.writeByte(BsonType.NULL.toByte())
         writeCurrentName()
     }
 
     override fun doWriteObjectId(value: BsonObjectId) {
-        bsonOutput.writeByte(BsonType.OBJECT_ID.value)
+        bsonOutput.writeByte(BsonType.OBJECT_ID.toByte())
         writeCurrentName()
         bsonOutput.writeBytes(value.toByteArray())
     }
 
     override fun doWriteRegularExpression(value: BsonRegularExpression) {
-        bsonOutput.writeByte(BsonType.REGULAR_EXPRESSION.value)
+        bsonOutput.writeByte(BsonType.REGULAR_EXPRESSION.toByte())
         writeCurrentName()
         bsonOutput.writeCString(value.pattern)
         bsonOutput.writeCString(value.options)
     }
 
     override fun doWriteString(value: String) {
-        bsonOutput.writeByte(BsonType.STRING.value)
+        bsonOutput.writeByte(BsonType.STRING.toByte())
         writeCurrentName()
         bsonOutput.writeString(value)
     }
 
     override fun doWriteSymbol(value: String) {
-        bsonOutput.writeByte(BsonType.SYMBOL.value)
+        bsonOutput.writeByte(BsonType.SYMBOL.toByte())
         writeCurrentName()
         bsonOutput.writeString(value)
     }
 
     override fun doWriteTimestamp(value: BsonTimestamp) {
-        bsonOutput.writeByte(BsonType.TIMESTAMP.value)
+        bsonOutput.writeByte(BsonType.TIMESTAMP.toByte())
         writeCurrentName()
         bsonOutput.writeInt64(value.value)
     }
 
     override fun doWriteUndefined() {
-        bsonOutput.writeByte(BsonType.UNDEFINED.value)
+        bsonOutput.writeByte(BsonType.UNDEFINED.toByte())
         writeCurrentName()
     }
 

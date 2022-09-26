@@ -203,7 +203,7 @@ internal class BsonBinaryReader(private val bsonInput: ByteArrayBsonInput) : Abs
             "readBsonType can only be called when State is ${State.TYPE}, not when State is $state."
         }
 
-        val bsonTypeByte = bsonInput.readByte()
+        val bsonTypeByte = bsonInput.readByte().toUByte()
         val bsonType: BsonType? = BsonType.values().find { it.value == bsonTypeByte }
         validateSerialization(bsonType != null) {
             "Detected unknown BSON type '$bsonTypeByte' for field name \"${bsonInput.readCString()}\". "

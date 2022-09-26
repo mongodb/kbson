@@ -20,72 +20,72 @@ package org.kbson
  *
  * @property value the int value of this BSON type.
  */
-public enum class BsonType(public val value: Byte) {
+public enum class BsonType(public val value: UByte) {
     /** Not a real BSON type. Used to signal the end of a document. */
-    END_OF_DOCUMENT(0x00), // no values of this type exist it marks the end of a document
+    END_OF_DOCUMENT(0u), // no values of this type exist it marks the end of a document
 
     /** A BSON double. */
-    DOUBLE(0x01),
+    DOUBLE(1u),
 
     /** A BSON string. */
-    STRING(0x02),
+    STRING(2u),
 
     /** A BSON document. */
-    DOCUMENT(0x03),
+    DOCUMENT(3u),
 
     /** A BSON array. */
-    ARRAY(0x04),
+    ARRAY(4u),
 
     /** BSON binary data. */
-    BINARY(0x05),
+    BINARY(5u),
 
     /** A BSON undefined value. */
-    UNDEFINED(0x06),
+    UNDEFINED(6u),
 
     /** A BSON ObjectId. */
-    OBJECT_ID(0x07),
+    OBJECT_ID(7u),
 
     /** A BSON bool. */
-    BOOLEAN(0x08),
+    BOOLEAN(8u),
 
     /** A BSON DateTime. */
-    DATE_TIME(0x09),
+    DATE_TIME(9u),
 
     /** A BSON null value. */
-    NULL(0x0a),
+    NULL(10u),
 
     /** A BSON regular expression. */
-    REGULAR_EXPRESSION(0x0b),
+    REGULAR_EXPRESSION(11u),
 
     /** A BSON regular expression. */
-    DB_POINTER(0x0c),
+    DB_POINTER(12u),
 
     /** BSON JavaScript code. */
-    JAVASCRIPT(0x0d),
+    JAVASCRIPT(13u),
 
     /** A BSON symbol. */
-    SYMBOL(0x0e),
+    SYMBOL(14u),
 
     /** BSON JavaScript code with a scope (a set of variables with values). */
-    JAVASCRIPT_WITH_SCOPE(0x0f),
+    JAVASCRIPT_WITH_SCOPE(15u),
 
     /** A BSON 32-bit integer. */
-    INT32(0x10),
+    INT32(16u),
 
     /** A BSON timestamp. */
-    TIMESTAMP(0x11),
+    TIMESTAMP(17u),
 
     /** A BSON 64-bit integer. */
-    INT64(0x12),
+    INT64(18u),
 
     /** A BSON Decimal128. */
-    DECIMAL128(0x13),
+    DECIMAL128(19u),
 
     /** A BSON MinKey value. */
-    MIN_KEY(0xff.toByte()),
+    MIN_KEY(255u),
 
     /** A BSON MaxKey value. */
-    MAX_KEY(0x7f);
+    MAX_KEY(127u);
 
     /**
      * Returns whether this type is some sort of containing type, e.g. a document or array.
@@ -94,5 +94,9 @@ public enum class BsonType(public val value: Byte) {
      */
     public fun isContainer(): Boolean {
         return this == DOCUMENT || this == ARRAY
+    }
+
+    internal fun toByte(): Byte {
+        return this.value.toByte()
     }
 }
