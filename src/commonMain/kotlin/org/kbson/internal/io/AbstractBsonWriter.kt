@@ -15,18 +15,15 @@
  */
 package org.kbson.internal.io
 
-import org.kbson.BsonArray
 import org.kbson.BsonBinary
 import org.kbson.BsonDBPointer
 import org.kbson.BsonDecimal128
-import org.kbson.BsonDocument
+import org.kbson.BsonInvalidOperationException
 import org.kbson.BsonJavaScript
-import org.kbson.BsonJavaScriptWithScope
 import org.kbson.BsonObjectId
 import org.kbson.BsonRegularExpression
 import org.kbson.BsonTimestamp
 import org.kbson.BsonType
-import org.kbson.BsonValue
 import org.kbson.internal.validateOperation
 import org.kbson.internal.validateSerialization
 
@@ -215,11 +212,12 @@ internal abstract class AbstractBsonWriter(private val maxSerializationDepth: In
 
         serializationDepth--
         doWriteEndDocument()
-        if (_context?.contextType == BsonContextType.TOP_LEVEL) {
-            state = State.DONE
-        } else {
-            state = nextState
-        }
+        state =
+            if (_context?.contextType == BsonContextType.TOP_LEVEL) {
+                State.DONE
+            } else {
+                nextState
+            }
     }
 
     override fun writeStartArray() {
@@ -371,7 +369,7 @@ internal abstract class AbstractBsonWriter(private val maxSerializationDepth: In
      *
      * @return the next `State`
      */
-    protected val nextState: State
+    private val nextState: State
         get() =
             if (_context?.contextType == BsonContextType.ARRAY) {
                 State.VALUE
@@ -385,15 +383,14 @@ internal abstract class AbstractBsonWriter(private val maxSerializationDepth: In
      * @param validStates an array of `State`s to compare this writer's state to.
      * @return true if this writer's state is in the given list.
      */
-    protected fun checkState(vararg validStates: State): Boolean {
+    private fun checkState(vararg validStates: State): Boolean {
         return validStates.find { it == state } != null
     }
 
     /**
      * Checks the writer is in the correct state. If the writer's current state is in the list of given states, this
-     * method will complete without exception. Throws an [java.lang.IllegalStateException] if the writer is closed.
-     * Throws BsonInvalidOperationException if the method is trying to do something that is not permitted in the current
-     * state.
+     * method will complete without exception. Throws an [BsonInvalidOperationException] if the writer is closed. Throws
+     * BsonInvalidOperationException if the method is trying to do something that is not permitted in the current state.
      *
      * @param methodName the name of the method being performed that checks are being performed for
      * @param validStates the list of valid states for this operation
@@ -402,7 +399,7 @@ internal abstract class AbstractBsonWriter(private val maxSerializationDepth: In
     private fun checkPreconditions(methodName: String, vararg validStates: State) {
         check(!isClosed) { "BsonWriter is closed" }
         validateOperation(checkState(*validStates)) {
-            "$methodName can only be called when the State is ${validStates.map { it.name }.joinToString(" or ")}, " +
+            "$methodName can only be called when the State is ${validStates.joinToString(" or ") { it.name }}, " +
                 "not when State is $state."
         }
     }
@@ -415,32 +412,15 @@ internal abstract class AbstractBsonWriter(private val maxSerializationDepth: In
         pipeDocument(reader)
     }
 
-    /**
-     * Return true if the current execution of the pipe method should be aborted.
-     *
-     * @return true if the current execution of the pipe method should be aborted.
-     */
-    protected open fun abortPipe(): Boolean {
-        return false
-    }
-
     private fun pipeDocument(reader: BsonReader) {
         reader.readStartDocument()
         writeStartDocument()
         while (reader.readBsonType() != BsonType.END_OF_DOCUMENT) {
             writeName(reader.readName())
             pipeValue(reader)
-            if (abortPipe()) {
-                return
-            }
         }
         reader.readEndDocument()
         writeEndDocument()
-    }
-
-    private fun pipeJavascriptWithScope(reader: BsonReader) {
-        writeJavaScriptWithScope(reader.readJavaScriptWithScope())
-        pipeDocument(reader)
     }
 
     @Suppress("ComplexMethod")
@@ -482,66 +462,19 @@ internal abstract class AbstractBsonWriter(private val maxSerializationDepth: In
             else -> throw IllegalArgumentException("unhandled BSON type: " + reader.currentBsonType)
         }
     }
-
-    fun pipeDocument(value: BsonDocument) {
-        writeStartDocument()
-        value.entries.forEach {
-            writeName(it.key)
-            pipeValue(it.value)
-        }
-        writeEndDocument()
-    }
-
     private fun pipeArray(reader: BsonReader) {
         reader.readStartArray()
         writeStartArray()
         while (reader.readBsonType() != BsonType.END_OF_DOCUMENT) {
             pipeValue(reader)
-            if (abortPipe()) {
-                return
-            }
         }
         reader.readEndArray()
         writeEndArray()
     }
 
-    private fun pipeArray(value: BsonArray) {
-        writeStartArray()
-        value.forEach { pipeValue(it) }
-        writeEndArray()
-    }
-
-    private fun pipeJavascriptWithScope(javaScriptWithScope: BsonJavaScriptWithScope) {
-        writeJavaScriptWithScope(javaScriptWithScope.code)
-        pipeDocument(javaScriptWithScope.scope)
-    }
-
-    @Suppress("ComplexMethod")
-    private fun pipeValue(value: BsonValue) {
-        when (value.bsonType) {
-            BsonType.ARRAY -> pipeArray(value.asArray())
-            BsonType.BINARY -> writeBinaryData(value.asBinary())
-            BsonType.BOOLEAN -> writeBoolean(value.asBoolean().value)
-            BsonType.DATE_TIME -> writeDateTime(value.asDateTime().value)
-            BsonType.DB_POINTER -> writeDBPointer(value.asDBPointer())
-            BsonType.DECIMAL128 -> writeDecimal128(value.asDecimal128())
-            BsonType.DOCUMENT -> pipeDocument(value.asDocument())
-            BsonType.DOUBLE -> writeDouble(value.asDouble().doubleValue())
-            BsonType.INT32 -> writeInt32(value.asInt32().intValue())
-            BsonType.INT64 -> writeInt64(value.asInt64().longValue())
-            BsonType.JAVASCRIPT -> writeJavaScript(value.asJavaScript())
-            BsonType.JAVASCRIPT_WITH_SCOPE -> pipeJavascriptWithScope(value.asJavaScriptWithScope())
-            BsonType.OBJECT_ID -> writeObjectId(value.asObjectId())
-            BsonType.REGULAR_EXPRESSION -> writeRegularExpression(value.asRegularExpression())
-            BsonType.STRING -> writeString(value.asString().value)
-            BsonType.SYMBOL -> writeSymbol(value.asSymbol().value)
-            BsonType.TIMESTAMP -> writeTimestamp(value.asTimestamp())
-            BsonType.MAX_KEY -> writeMaxKey()
-            BsonType.MIN_KEY -> writeMinKey()
-            BsonType.NULL -> writeNull()
-            BsonType.UNDEFINED -> writeUndefined()
-            else -> throw IllegalArgumentException("unhandled BSON type: " + value.bsonType)
-        }
+    private fun pipeJavascriptWithScope(reader: BsonReader) {
+        writeJavaScriptWithScope(reader.readJavaScriptWithScope())
+        pipeDocument(reader)
     }
 
     /** The state of a writer. Indicates where in a document the writer is. */
@@ -562,10 +495,7 @@ internal abstract class AbstractBsonWriter(private val maxSerializationDepth: In
         SCOPE_DOCUMENT,
 
         /** The writer is done. */
-        DONE,
-
-        /** The writer is closed. */
-        CLOSED
+        DONE
     }
 
     /**
@@ -574,25 +504,5 @@ internal abstract class AbstractBsonWriter(private val maxSerializationDepth: In
      * array, or other complex sub-structure.
      */
     @Suppress("ConstructorParameterNaming")
-    open inner class Context(val _parentContext: Context?, val contextType: BsonContextType, val name: String? = null)
-
-    /** Capture the current state of this writer - its [Context], [ ], field name and depth. */
-    protected open inner class Mark {
-        private val state: State
-        private val context: Context?
-        private val serializationDepth: Int
-
-        /** Construct an instance. */
-        init {
-            state = this@AbstractBsonWriter.state
-            context = this@AbstractBsonWriter._context
-            serializationDepth = this@AbstractBsonWriter.serializationDepth
-        }
-
-        fun reset() {
-            this@AbstractBsonWriter.state = state
-            this@AbstractBsonWriter._context = context
-            this@AbstractBsonWriter.serializationDepth = serializationDepth
-        }
-    }
+    open inner class Context(val contextType: BsonContextType, val name: String? = null)
 }

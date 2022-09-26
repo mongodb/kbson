@@ -457,8 +457,7 @@ internal abstract class AbstractBsonReader : BsonReader {
      * context of the reader. Also records the [BsonContextType], indicating whether the reader is reading a document,
      * array, or other complex sub-structure.
      */
-    @Suppress("ConstructorParameterNaming")
-    open inner class Context(val _parentContext: Context?, val contextType: BsonContextType)
+    @Suppress("ConstructorParameterNaming") open inner class Context(val contextType: BsonContextType)
 
     /** The state of a reader. Indicates where in a document the reader is. */
     enum class State {
@@ -484,9 +483,6 @@ internal abstract class AbstractBsonReader : BsonReader {
         END_OF_ARRAY,
 
         /** The reader has finished reading a document. */
-        DONE,
-
-        /** The reader is closed. */
-        CLOSED
+        DONE
     }
 }

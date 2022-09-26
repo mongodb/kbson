@@ -17,6 +17,7 @@ package org.kbson
 
 import org.kbson.internal.io.BsonBinaryReader
 import org.kbson.internal.io.BsonBinaryWriter
+import org.kbson.internal.io.BsonDocumentReader
 import org.kbson.internal.io.BsonDocumentWriter
 import org.kbson.internal.use
 import org.kbson.serialization.Bson
@@ -68,7 +69,7 @@ public class BsonDocument(initial: Map<String, BsonValue> = LinkedHashMap()) :
      */
     public fun toByteArray(): ByteArray {
         return BsonBinaryWriter().use { w ->
-            w.pipeDocument(this)
+            w.pipe(BsonDocumentReader(this))
             w.bsonOutput.toByteArray()
         }
     }

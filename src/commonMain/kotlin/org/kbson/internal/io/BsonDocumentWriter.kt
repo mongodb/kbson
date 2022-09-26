@@ -38,11 +38,12 @@ import org.kbson.BsonSymbol
 import org.kbson.BsonTimestamp
 import org.kbson.BsonUndefined
 import org.kbson.BsonValue
+import org.kbson.internal.validateSerialization
 
 /** A BsonWriter implementation that writes to a binary stream of data to a BsonDocument */
 @Suppress("TooManyFunctions")
 internal class BsonDocumentWriter : AbstractBsonWriter() {
-    public val bsonDocument: BsonDocument = BsonDocument()
+    val bsonDocument: BsonDocument = BsonDocument()
     private var context: BsonDocumentWriterContext =
         BsonDocumentWriterContext(null, BsonContextType.TOP_LEVEL, bsonDocument)
         set(context) {
@@ -177,12 +178,13 @@ internal class BsonDocumentWriter : AbstractBsonWriter() {
         contextType: BsonContextType,
         val container: BsonValue,
         val currentName: String? = null
-    ) : Context(parentContext, contextType, currentName) {
+    ) : Context(contextType, currentName) {
 
         fun add(value: BsonValue) {
             require(container.isDocument() || container.isArray()) { "Cannot add $value to $container" }
             if (container.isDocument()) {
-                container.asDocument().put(currentName!!, value)
+                validateSerialization(currentName != null) { "Missing fields current name." }
+                container.asDocument()[currentName] = value
             } else {
                 container.asArray().add(value)
             }

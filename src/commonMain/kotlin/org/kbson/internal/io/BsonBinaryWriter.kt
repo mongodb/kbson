@@ -224,10 +224,10 @@ internal class BsonBinaryWriter(public val bsonOutput: ByteArrayBsonOutput) : Ab
         currentName: String?,
         val startPosition: Int,
         var index: Int = 0 // used when contextType is an array
-    ) : Context(parentContext, contextType, currentName)
+    ) : Context(contextType, currentName)
 
-    public companion object {
-        public operator fun invoke(): BsonBinaryWriter {
+    companion object {
+        operator fun invoke(): BsonBinaryWriter {
             return BsonBinaryWriter(ByteArrayBsonOutput())
         }
     }

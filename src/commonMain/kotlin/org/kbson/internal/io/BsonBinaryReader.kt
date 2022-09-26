@@ -257,11 +257,12 @@ internal class BsonBinaryReader(private val bsonInput: ByteArrayBsonInput) : Abs
         contextType: BsonContextType,
         private val startPosition: Int,
         private val size: Int
-    ) : Context(parentContext, contextType) {
+    ) : Context(contextType) {
         fun popContext(position: Int): BsonBinaryReaderContext {
             val actualSize = position - startPosition
             validateSerialization(actualSize == size) { "Expected size to be $size, not $actualSize." }
-            return parentContext!!
+            validateSerialization(parentContext != null) { "Missing parent context." }
+            return parentContext
         }
     }
 }
