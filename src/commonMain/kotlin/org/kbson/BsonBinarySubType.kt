@@ -22,28 +22,28 @@ package org.kbson
  */
 public enum class BsonBinarySubType(public val value: Byte) {
     /** Binary data. */
-    BINARY(0x00.toByte()),
+    BINARY(0x00),
 
     /** A function. */
-    FUNCTION(0x01.toByte()),
+    FUNCTION(0x01),
 
     /** Obsolete binary data subtype (use Binary instead). */
-    OLD_BINARY(0x02.toByte()),
+    OLD_BINARY(0x02),
 
     /** A UUID in a driver dependent legacy byte order. */
-    UUID_LEGACY(0x03.toByte()),
+    UUID_LEGACY(0x03),
 
     /** A UUID in standard network byte order. */
-    UUID_STANDARD(0x04.toByte()),
+    UUID_STANDARD(0x04),
 
     /** An MD5 hash. */
-    MD5(0x05.toByte()),
+    MD5(0x05),
 
     /** Encrypted data. */
-    ENCRYPTED(0x06.toByte()),
+    ENCRYPTED(0x06),
 
     /** Columnar data */
-    COLUMN(0x07.toByte()),
+    COLUMN(0x07),
 
     /** User defined binary data. */
     USER_DEFINED(0x80.toByte())

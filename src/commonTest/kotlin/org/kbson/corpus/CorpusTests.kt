@@ -17,11 +17,18 @@ package org.kbson.corpus
 
 import com.goncalossilva.resources.Resource
 import kotlin.test.Test
-import kotlin.test.assertTrue
+import kotlin.test.assertEquals
+import kotlin.test.assertFailsWith
+import kotlin.test.fail
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
+import org.kbson.BsonDocument
+import org.kbson.BsonSerializationException
+import org.kbson.BsonType
+import org.kbson.BsonValue
+import org.kbson.internal.HexUtils
 
 class ArrayTest : CorpusTest("array.json")
 
@@ -127,13 +134,62 @@ abstract class CorpusTest(filename: String) {
     }
 
     private fun testValid(scenario: ValidBson) {
-        // TODO("Not implemented yet")
-        assertTrue(scenario.description.isNotEmpty())
+        val decodedDocument = hexStringToBsonDocument(scenario.canonicalBsonHex, scenario.description)
+
+        assertEquals(
+            scenario.canonicalBsonHex.uppercase(),
+            HexUtils.toHexString(decodedDocument.toByteArray()),
+            "Failed to create expected BSON for document with description: ${scenario.description}")
+
+        scenario.degenerateBsonHex?.let {
+            val decodedDegenerateDocument: BsonDocument = BsonDocument.invoke(HexUtils.toByteArray(it))
+            decodedDegenerateDocument.values
+            assertEquals(
+                scenario.canonicalBsonHex.uppercase(),
+                HexUtils.toHexString(decodedDegenerateDocument.toByteArray()),
+                "Failed to create expected canonical BSON from degenerate BSON for document with description:" +
+                    " ${scenario.description}.")
+        }
     }
 
     @Suppress("ThrowsCount")
     private fun testDecodeError(scenario: InvalidBson) {
-        // TODO("Not implemented yet")
-        assertTrue(scenario.description.isNotEmpty())
+        assertFailsWith<BsonSerializationException>("${scenario.description} should have failed parsing") {
+            // Working around the fact that the kbson doesn't report an error for invalid UTF-8, but
+            // rather replaces the invalid
+            // sequence with the replacement character
+
+            val byteArray = HexUtils.toByteArray(scenario.invalidBson)
+            val decodedDocument: BsonDocument = BsonDocument.invoke(byteArray)
+
+            val value: BsonValue? = decodedDocument[decodedDocument.getFirstKey()]
+            val decodedString: String =
+                when (value?.bsonType) {
+                    BsonType.STRING -> value.asString().value
+                    BsonType.DB_POINTER -> value.asDBPointer().namespace
+                    BsonType.JAVASCRIPT -> value.asJavaScript().code
+                    BsonType.SYMBOL -> value.asSymbol().value
+                    BsonType.JAVASCRIPT_WITH_SCOPE -> value.asJavaScriptWithScope().code
+                    else -> throw UnsupportedOperationException("Unsupported test for BSON type ${value?.bsonType}")
+                }
+            if (decodedString.contains("\uFFFD")) {
+                throw BsonSerializationException("String contains replacement character")
+            }
+
+            val decodedByteArray = decodedDocument.toByteArray()
+            if (byteArray.size > decodedByteArray.size) {
+                throw BsonSerializationException(
+                    """Should have consumed all bytes, but ${byteArray.size - decodedByteArray.size},
+                       | were not decoded for document with description ${scenario.description}""".trimMargin())
+            }
+        }
+    }
+
+    private fun hexStringToBsonDocument(hexString: String, description: String): BsonDocument {
+        try {
+            return BsonDocument.invoke(HexUtils.toByteArray(hexString))
+        } catch (e: Exception) {
+            fail("$description: Failed to decode Document: ${e.message} :: ${e.stackTraceToString()}")
+        }
     }
 }

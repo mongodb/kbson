@@ -326,4 +326,32 @@ class BsonDocumentTest {
         assertEquals(expectedDocument, BsonDocument(pairs.map { BsonElement(it.first, it.second) }))
         assertEquals(expectedDocument, BsonDocument(*pairs.toTypedArray()))
     }
+
+    @Test
+    fun shouldRoundTripToFromBytes() {
+        val expectedDocument =
+            BsonDocument()
+                .append("null", bsonNull)
+                .append("int32", bsonInt32)
+                .append("int64", bsonInt64)
+                .append("decimal128", bsonDecimal128)
+                .append("boolean", bsonBoolean)
+                .append("date", bsonDateTime)
+                .append("double", bsonDouble)
+                .append("string", bsonString)
+                .append("minKey", bsonMinKey)
+                .append("maxKey", bsonMaxKey)
+                .append("javaScript", bsonJavaScript)
+                .append("objectId", bsonObjectId)
+                .append("codeWithScope", bsonJavaScriptWithScope)
+                .append("regex", bsonRegularExpression)
+                .append("symbol", bsonSymbol)
+                .append("timestamp", bsonTimestamp)
+                .append("undefined", bsonUndefined)
+                .append("bsonBinary", bsonBinary)
+                .append("array", bsonArray)
+                .append("document", bsonDocument)
+
+        assertEquals(expectedDocument, BsonDocument(expectedDocument.toByteArray()))
+    }
 }

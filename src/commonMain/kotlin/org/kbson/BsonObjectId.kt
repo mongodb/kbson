@@ -17,6 +17,7 @@ package org.kbson
 
 import org.kbson.internal.AtomicInt
 import org.kbson.internal.CurrentTime.getCurrentTimeInSeconds
+import org.kbson.internal.HexUtils
 
 /**
  * A representation of the BSON ObjectId type
@@ -83,13 +84,7 @@ public class BsonObjectId(
      * @return a string representation of the ObjectId in hexadecimal format
      */
     public fun toHexString(): String {
-        val chars = CharArray(OBJECT_ID_LENGTH * 2)
-        var i = 0
-        for (b in toByteArray()) {
-            chars[i++] = HEX_CHARS[b.toInt() shr 4 and 0xF]
-            chars[i++] = HEX_CHARS[b.toInt() and 0xF]
-        }
-        return chars.concatToString()
+        return HexUtils.toHexString(toByteArray())
     }
 
     override val bsonType: BsonType
@@ -133,9 +128,8 @@ public class BsonObjectId(
     }
 
     public companion object {
-        private const val OBJECT_ID_LENGTH = 12
+        internal const val OBJECT_ID_LENGTH: Int = 12
         private const val LOW_ORDER_THREE_BYTES = 0x00ffffff
-        private val HEX_CHARS = "0123456789abcdef".toCharArray()
 
         // Use primitives to represent the 5-byte random value.
         private val RANDOM_VALUE1: Int
@@ -160,11 +154,10 @@ public class BsonObjectId(
          * @see [BsonObjectId.toHexString]
          */
         public operator fun invoke(hexString: String): BsonObjectId {
-            val invalidHexString =
-                hexString.length != 24 ||
-                    hexString.none { c -> (c < '0' || c > '9') || (c < 'a' || c > 'f') || (c < 'A' || c > 'F') }
-            require(!invalidHexString) { "invalid hexadecimal representation of an ObjectId: [$hexString]" }
-            return invoke(hexString.chunked(2).map { it.toInt(16).toByte() }.toByteArray())
+            require(hexString.length == OBJECT_ID_LENGTH * 2) {
+                "invalid hexadecimal representation of an ObjectId: [$hexString]"
+            }
+            return invoke(HexUtils.toByteArray(hexString))
         }
 
         /** Construct a new BsonObjectId from a ByteArray */
