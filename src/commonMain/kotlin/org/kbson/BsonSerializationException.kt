@@ -21,8 +21,8 @@ package org.kbson
  * @param message the message
  * @param cause the error cause
  */
-public class BsonSerializationException(message: String) : BsonException(message) {
+public class BsonSerializationException(message: String, cause: Throwable? = null) : BsonException(message, cause) {
     override fun toString(): String {
-        return "BsonSerializationException(message=$message)"
+        return "BsonSerializationException(message=$message, cause=${cause?.message})"
     }
 }

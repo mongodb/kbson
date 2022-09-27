@@ -84,7 +84,7 @@ public class BsonObjectId(
      * @return a string representation of the ObjectId in hexadecimal format
      */
     public fun toHexString(): String {
-        return HexUtils.toHexString(toByteArray())
+        return HexUtils.toHexString(toByteArray()).lowercase()
     }
 
     override val bsonType: BsonType

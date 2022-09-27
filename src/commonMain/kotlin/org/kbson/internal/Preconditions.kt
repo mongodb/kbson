@@ -21,7 +21,7 @@ import org.kbson.BsonInvalidOperationException
 import org.kbson.BsonSerializationException
 
 @OptIn(ExperimentalContracts::class)
-public inline fun validateSerialization(value: Boolean, lazyMessage: () -> Any) {
+internal inline fun validateSerialization(value: Boolean, lazyMessage: () -> Any) {
     contract { returns() implies value }
     if (!value) {
         val message = lazyMessage()
@@ -30,7 +30,7 @@ public inline fun validateSerialization(value: Boolean, lazyMessage: () -> Any) 
 }
 
 @OptIn(ExperimentalContracts::class)
-public inline fun validateOperation(value: Boolean, lazyMessage: () -> Any) {
+internal inline fun validateOperation(value: Boolean, lazyMessage: () -> Any) {
     contract { returns() implies value }
     if (!value) {
         val message = lazyMessage()

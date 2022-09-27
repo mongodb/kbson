@@ -20,6 +20,7 @@ import org.kbson.internal.io.BsonBinaryWriter
 import org.kbson.internal.io.BsonDocumentReader
 import org.kbson.internal.io.BsonDocumentWriter
 import org.kbson.internal.use
+import org.kbson.serialization.Bson
 
 /**
  * A type-safe container for a BSON document.
@@ -691,9 +692,7 @@ public class BsonDocument(initial: Map<String, BsonValue> = LinkedHashMap()) :
         return get(key)!!.asBinary()
     }
 
-    /**
-     * BsonDocument companion object
-     */
+    /** BsonDocument companion object */
     public companion object {
 
         /**
@@ -708,6 +707,16 @@ public class BsonDocument(initial: Map<String, BsonValue> = LinkedHashMap()) :
                 w.pipe(BsonBinaryReader(byteArray))
                 w.bsonDocument
             }
+        }
+
+        /**
+         * Create a BsonDocument from a Json string
+         *
+         * @param json the Json String
+         * @return a BsonDocument
+         */
+        public operator fun invoke(json: String): BsonDocument {
+            return Bson(json).asDocument()
         }
     }
 

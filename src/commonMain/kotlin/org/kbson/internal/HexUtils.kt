@@ -15,9 +15,18 @@
  */
 package org.kbson.internal
 
+/** Hex utils to convert to and from a hex encoded string and ByteArray */
 @Suppress("MagicNumber")
-public object HexUtils {
-    private val HEX_CHARS = "0123456789ABCDEF".toCharArray()
+internal object HexUtils {
+    /**
+     * Converts byteArray to hex string
+     *
+     * @param byteArray the byte array
+     * @return the hex string
+     */
+    fun toHexString(byteArray: ByteArray): String {
+        return byteArray.joinToString("") { (0xFF and it.toInt()).toString(16).padStart(2, '0').uppercase() }
+    }
 
     /**
      * Converts a hex string to a byteArray
@@ -25,28 +34,12 @@ public object HexUtils {
      * @param hexString the hex string
      * @return the byte array
      */
-    public fun toByteArray(hexString: String): ByteArray {
+    fun toByteArray(hexString: String): ByteArray {
         require(
             hexString.length % 2 == 0 &&
                 hexString.all { c -> (c < '0' || c > '9') || (c < 'a' || c > 'f') || (c < 'A' || c > 'F') }) {
             "Invalid hexadecimal representation of an byte array: [$hexString]."
         }
         return hexString.chunked(2).map { it.toInt(16).toByte() }.toByteArray()
-    }
-
-    /**
-     * Converts byteArray to hex string
-     *
-     * @param byteArray the byte array
-     * @return the hex string
-     */
-    public fun toHexString(byteArray: ByteArray): String {
-        val chars = CharArray(byteArray.size * 2)
-        var i = 0
-        byteArray.forEach {
-            chars[i++] = HEX_CHARS[it.toInt() shr 4 and 0xF]
-            chars[i++] = HEX_CHARS[it.toInt() and 0xF]
-        }
-        return chars.concatToString()
     }
 }

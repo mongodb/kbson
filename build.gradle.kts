@@ -54,11 +54,12 @@ kotlin {
         }
 
     sourceSets {
-        val commonMain by getting
+        val commonMain by getting {
+            dependencies { implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.4.0") }
+        }
         val commonTest by getting {
             dependencies {
                 implementation(kotlin("test"))
-                implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.4.0")
                 implementation("com.goncalossilva:resources:0.2.1") // kotlinx-resources
             }
         }

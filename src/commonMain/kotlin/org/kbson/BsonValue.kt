@@ -15,6 +15,8 @@
  */
 package org.kbson
 
+import org.kbson.serialization.Bson
+
 /** Base class for any BSON type. */
 @Suppress("TooManyFunctions")
 public sealed class BsonValue {
@@ -379,6 +381,15 @@ public sealed class BsonValue {
     public fun asBsonUndefined(): BsonUndefined {
         throwIfInvalidType(BsonType.UNDEFINED)
         return this as BsonUndefined
+    }
+
+    /**
+     * Return an extended json representation of this BsonValue
+     *
+     * @return the extended json representation of this BsonValue
+     */
+    public fun toJson(): String {
+        return Bson.toJson(this)
     }
 
     private fun throwIfInvalidType(expectedType: BsonType) {
