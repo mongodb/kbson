@@ -36,7 +36,7 @@ import org.kbson.internal.Decimal128.Flags.isSecondForm
  * @see [754-2008 - IEEE Standard for Floating-Point Arithmetic](http://ieeexplore.ieee.org/document/4610935/)
  */
 @Suppress("MagicNumber")
-public class Decimal128
+internal class Decimal128
 private constructor(
     /**
      * Gets the low-order 64 bits of the IEEE 754-2008 128-bit decimal floating point encoding for this Decimal128,
@@ -44,7 +44,7 @@ private constructor(
      *
      * @return the low-order 64 bits of this Decimal128
      */
-    public val high: ULong,
+    val high: ULong,
 
     /**
      * Gets the high-order 64 bits of the IEEE 754-2008 128-bit decimal floating point encoding for this Decimal128,
@@ -52,7 +52,7 @@ private constructor(
      *
      * @return the high-order 64 bits of this Decimal128
      */
-    public val low: ULong
+    val low: ULong
 ) {
 
     /**
@@ -60,7 +60,7 @@ private constructor(
      *
      * @return true if this Decimal128 is negative
      */
-    public val isNegative: Boolean
+    val isNegative: Boolean
         get() = high and SIGN_BIT_MASK == SIGN_BIT_MASK
 
     /**
@@ -68,7 +68,7 @@ private constructor(
      *
      * @return true if this Decimal128 is infinite
      */
-    public val isInfinite: Boolean
+    val isInfinite: Boolean
         get() = high and INFINITY_MASK == INFINITY_MASK
 
     /**
@@ -76,7 +76,7 @@ private constructor(
      *
      * @return true if this Decimal128 is finite
      */
-    public val isFinite: Boolean
+    val isFinite: Boolean
         get() = !isInfinite
 
     /**
@@ -84,7 +84,7 @@ private constructor(
      *
      * @return true if this Decimal128 is Not-A-Number
      */
-    public val isNaN: Boolean
+    val isNaN: Boolean
         get() = high and NaN_MASK == NaN_MASK
 
     /**
@@ -224,7 +224,7 @@ private constructor(
         }
     }
 
-    public companion object {
+    companion object {
         private const val EXPONENT_MAX: Int = 6111
         private const val EXPONENT_MIN: Int = -6176
         private val MAX_SIGNIFICAND = UInt128.parse("9999999999999999999999999999999999")
@@ -236,37 +236,37 @@ private constructor(
          * A constant holding the positive infinity of type `Decimal128`. It is equal to the value return by
          * `Decimal128("Infinity")`.
          */
-        public val POSITIVE_INFINITY: Decimal128 = fromIEEE754BIDEncoding(INFINITY_MASK, 0uL)
+        val POSITIVE_INFINITY: Decimal128 = fromIEEE754BIDEncoding(INFINITY_MASK, 0uL)
 
         /**
          * A constant holding the negative infinity of type `Decimal128`. It is equal to the value return by
          * `Decimal128("-Infinity")`.
          */
-        public val NEGATIVE_INFINITY: Decimal128 = fromIEEE754BIDEncoding(INFINITY_MASK or SIGN_BIT_MASK, 0uL)
+        val NEGATIVE_INFINITY: Decimal128 = fromIEEE754BIDEncoding(INFINITY_MASK or SIGN_BIT_MASK, 0uL)
 
         /**
          * A constant holding a negative Not-a-Number (-NaN) value of type `Decimal128`. It is equal to the value return
          * by `Decimal128("-NaN")`.
          */
-        public val NEGATIVE_NaN: Decimal128 = fromIEEE754BIDEncoding(NaN_MASK or SIGN_BIT_MASK, 0uL)
+        val NEGATIVE_NaN: Decimal128 = fromIEEE754BIDEncoding(NaN_MASK or SIGN_BIT_MASK, 0uL)
 
         /**
          * A constant holding a Not-a-Number (NaN) value of type `Decimal128`. It is equal to the value return by
          * `Decimal128("NaN")`.
          */
-        public val NaN: Decimal128 = fromIEEE754BIDEncoding(NaN_MASK, 0uL)
+        val NaN: Decimal128 = fromIEEE754BIDEncoding(NaN_MASK, 0uL)
 
         /**
          * A constant holding a positive zero value of type `Decimal128`. It is equal to the value return by
          * `Decimal128("0")`.
          */
-        public val POSITIVE_ZERO: Decimal128 = fromIEEE754BIDEncoding(0x3040000000000000uL, 0x0000000000000000uL)
+        val POSITIVE_ZERO: Decimal128 = fromIEEE754BIDEncoding(0x3040000000000000uL, 0x0000000000000000uL)
 
         /**
          * A constant holding a negative zero value of type `Decimal128`. It is equal to the value return by
          * `Decimal128("-0")`.
          */
-        public val NEGATIVE_ZERO: Decimal128 = fromIEEE754BIDEncoding(0xb040000000000000uL, 0x0000000000000000uL)
+        val NEGATIVE_ZERO: Decimal128 = fromIEEE754BIDEncoding(0xb040000000000000uL, 0x0000000000000000uL)
 
         /**
          * Create an instance with the given high and low order bits representing this Decimal128 as an IEEE 754-2008
@@ -276,7 +276,7 @@ private constructor(
          * @param low the low-order 64 bits
          * @return the Decimal128 value representing the given high and low order bits
          */
-        public fun fromIEEE754BIDEncoding(high: ULong, low: ULong): Decimal128 = Decimal128(high, low)
+        fun fromIEEE754BIDEncoding(high: ULong, low: ULong): Decimal128 = Decimal128(high, low)
 
         /**
          * Returns a Decimal128 value representing the given String.
@@ -288,7 +288,7 @@ private constructor(
          * Specification](https://github.com/mongodb/specifications/blob/master/source/bson-decimal128/decimal128.rst.from-string-representation)
          */
         @Suppress("MaxLineLength", "ComplexMethod", "ThrowsCount")
-        public operator fun invoke(value: String): Decimal128 {
+        operator fun invoke(value: String): Decimal128 {
             if (value.isEmpty()) {
                 throw NumberFormatException()
             }
@@ -307,7 +307,7 @@ private constructor(
                     var exponent = 0
 
                     val exponentGroup = groups["exponent"]?.value
-                    if (exponentGroup != null && exponentGroup.isNotEmpty()) {
+                    if (!exponentGroup.isNullOrEmpty()) {
                         exponent = groups["exponentDigits"]!!.value.toInt()
                         val exponentSignString = groups["exponentSign"]?.value
                         if (exponentSignString != null && exponentSignString == "-") {
