@@ -16,7 +16,7 @@
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.gradle.api.tasks.testing.logging.TestLogEvent
 
-group = "org.mongodb"
+group = "org.mongodb.kbson"
 
 version = "1.0-SNAPSHOT"
 
@@ -104,7 +104,7 @@ kotlin {
     }
 
     // Require that all methods in the API have visibility modifiers and return types.
-    // Anything inside `org.kbson.internal.*` is considered internal
+    // Anything inside `org.mongodb.kbson.internal.*` is considered internal
     explicitApi = org.jetbrains.kotlin.gradle.dsl.ExplicitApiMode.Strict
 }
 
