@@ -25,6 +25,7 @@ plugins {
     kotlin("plugin.serialization") version "1.7.10"
     id("com.android.library") version "7.3.0" apply false
     id("maven-publish")
+    id("signing")
 
     // Test based plugins
     id("com.diffplug.spotless") version "6.10.0"
@@ -126,9 +127,7 @@ if (!hasAndroidSDK) {
     apply(plugin = "com.android.library")
     @Suppress("UNUSED_VARIABLE")
     kotlin {
-        android("android") {
-            publishLibraryVariants("release", "debug")
-        }
+        android("android") { publishLibraryVariants("release", "debug") }
         sourceSets {
             val androidMain by getting { dependsOn(getByName("jvmMain")) }
             val androidTest by getting { dependsOn(getByName("jvmTest")) }
@@ -148,6 +147,14 @@ if (!hasAndroidSDK) {
             sourceSets {
                 getByName("main") { manifest.srcFile("src/androidMain/AndroidManifest.xml") }
                 getByName("androidTest") { java.srcDirs("src/androidTest/kotlin") }
+            }
+        }
+
+        publishing {
+            multipleVariants {
+                withSourcesJar()
+                withJavadocJar()
+                allVariants()
             }
         }
 
@@ -257,6 +264,117 @@ tasks.withType<io.gitlab.arturbosch.detekt.Detekt>().configureEach {
         xml.required.set(true) // checkstyle like format mainly for integrations like Jenkins
         txt.required.set(false) // similar to the console output, contains issue signature to manually edit
     }
+}
+
+/*
+ * Git Versioning
+ */
+val gitVersion: String by lazy {
+    val os = org.apache.commons.io.output.ByteArrayOutputStream()
+    project.exec {
+        commandLine = "git describe --tags --always --dirty".split(" ")
+        standardOutput = os
+    }
+    String(os.toByteArray()).trim()
+}
+
+tasks.register("publishSnapshots") {
+    group = "publishing"
+    description = "Publishes snapshots to Sonatype"
+    if (version.toString().endsWith("-SNAPSHOT")) {
+        dependsOn(tasks.withType<PublishToMavenRepository>())
+    }
+}
+
+tasks.register("publishArchives") {
+    group = "publishing"
+    description = "Publishes a release and uploads to Sonatype / Maven Central"
+
+    doFirst {
+        if (gitVersion != version) {
+            val cause =
+                """
+                | Version mismatch:
+                | =================
+                |
+                | $version != $gitVersion
+                |
+                | The project version does not match the git tag.
+                |""".trimMargin()
+            throw GradleException(cause)
+        } else {
+            println("Publishing: ${project.name} : $gitVersion")
+        }
+    }
+
+    if (gitVersion == version) {
+        dependsOn(tasks.withType<PublishToMavenRepository>())
+    }
+}
+
+val dokkaOutputDir = "$buildDir/dokka"
+
+tasks.getByName<org.jetbrains.dokka.gradle.DokkaTask>("dokkaHtml") { outputDirectory.set(file(dokkaOutputDir)) }
+
+val deleteDokkaOutputDir by tasks.register<Delete>("deleteDokkaOutputDirectory") { delete(dokkaOutputDir) }
+
+val javadocJar =
+    tasks.register<Jar>("javadocJar") {
+        dependsOn(deleteDokkaOutputDir, tasks.dokkaHtml)
+        archiveClassifier.set("javadoc")
+        from(dokkaOutputDir)
+    }
+
+publishing {
+    repositories {
+        maven {
+            name = "oss"
+            val releasesRepoUrl = uri("https://oss.sonatype.org/service/local/staging/deploy/maven2/")
+            val snapshotsRepoUrl = uri("https://oss.sonatype.org/content/repositories/snapshots/")
+            url = if (version.toString().endsWith("SNAPSHOT")) snapshotsRepoUrl else releasesRepoUrl
+
+            credentials {
+                val nexusUsername: String? by project
+                val nexusPassword: String? by project
+                username = nexusUsername ?: ""
+                password = nexusPassword ?: ""
+            }
+        }
+    }
+    publications {
+        withType<MavenPublication> {
+            artifact(javadocJar)
+            pom {
+                name.set(project.name)
+                description.set(project.description)
+                url.set("http://www.mongodb.org")
+                licenses {
+                    license {
+                        name.set("The Apache License, Version 2.0")
+                        url.set("http://www.apache.org/licenses/LICENSE-2.0.txt")
+                    }
+                }
+                developers {
+                    developer {
+                        id.set("Various")
+                        organization.set("MongoDB")
+                    }
+                }
+                scm {
+                    connection.set("scm:https://github.com/mongodb/kbson.git")
+                    developerConnection.set("scm:git@github.com:mongodb/kbson.git")
+                    url.set("https://github.com/mongodb/kbson")
+                }
+            }
+        }
+    }
+}
+
+signing {
+    val signingKey: String? by project
+    val signingPassword: String? by project
+    useInMemoryPgpKeys(signingKey, signingPassword)
+    sign(publishing.publications)
 }
 
 tasks.named("check") { dependsOn(":spotlessApply") }

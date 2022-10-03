@@ -187,13 +187,31 @@ functions:
           ${PREPARE_SHELL}
           .evergreen/run-tests.sh
 
+  "publish snapshot":
+    - command: shell.exec
+      type: test
+      params:
+        working_dir: "kbson"
+        script: |
+          # DO NOT ECHO WITH XTRACE (which PREPARE_SHELL does)
+          RELEASE=false NEXUS_USERNAME=${nexus_username} NEXUS_PASSWORD=${nexus_password} SIGNING_PASSWORD=${signing_password} SIGNING_KEY="${gpg_ascii_armored}" .evergreen/publish.sh
+
+  "publish release":
+    - command: shell.exec
+      type: test
+      params:
+        working_dir: "kbson"
+        script: |
+          # DO NOT ECHO WITH XTRACE (which PREPARE_SHELL does)
+          RELEASE=true NEXUS_USERNAME=${nexus_username} NEXUS_PASSWORD=${nexus_password} SIGNING_PASSWORD=${signing_password} SIGNING_KEY="${gpg_ascii_armored}" .evergreen/publish.sh
+
+
 pre:
   - func: "fetch source"
   - func: "windows fix"
   - func: "fix absolute paths"
   - func: "init test-results"
   - func: "make files executable"
-  - func: "setup android toolchain"
 
 post:
   - func: "upload test results"
@@ -205,7 +223,15 @@ tasks:
       - func: "run static checks"
   - name: "test-task"
     commands:
+      - func: "setup android toolchain"
       - func: "run tests"
+  - name: "publish-snapshot-task"
+    commands:
+      - func: "setup android toolchain"
+      - func: "publish snapshot"
+  - name: "publish-release-task"
+    commands:
+      - func: "publish release"
 
 buildvariants:
 
@@ -213,7 +239,6 @@ buildvariants:
     display_name: "Ubuntu 20.04 64-bit"
     run_on: ubuntu2004-small
     tasks:
-      - static-checks-task
       - test-task
 
   - name: "macos_x86_64"
@@ -226,5 +251,15 @@ buildvariants:
     display_name: macOS m1 (Apple LLVM)
     run_on: macos-1100-arm64
     tasks:
-      - test-task
+      - name: static-checks-task
+      - name: test-task
+      - name: publish-snapshot-task
+        depends_on:
+          - name: static-checks-task
+          - name: test-task
 
+  - name: "publish-release"
+    display_name: "Publish Release"
+    run_on: macos-1100-arm64
+    tasks:
+      - name: publish-release-task
