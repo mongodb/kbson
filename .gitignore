@@ -42,11 +42,5 @@ local.properties
 # jenv
 .java-version
 
-# mongocryptd
-**/mongocryptd.pid
-
-# shell scripts
-*.sh
-
 # security-sensitive files
 *.gpg
