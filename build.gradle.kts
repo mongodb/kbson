@@ -23,6 +23,8 @@ version = "1.0-SNAPSHOT"
 plugins {
     kotlin("multiplatform") version "1.7.10"
     kotlin("plugin.serialization") version "1.7.10"
+    id("com.android.library") version "7.3.0" apply false
+    id("maven-publish")
 
     // Test based plugins
     id("com.diffplug.spotless") version "6.10.0"
@@ -31,27 +33,22 @@ plugins {
     id("com.goncalossilva.resources") version "0.2.2" // kotlinx-resources
 }
 
-repositories { mavenCentral() }
+repositories {
+    mavenCentral()
+    google()
+}
 
 @Suppress("UNUSED_VARIABLE")
 kotlin {
     jvm {
         compilations.all { kotlinOptions.jvmTarget = "1.8" }
-        withJava()
         tasks.withType<Test> { useJUnitPlatform() }
     }
 
-    js(IR) { nodejs {} }
-
-    val hostOs = System.getProperty("os.name")
-    val isMingwX64 = hostOs.startsWith("Windows")
-    val nativeTarget =
-        when {
-            hostOs == "Mac OS X" -> macosX64("native")
-            hostOs == "Linux" -> linuxX64("native")
-            isMingwX64 -> mingwX64("native")
-            else -> throw GradleException("Host OS is not supported in Kotlin/Native.")
-        }
+    // Note: Android is configured separately below.
+    ios()
+    macosX64("macos")
+    macosArm64()
 
     sourceSets {
         val commonMain by getting {
@@ -59,31 +56,109 @@ kotlin {
         }
         val commonTest by getting {
             dependencies {
-                implementation(kotlin("test"))
-                implementation("com.goncalossilva:resources:0.2.1") // kotlinx-resources
+                implementation("com.goncalossilva:resources:0.2.2") // kotlinx-resources
             }
         }
         val jvmMain by getting
         val jvmTest by getting {
             dependencies {
-                implementation(kotlin("test"))
-                implementation("org.jetbrains.kotlin:kotlin-reflect:1.7.10")
-                implementation("org.junit.jupiter:junit-jupiter:5.9.0")
+                implementation(kotlin("test-junit5"))
+                implementation(kotlin("reflect"))
                 implementation("org.reflections:reflections:0.10.2")
-                implementation("org.mongodb:bson:4.7.0")
+                implementation("org.mongodb:bson:4.7.1")
             }
         }
 
-        val jsMain by getting
-        val jsTest by getting
-
-        val nativeMain by getting
-        val nativeTest by getting
+        val macosMain by getting {}
+        val macosTest by getting {
+            dependencies {
+                // Can't set in CommonTest due to https://youtrack.jetbrains.com/issue/KT-49202
+                implementation(kotlin("test"))
+            }
+        }
+        val macosArm64Main by getting {
+            dependsOn(macosMain)
+            kotlin.srcDir("src/macosMain/kotlin")
+        }
+        val macosArm64Test by getting {
+            dependsOn(macosTest)
+            kotlin.srcDir("src/macosTest/kotlin")
+        }
+        val iosX64Main by getting {
+            dependsOn(macosMain)
+            kotlin.srcDir("src/macosMain/kotlin")
+        }
+        val iosX64Test by getting {
+            dependsOn(macosTest)
+            kotlin.srcDir("src/macosTest/kotlin")
+        }
+        val iosArm64Main by getting {
+            dependsOn(macosMain)
+            kotlin.srcDir("src/macosMain/kotlin")
+        }
+        val iosArm64Test by getting {
+            dependsOn(macosTest)
+            kotlin.srcDir("src/macosTest/kotlin")
+        }
     }
 
     // Require that all methods in the API have visibility modifiers and return types.
     // Anything inside `org.kbson.internal.*` is considered internal
     explicitApi = org.jetbrains.kotlin.gradle.dsl.ExplicitApiMode.Strict
+}
+
+// Android configuration
+// The Android plugin doesn't have the nice native targets build check and auto disabling, so we
+// replicate it here. Otherwise, gradle fails immediately due to the lack of the sdk preventing any
+// development.
+val hasAndroidSDK =
+    !System.getenv("ANDROID_HOME").isNullOrEmpty() ||
+        (File("local.properties").exists() && File("local.properties").readText().contains("sdk.dir="))
+
+if (!hasAndroidSDK) {
+    project.logger.warn(
+        """
+          Android SDK cannot be found. Android support disabled.
+
+            To add android support: Define a valid SDK location with an ANDROID_HOME environment variable or by setting the sdk.dir path
+            in your project's local properties file at "${rootDir}/local.properties"""".trimIndent())
+} else {
+    apply(plugin = "com.android.library")
+    @Suppress("UNUSED_VARIABLE")
+    kotlin {
+        android("android") {
+            publishLibraryVariants("release", "debug")
+        }
+        sourceSets {
+            val androidMain by getting { dependsOn(getByName("jvmMain")) }
+            val androidTest by getting { dependsOn(getByName("jvmTest")) }
+        }
+    }
+
+    @Suppress("UnstableApiUsage")
+    configure<com.android.build.gradle.LibraryExtension> {
+        namespace = "org.kbson"
+        compileSdk = 33
+        buildToolsVersion = "33.0.0"
+
+        defaultConfig {
+            minSdk = 16
+            targetSdk = 33
+
+            sourceSets {
+                getByName("main") { manifest.srcFile("src/androidMain/AndroidManifest.xml") }
+                getByName("androidTest") { java.srcDirs("src/androidTest/kotlin") }
+            }
+        }
+
+        lint {
+            baseline = rootProject.file("config/android/baseline.xml")
+            warningsAsErrors = true
+            abortOnError = true
+        }
+
+        testOptions { unitTests.all { test -> test.useJUnitPlatform() } }
+    }
 }
 
 // Output summaries for all test environments (jvm, js and native)

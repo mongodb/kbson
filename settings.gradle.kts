@@ -14,3 +14,11 @@
  * limitations under the License.
  */
 rootProject.name = "kbson"
+
+pluginManagement {
+    repositories {
+        gradlePluginPortal()
+        google()
+        mavenCentral()
+    }
+}

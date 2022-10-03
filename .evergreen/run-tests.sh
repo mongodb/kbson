@@ -3,16 +3,16 @@
 set -o xtrace   # Write all commands first to stderr
 set -o errexit  # Exit the script with error if any of the commands fail
 
-if [ "Windows_NT" = "$OS" ]; then
-   export JAVA_HOME=/cygdrive/c/java/jdk8
-else
-   export JAVA_HOME=/opt/java/jdk8
-fi
-
 ############################################
 #            Main Program                  #
 ############################################
 
+OS=$(uname -s | tr '[:upper:]' '[:lower:]')
+if [ "$OS" == "darwin" ]; then
+   sudo xcode-select -s /Applications/Xcode13.2.1.app
+fi
+
+export JAVA_HOME=/opt/java/jdk11
 
 echo "Running tests"
 

@@ -27,11 +27,11 @@ functions:
     # Executes git clone and applies the submitted patch, if any
     - command: git.get_project
       params:
-        directory: "src"
+        directory: "kbson"
     # Make an evergreen expansion file with dynamic values
     - command: shell.exec
       params:
-        working_dir: "src"
+        working_dir: "kbson"
         script: |
           # Get the current unique version of this checkout
           if [ "${is_patch}" = "true" ]; then
@@ -59,7 +59,7 @@ functions:
     # Load the expansion file to make an evergreen variable with the current unique version
     - command: expansions.update
       params:
-        file: src/expansion.yml
+        file: kbson/expansion.yml
 
   # Upload build artifacts that other tasks may depend on
   # Note this URL needs to be totally unique, while predictable for the next task
@@ -88,7 +88,7 @@ functions:
     - command: shell.exec
       type: test
       params:
-        working_dir: "src"
+        working_dir: "kbson"
         script: |
           ${PREPARE_SHELL}
           ${PROJECT_DIRECTORY}/${file}
@@ -151,6 +151,17 @@ functions:
             chmod +x $i
           done
 
+  "setup android toolchain":
+    - command: shell.exec
+      params:
+        working_dir: "kbson"
+        script: |
+          ${PREPARE_SHELL}
+          ${PROJECT_DIRECTORY}/.evergreen/setup-android-toolchain.sh $(pwd)/android_sdk
+          cat <<EOF > local.properties
+          sdk.dir=$(pwd)/android_sdk
+          EOF
+
   "init test-results":
     - command: shell.exec
       params:
@@ -162,7 +173,7 @@ functions:
     - command: shell.exec
       type: test
       params:
-        working_dir: "src"
+        working_dir: "kbson"
         script: |
           ${PREPARE_SHELL}
           .evergreen/run-static-checks.sh
@@ -171,19 +182,10 @@ functions:
     - command: shell.exec
       type: test
       params:
-        working_dir: "src"
+        working_dir: "kbson"
         script: |
           ${PREPARE_SHELL}
           .evergreen/run-tests.sh
-
-  "run tests no native":
-    - command: shell.exec
-      type: test
-      params:
-        working_dir: "src"
-        script: |
-          ${PREPARE_SHELL}
-          .evergreen/run-tests.sh -x nativeTest
 
 pre:
   - func: "fetch source"
@@ -191,6 +193,7 @@ pre:
   - func: "fix absolute paths"
   - func: "init test-results"
   - func: "make files executable"
+  - func: "setup android toolchain"
 
 post:
   - func: "upload test results"
@@ -203,9 +206,6 @@ tasks:
   - name: "test-task"
     commands:
       - func: "run tests"
-  - name: "test-task-no-native"
-    commands:
-      - func: "run tests no native"
 
 buildvariants:
 
@@ -217,19 +217,14 @@ buildvariants:
       - test-task
 
   - name: "macos_x86_64"
-    display_name: "macOS (x86_64) 10.14"
-    run_on: macos-1014
+    display_name: "macOS (x86_64) 11"
+    run_on: macos-1100
     tasks:
-      - test-task-no-native # native tests - requires xcode 12.5
+      - test-task
 
   - name: "macos-arm64"
     display_name: macOS m1 (Apple LLVM)
     run_on: macos-1100-arm64
     tasks:
-      - test-task-no-native # native tests - requires xcode 12.5
-
-  - name: "windows-2016"
-    display_name: "Windows 2016"
-    run_on: windows-64-vs2017-test
-    tasks:
       - test-task
+
