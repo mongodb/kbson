@@ -21,8 +21,7 @@ package org.mongodb.kbson
  * @constructor constructs the bson array with an initial list of values, defaults to no items
  * @param initial the initial list of [BsonValue]s in the array
  */
-public class BsonArray(initial: List<BsonValue> = emptyList()) :
-    BsonValue(), MutableList<BsonValue> {
+public class BsonArray(initial: List<BsonValue> = emptyList()) : BsonValue(), MutableList<BsonValue> {
     private val _values: MutableList<BsonValue>
     init {
         _values = initial.toMutableList()

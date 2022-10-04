@@ -18,7 +18,7 @@ import org.gradle.api.tasks.testing.logging.TestLogEvent
 
 group = "org.mongodb.kbson"
 
-version = "1.0-SNAPSHOT"
+version = "1.0.0-SNAPSHOT"
 
 plugins {
     kotlin("multiplatform") version "1.7.10"
@@ -136,7 +136,7 @@ if (!hasAndroidSDK) {
 
     @Suppress("UnstableApiUsage")
     configure<com.android.build.gradle.LibraryExtension> {
-        namespace = "org.kbson"
+        namespace = "org.mongodb.kbson"
         compileSdk = 33
         buildToolsVersion = "33.0.0"
 
