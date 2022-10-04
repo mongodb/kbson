@@ -21,8 +21,8 @@ group = "org.mongodb.kbson"
 version = "1.0.0-SNAPSHOT"
 
 plugins {
-    kotlin("multiplatform") version "1.7.10"
-    kotlin("plugin.serialization") version "1.7.10"
+    kotlin("multiplatform") version "1.6.10"
+    kotlin("plugin.serialization") version "1.6.10"
     id("com.android.library") version "7.3.0" apply false
     id("maven-publish")
     id("signing")
@@ -30,7 +30,7 @@ plugins {
     // Test based plugins
     id("com.diffplug.spotless") version "6.10.0"
     id("io.gitlab.arturbosch.detekt") version "1.21.0"
-    id("org.jetbrains.dokka") version "1.7.10"
+    id("org.jetbrains.dokka") version "1.6.10"
     id("com.goncalossilva.resources") version "0.2.2" // kotlinx-resources
 }
 
@@ -41,6 +41,8 @@ repositories {
 
 @Suppress("UNUSED_VARIABLE")
 kotlin {
+    targets.all { compilations.all { kotlinOptions { freeCompilerArgs = freeCompilerArgs + "-opt-in=kotlin.RequiresOptIn" } } }
+
     jvm {
         compilations.all { kotlinOptions.jvmTarget = "1.8" }
         tasks.withType<Test> { useJUnitPlatform() }
@@ -53,7 +55,7 @@ kotlin {
 
     sourceSets {
         val commonMain by getting {
-            dependencies { implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.4.0") }
+            dependencies { implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.3.2") }
         }
         val commonTest by getting {
             dependencies {
