@@ -292,30 +292,33 @@ private constructor(
             if (value.isEmpty()) {
                 throw NumberFormatException()
             }
-            val regularExpression =
-                """^(?<sign>[+-])?(?<significand>\d+([.]\d*)?|[.]\d+)(?<exponent>[eE](?<exponentSign>[+-])?(?<exponentDigits>\d+))?$"""
-            return when (val matchResult = Regex(regularExpression).matchEntire(value)) {
+
+            // https://youtrack.jetbrains.com/issue/KT-41890/Support-named-capture-groups-in-Regex-on-Native
+            // val regularExpression =
+            // """^(?<sign>[+-])?(?<significand>\d+([.]\d*)?|[.]\d+)(?<exponent>[eE](?<exponentSign>[+-])?(?<exponentDigits>\d+))?$""".toRegex()
+            //  Groups                  1      2   3                4    5      6
+            val regularExpression = """^([+-])?(\d+([.]\d*)?|[.]\d+)([eE]([+-])?(\d+))?$""".toRegex()
+            return when (val matchResult = regularExpression.matchEntire(value)) {
                 null -> {
                     parseSpecialValues(value)
                 }
                 else -> {
-                    val groups = matchResult.groups as MatchNamedGroupCollection
-
-                    val signGroup = groups["sign"]?.value
+                    val groups = matchResult.groups
+                    val signGroup = groups[1]?.value
                     val isNegative = signGroup != null && signGroup == "-"
 
                     var exponent = 0
 
-                    val exponentGroup = groups["exponent"]?.value
+                    val exponentGroup = groups[4]?.value
                     if (!exponentGroup.isNullOrEmpty()) {
-                        exponent = groups["exponentDigits"]!!.value.toInt()
-                        val exponentSignString = groups["exponentSign"]?.value
+                        exponent = groups[6]!!.value.toInt()
+                        val exponentSignString = groups[5]?.value
                         if (exponentSignString != null && exponentSignString == "-") {
                             exponent = -exponent
                         }
                     }
 
-                    var significandString: String = groups["significand"]!!.value
+                    var significandString: String = groups[2]!!.value
                     var decimalPointIndex: Int
                     if (significandString.indexOf('.').also { decimalPointIndex = it } != -1) {
                         exponent -= significandString.length - (decimalPointIndex + 1)
