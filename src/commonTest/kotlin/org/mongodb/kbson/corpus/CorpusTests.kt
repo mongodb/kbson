@@ -17,7 +17,6 @@
 
 package org.mongodb.kbson.corpus
 
-import com.goncalossilva.resources.Resource
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
@@ -125,13 +124,12 @@ abstract class CorpusTest(filename: String) {
     private val data: TestData
 
     init {
-        val resource = Resource("src/commonTest/resources/bson/$filename")
         val json = Json {
             isLenient = true
             ignoreUnknownKeys = true
             useAlternativeNames = true
         }
-        this.data = json.decodeFromString(resource.readText())
+        this.data = json.decodeFromString(ResourceLoader.readText("bson/$filename"))
     }
 
     @Test

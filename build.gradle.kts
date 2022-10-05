@@ -31,7 +31,6 @@ plugins {
     id("com.diffplug.spotless") version "6.10.0"
     id("io.gitlab.arturbosch.detekt") version "1.21.0"
     id("org.jetbrains.dokka") version "1.6.10"
-    id("com.goncalossilva.resources") version "0.2.2" // kotlinx-resources
 }
 
 repositories {
@@ -41,7 +40,9 @@ repositories {
 
 @Suppress("UNUSED_VARIABLE")
 kotlin {
-    targets.all { compilations.all { kotlinOptions { freeCompilerArgs = freeCompilerArgs + "-opt-in=kotlin.RequiresOptIn" } } }
+    targets.all {
+        compilations.all { kotlinOptions { freeCompilerArgs = freeCompilerArgs + "-opt-in=kotlin.RequiresOptIn" } }
+    }
 
     jvm {
         compilations.all { kotlinOptions.jvmTarget = "1.8" }
@@ -50,18 +51,14 @@ kotlin {
 
     // Note: Android is configured separately below.
     ios()
-    macosX64("macos")
+    macosX64()
     macosArm64()
 
     sourceSets {
         val commonMain by getting {
             dependencies { implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.3.2") }
         }
-        val commonTest by getting {
-            dependencies {
-                implementation("com.goncalossilva:resources:0.2.2") // kotlinx-resources
-            }
-        }
+        val commonTest by getting {}
         val jvmMain by getting
         val jvmTest by getting {
             dependencies {
@@ -72,36 +69,43 @@ kotlin {
             }
         }
 
-        val macosMain by getting {}
-        val macosTest by getting {
+        val iosX64Main by getting
+        val iosX64Test by getting
+        val iosArm64Main by getting
+        val iosArm64Test by getting
+
+        val iosMain by getting {
+            dependsOn(commonMain)
+            iosX64Main.dependsOn(this)
+            iosArm64Main.dependsOn(this)
+        }
+        val iosTest by getting {
             dependencies {
                 // Can't set in CommonTest due to https://youtrack.jetbrains.com/issue/KT-49202
                 implementation(kotlin("test"))
             }
+            dependsOn(commonTest)
+            iosX64Test.dependsOn(this)
+            iosArm64Test.dependsOn(this)
         }
-        val macosArm64Main by getting {
-            dependsOn(macosMain)
-            kotlin.srcDir("src/macosMain/kotlin")
+
+        val macosX64Main by getting
+        val macosX64Test by getting
+        val macosArm64Main by getting
+        val macosArm64Test by getting
+        val macosMain by creating {
+            dependsOn(commonMain)
+            macosX64Main.dependsOn(this)
+            macosArm64Main.dependsOn(this)
         }
-        val macosArm64Test by getting {
-            dependsOn(macosTest)
-            kotlin.srcDir("src/macosTest/kotlin")
-        }
-        val iosX64Main by getting {
-            dependsOn(macosMain)
-            kotlin.srcDir("src/macosMain/kotlin")
-        }
-        val iosX64Test by getting {
-            dependsOn(macosTest)
-            kotlin.srcDir("src/macosTest/kotlin")
-        }
-        val iosArm64Main by getting {
-            dependsOn(macosMain)
-            kotlin.srcDir("src/macosMain/kotlin")
-        }
-        val iosArm64Test by getting {
-            dependsOn(macosTest)
-            kotlin.srcDir("src/macosTest/kotlin")
+        val macosTest by creating {
+            dependencies {
+                // Can't set in CommonTest due to https://youtrack.jetbrains.com/issue/KT-49202
+                implementation(kotlin("test"))
+            }
+            dependsOn(commonTest)
+            macosX64Test.dependsOn(this)
+            macosArm64Test.dependsOn(this)
         }
     }
 
@@ -206,6 +210,13 @@ tasks.withType<AbstractTestTask> {
             }
         })
 }
+// Handle test resources for ios
+tasks.register<Copy>("copyiOSTestResources") {
+    from("src/commonTest/resources")
+    into("build/bin/iosX64/debugTest/resources")
+}
+
+tasks.findByName("iosX64Test")!!.dependsOn("copyiOSTestResources")
 
 spotless {
     java {
