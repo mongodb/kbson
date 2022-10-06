@@ -51,6 +51,7 @@ kotlin {
 
     // Note: Android is configured separately below.
     ios()
+    iosSimulatorArm64()
     macosX64()
     macosArm64()
 
@@ -73,11 +74,14 @@ kotlin {
         val iosX64Test by getting
         val iosArm64Main by getting
         val iosArm64Test by getting
+        val iosSimulatorArm64Main by getting
+        val iosSimulatorArm64Test by getting
 
         val iosMain by getting {
             dependsOn(commonMain)
             iosX64Main.dependsOn(this)
             iosArm64Main.dependsOn(this)
+            iosSimulatorArm64Main.dependsOn(this)
         }
         val iosTest by getting {
             dependencies {
@@ -87,6 +91,7 @@ kotlin {
             dependsOn(commonTest)
             iosX64Test.dependsOn(this)
             iosArm64Test.dependsOn(this)
+            iosSimulatorArm64Test.dependsOn(this)
         }
 
         val macosX64Main by getting
@@ -217,6 +222,13 @@ tasks.register<Copy>("copyiOSTestResources") {
 }
 
 tasks.findByName("iosX64Test")!!.dependsOn("copyiOSTestResources")
+
+val copyIosSimulatorArm64TestResources = tasks.register<Copy>("copyIosArm64TestResources") {
+    from("src/commonTest/resources")
+    into("build/bin/iosSimulatorArm64/debugTest")
+}
+
+tasks.findByName("iosSimulatorArm64Test")!!.dependsOn(copyIosSimulatorArm64TestResources)
 
 spotless {
     java {
