@@ -38,6 +38,10 @@ repositories {
     google()
 }
 
+// ===========================
+//   Platform configuration
+// ===========================
+
 @Suppress("UNUSED_VARIABLE")
 kotlin {
     targets.all {
@@ -119,7 +123,10 @@ kotlin {
     explicitApi = org.jetbrains.kotlin.gradle.dsl.ExplicitApiMode.Strict
 }
 
-// Android configuration
+// ===========================
+//    Android configuration
+// ===========================
+
 // The Android plugin doesn't have the nice native targets build check and auto disabling, so we
 // replicate it here. Otherwise, gradle fails immediately due to the lack of the sdk preventing any
 // development.
@@ -215,7 +222,12 @@ tasks.withType<AbstractTestTask> {
             }
         })
 }
-// Handle test resources for ios
+
+// ===========================
+//    Test resource handling
+// ===========================
+// See:
+// https://youtrack.jetbrains.com/issue/KT-29311/Support-Native-resource-processing-in-the-Gradle-MPP-plugin
 tasks.register<Copy>("copyiOSTestResources") {
     from("src/commonTest/resources")
     into("build/bin/iosX64/debugTest/resources")
@@ -238,6 +250,10 @@ val copyMacosArm64TestResources =
     }
 
 tasks.findByName("macosArm64Test")!!.dependsOn(copyMacosArm64TestResources)
+
+// ===========================
+//     Code Quality checks
+// ===========================
 
 spotless {
     java {
@@ -275,6 +291,8 @@ spotless {
     }
 }
 
+tasks.named("check") { dependsOn(":spotlessApply") }
+
 detekt {
     allRules = true // fail build on any finding
     buildUponDefaultConfig = true // preconfigure defaults
@@ -300,9 +318,10 @@ tasks.withType<io.gitlab.arturbosch.detekt.Detekt>().configureEach {
     }
 }
 
-/*
- * Git Versioning
- */
+// ===========================
+//  Publishing Configuration
+// ===========================
+
 val gitVersion: String by lazy {
     val os = org.apache.commons.io.output.ByteArrayOutputStream()
     project.exec {
@@ -410,5 +429,3 @@ signing {
     useInMemoryPgpKeys(signingKey, signingPassword)
     sign(publishing.publications)
 }
-
-tasks.named("check") { dependsOn(":spotlessApply") }
