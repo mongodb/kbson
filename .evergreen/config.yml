@@ -226,6 +226,11 @@ tasks:
       - func: "setup android toolchain"
       - func: "run tests"
   - name: "publish-snapshot-task"
+    depends_on:
+      - name: "static-checks-task"
+        variant: ".arm64Build"
+      - name: "test-task"
+        variant: ".arm64Build"
     commands:
       - func: "setup android toolchain"
       - func: "publish snapshot"
@@ -239,24 +244,22 @@ buildvariants:
     display_name: "Ubuntu 20.04 64-bit"
     run_on: ubuntu2004-small
     tasks:
-      - test-task
-
-  - name: "macos_x86_64"
-    display_name: "macOS (x86_64) 11"
-    run_on: macos-1100
-    tasks:
-      - test-task
+      - name: static-checks-task
+      - name: test-task
 
   - name: "macos-arm64"
     display_name: macOS m1 (Apple LLVM)
     run_on: macos-1100-arm64
+    tags: ["arm64Build"]
     tasks:
       - name: static-checks-task
       - name: test-task
-      - name: publish-snapshot-task
-        depends_on:
-          - name: static-checks-task
-          - name: test-task
+
+  - name: publish-snapshot
+    display_name: "Publish Snapshot"
+    run_on: macos-1100-arm64
+    tasks:
+      - name: "publish-snapshot-task"
 
   - name: "publish-release"
     display_name: "Publish Release"
