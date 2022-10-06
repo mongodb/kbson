@@ -27,17 +27,17 @@ import kotlin.test.assertTrue
 class BsonArrayTest {
 
     private val listOfBsonValues = listOf(BsonBoolean.TRUE, BsonBoolean.FALSE)
-    private val bsonValue = org.mongodb.kbson.BsonArray(listOfBsonValues)
+    private val bsonValue = BsonArray(listOfBsonValues)
 
     @Test
     fun shouldHaveTheExpectedBsonType() {
         assertTrue { bsonValue.isArray() }
-        assertEquals(BsonType.ARRAY, org.mongodb.kbson.BsonArray().bsonType)
+        assertEquals(BsonType.ARRAY, BsonArray().bsonType)
     }
 
     @Test
     fun shouldConstructAnEmptyArray() {
-        val bsonValue = org.mongodb.kbson.BsonArray()
+        val bsonValue = BsonArray()
 
         assertTrue(bsonValue.isEmpty())
         assertEquals(0, bsonValue.size)
@@ -46,7 +46,7 @@ class BsonArrayTest {
 
     @Test
     fun shouldConstructWithInitialCapacity() {
-        val bsonValue = org.mongodb.kbson.BsonArray(10)
+        val bsonValue = BsonArray(10)
 
         assertTrue(bsonValue.isEmpty())
         assertEquals(0, bsonValue.size)
@@ -62,10 +62,10 @@ class BsonArrayTest {
 
     @Test
     fun shouldOverrideEquals() {
-        assertEquals(org.mongodb.kbson.BsonArray(), org.mongodb.kbson.BsonArray())
+        assertEquals(BsonArray(), BsonArray())
         assertEquals(bsonValue, bsonValue)
-        assertNotEquals(org.mongodb.kbson.BsonArray(), bsonValue)
-        assertNotEquals(bsonValue, org.mongodb.kbson.BsonArray(listOf(BsonBoolean.TRUE, BsonBoolean.TRUE)))
+        assertNotEquals(BsonArray(), bsonValue)
+        assertNotEquals(bsonValue, BsonArray(listOf(BsonBoolean.TRUE, BsonBoolean.TRUE)))
     }
 
     @Test
@@ -111,7 +111,7 @@ class BsonArrayTest {
 
     @Test
     fun shouldSupportMutableListMethods() {
-        val mutableList = org.mongodb.kbson.BsonArray()
+        val mutableList = BsonArray()
 
         assertTrue(mutableList.add(BsonBoolean.TRUE))
         assertFalse(mutableList.isEmpty())
@@ -151,10 +151,10 @@ class BsonArrayTest {
     @Test
     fun cloneShouldMakeADeepCopyOfAllMutableBsonValueTypes() {
         val bsonArray =
-            org.mongodb.kbson.BsonArray(
+            BsonArray(
                 listOf(
                     BsonInt32(3),
-                    org.mongodb.kbson.BsonArray(listOf(BsonInt32(11))),
+                    BsonArray(listOf(BsonInt32(11))),
                     BsonDocument("i3", BsonInt32(6)),
                     BsonBinary(listOf(1.toByte(), 2.toByte(), 3.toByte()).toByteArray()),
                     BsonJavaScriptWithScope("code", BsonDocument("a", BsonInt32(4)))))

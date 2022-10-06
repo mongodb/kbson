@@ -77,7 +77,7 @@ internal class BsonDocumentWriter : AbstractBsonWriter() {
     }
 
     override fun doWriteStartArray() {
-        context = BsonDocumentWriterContext(context, BsonContextType.ARRAY, org.mongodb.kbson.BsonArray())
+        context = BsonDocumentWriterContext(context, BsonContextType.ARRAY, BsonArray())
     }
 
     override fun doWriteEndArray() {

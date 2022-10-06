@@ -45,12 +45,12 @@ class BsonDocumentTest {
     private val bsonBinary =
         BsonBinary(80.toByte(), listOf(5.toByte(), 4.toByte(), 3.toByte(), 2.toByte(), 1.toByte()).toByteArray())
     private val bsonArray =
-        org.mongodb.kbson.BsonArray(
+        BsonArray(
             listOf(
                 BsonInt32(1),
                 BsonInt64(2L),
                 BsonBoolean(true),
-                org.mongodb.kbson.BsonArray(listOf(BsonInt32(1), BsonInt32(2), BsonInt32(3))),
+                BsonArray(listOf(BsonInt32(1), BsonInt32(2), BsonInt32(3))),
                 BsonDocument("a", BsonInt64(2L))))
     private val bsonDocument = BsonDocument("a", BsonInt32(1))
 
@@ -115,7 +115,7 @@ class BsonDocumentTest {
         assertEquals(bsonRegularExpression, document.getRegularExpression("regex", BsonRegularExpression("^foo", "i")))
         assertEquals(bsonBinary, document.getBinary("bsonBinary", BsonBinary(listOf(5.toByte()).toByteArray())))
         assertEquals(bsonTimestamp, document.getTimestamp("timestamp", BsonTimestamp(343, 23)))
-        assertEquals(bsonArray, document.getArray("array", org.mongodb.kbson.BsonArray()))
+        assertEquals(bsonArray, document.getArray("array", BsonArray()))
         assertEquals(bsonDocument, document.getDocument("document", BsonDocument()))
         assertEquals(bsonInt32, document.getNumber("int32", BsonInt32(2)))
         assertEquals(bsonInt64, document.getNumber("int64", BsonInt32(2)))
@@ -200,10 +200,10 @@ class BsonDocumentTest {
                 .append("i", BsonInt32(2))
                 .append(
                     "a",
-                    org.mongodb.kbson.BsonArray(
+                    BsonArray(
                         listOf(
                             BsonInt32(3),
-                            org.mongodb.kbson.BsonArray(listOf(BsonInt32(11))),
+                            BsonArray(listOf(BsonInt32(11))),
                             BsonDocument("i3", BsonInt32(6)),
                             BsonBinary(listOf(1.toByte(), 2.toByte(), 3.toByte()).toByteArray()),
                             BsonJavaScriptWithScope("code", BsonDocument("a", BsonInt32(4))))))
