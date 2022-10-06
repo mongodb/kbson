@@ -231,6 +231,14 @@ val copyIosSimulatorArm64TestResources =
 
 tasks.findByName("iosSimulatorArm64Test")!!.dependsOn(copyIosSimulatorArm64TestResources)
 
+val copyMacosArm64TestResources =
+    tasks.register<Copy>("copyMacosArm64TestResources") {
+        from("src/commonTest/resources")
+        into("build/bin/macosArm64/debugTest")
+    }
+
+tasks.findByName("macosArm64Test")!!.dependsOn(copyMacosArm64TestResources)
+
 spotless {
     java {
         googleJavaFormat("1.12.0")

@@ -23,9 +23,9 @@ import platform.Foundation.stringWithContentsOfFile
 internal actual object ResourceLoader {
 
     actual fun readText(resourceName: String): String {
-        val path = "src/commonTest/resources/$resourceName"
         val absolutePath =
-            NSBundle.mainBundle.pathForResource(path.substringBeforeLast("."), path.substringAfterLast("."))
-        return NSString.stringWithContentsOfFile(absolutePath, NSUTF8StringEncoding, null)!!
+            NSBundle.mainBundle.pathForResource(
+                resourceName.substringBeforeLast("."), resourceName.substringAfterLast("."))
+        return NSString.stringWithContentsOfFile(absolutePath!!, NSUTF8StringEncoding, null)!!
     }
 }
