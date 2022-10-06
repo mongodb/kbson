@@ -96,7 +96,7 @@ class TopTest : CorpusTest("top.json")
 class UndefinedTest : CorpusTest("undefined.json")
 
 @Suppress("UnnecessaryAbstractClass")
-abstract class CorpusTest(filename: String) {
+abstract class CorpusTest(val filename: String) {
 
     @Serializable
     data class ValidBson(
@@ -118,22 +118,24 @@ abstract class CorpusTest(filename: String) {
         @SerialName("valid") val validBsonScenarios: List<ValidBson> = emptyList(),
         @SerialName("decodeErrors") val invalidBsonScenarios: List<InvalidBson> = emptyList(),
         @SerialName("parseErrors") val parseErrorScenarios: List<ParseError> = emptyList(),
-        val deprecated: Boolean = false
+        val deprecated: Boolean = false,
+        val failedToLoad: Boolean = false
     )
 
-    private val data: TestData
-
-    init {
-        val json = Json {
-            isLenient = true
-            ignoreUnknownKeys = true
-            useAlternativeNames = true
-        }
-        this.data = json.decodeFromString(ResourceLoader.readText("bson/$filename"))
+    private val json = Json {
+        isLenient = true
+        ignoreUnknownKeys = true
+        useAlternativeNames = true
     }
+    private val data: TestData =
+        runCatching<TestData> { json.decodeFromString(ResourceLoader.readText("bson/$filename")) }
+            .getOrElse { TestData(filename, "", failedToLoad = true) }
 
     @Test
     fun shouldPassAllOutcomes() {
+        if (data.failedToLoad) {
+            fail("Could not load resource for $filename")
+        }
         data.validBsonScenarios.forEach { testValid(it) }
         data.invalidBsonScenarios.forEach { testDecodeError(it) }
         data.parseErrorScenarios.forEach { testParseError(it) }

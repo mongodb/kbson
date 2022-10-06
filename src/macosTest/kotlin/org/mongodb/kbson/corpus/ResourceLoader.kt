@@ -15,21 +15,17 @@
  */
 package org.mongodb.kbson.corpus
 
-import kotlinx.cinterop.*
-import platform.posix.*
+import platform.Foundation.NSBundle
+import platform.Foundation.NSString
+import platform.Foundation.NSUTF8StringEncoding
+import platform.Foundation.stringWithContentsOfFile
 
 internal actual object ResourceLoader {
 
     actual fun readText(resourceName: String): String {
-        val file: CPointer<FILE>? = fopen("./src/commonTest/resources/$resourceName", "r")
-        fseek(file, 0, SEEK_END)
-        val size = ftell(file)
-        rewind(file)
-
-        return memScoped {
-            val tmp = allocArray<ByteVar>(size)
-            fread(tmp, sizeOf<ByteVar>().convert(), size.convert(), file)
-            tmp.toKString()
-        }
+        val path = "src/commonTest/resources/$resourceName"
+        val absolutePath =
+            NSBundle.mainBundle.pathForResource(path.substringBeforeLast("."), path.substringAfterLast("."))
+        return NSString.stringWithContentsOfFile(absolutePath, NSUTF8StringEncoding, null)!!
     }
 }

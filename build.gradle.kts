@@ -157,7 +157,7 @@ if (!hasAndroidSDK) {
 
             sourceSets {
                 getByName("main") { manifest.srcFile("src/androidMain/AndroidManifest.xml") }
-                getByName("androidTest") { java.srcDirs("src/androidTest/kotlin") }
+                getByName("androidTest") {}
             }
         }
 
@@ -223,10 +223,11 @@ tasks.register<Copy>("copyiOSTestResources") {
 
 tasks.findByName("iosX64Test")!!.dependsOn("copyiOSTestResources")
 
-val copyIosSimulatorArm64TestResources = tasks.register<Copy>("copyIosArm64TestResources") {
-    from("src/commonTest/resources")
-    into("build/bin/iosSimulatorArm64/debugTest")
-}
+val copyIosSimulatorArm64TestResources =
+    tasks.register<Copy>("copyIosArm64TestResources") {
+        from("src/commonTest/resources")
+        into("build/bin/iosSimulatorArm64/debugTest")
+    }
 
 tasks.findByName("iosSimulatorArm64Test")!!.dependsOn(copyIosSimulatorArm64TestResources)
 

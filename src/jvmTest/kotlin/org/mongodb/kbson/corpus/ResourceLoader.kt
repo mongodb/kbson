@@ -15,8 +15,12 @@
  */
 package org.mongodb.kbson.corpus
 
+import java.io.File
+
 internal actual object ResourceLoader {
     actual fun readText(resourceName: String): String {
-        return ClassLoader.getSystemResourceAsStream(resourceName)!!.readAllBytes().decodeToString()
+        val file = File("src/commonTest/resources/$resourceName")
+        return runCatching { file.readText() }
+            .getOrElse { throw IllegalStateException("Cannot find resource: src/commonTest/resources/$resourceName") }
     }
 }
