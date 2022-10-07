@@ -196,7 +196,7 @@ tasks.withType<AbstractTestTask> {
         showCauses = true
         showStackTraces = true
     }
-    ignoreFailures = true // Always try to run all tests for all modules
+    ignoreFailures = false // Use the --continue flag to run all tests
     addTestListener(
         object : TestListener {
             override fun beforeTest(testDescriptor: TestDescriptor?) {}
@@ -228,28 +228,18 @@ tasks.withType<AbstractTestTask> {
 // ===========================
 // See:
 // https://youtrack.jetbrains.com/issue/KT-29311/Support-Native-resource-processing-in-the-Gradle-MPP-plugin
-tasks.register<Copy>("copyiOSTestResources") {
-    from("src/commonTest/resources")
-    into("build/bin/iosX64/debugTest/resources")
+
+val environments = listOf("iosX64", "macosX64", "iosArm64", "iosSimulatorArm64", "macosArm64")
+environments.forEach { build ->
+    tasks.findByName("${build}Test")?.let { task ->
+        val copyTask =
+            tasks.register<Copy>("copy${build}TestResources") {
+                from("src/commonTest/resources")
+                into("build/bin/${build}/debugTest")
+            }
+        task.dependsOn(copyTask)
+    }
 }
-
-tasks.findByName("iosX64Test")!!.dependsOn("copyiOSTestResources")
-
-val copyIosSimulatorArm64TestResources =
-    tasks.register<Copy>("copyIosArm64TestResources") {
-        from("src/commonTest/resources")
-        into("build/bin/iosSimulatorArm64/debugTest")
-    }
-
-tasks.findByName("iosSimulatorArm64Test")!!.dependsOn(copyIosSimulatorArm64TestResources)
-
-val copyMacosArm64TestResources =
-    tasks.register<Copy>("copyMacosArm64TestResources") {
-        from("src/commonTest/resources")
-        into("build/bin/macosArm64/debugTest")
-    }
-
-tasks.findByName("macosArm64Test")!!.dependsOn(copyMacosArm64TestResources)
 
 // ===========================
 //     Code Quality checks

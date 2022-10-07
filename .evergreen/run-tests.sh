@@ -17,4 +17,4 @@ export JAVA_HOME=/opt/java/jdk11
 echo "Running tests"
 
 ./gradlew -version
-./gradlew --stacktrace --info allTests $@
+./gradlew --stacktrace --info allTests --continue $@
