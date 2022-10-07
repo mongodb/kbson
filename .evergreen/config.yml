@@ -264,5 +264,6 @@ buildvariants:
   - name: "publish-release"
     display_name: "Publish Release"
     run_on: macos-1100-arm64
+    git_tag_only: true
     tasks:
       - name: publish-release-task
