@@ -129,6 +129,7 @@ public class BsonObjectId(
 
     public companion object {
         internal const val OBJECT_ID_LENGTH: Int = 12
+        private const val MILLIS_IN_SECOND: Int = 1000
         private const val LOW_ORDER_THREE_BYTES = 0x00ffffff
 
         // Use primitives to represent the 5-byte random value.
@@ -145,7 +146,16 @@ public class BsonObjectId(
 
         /** Create a new BsonObjectId */
         public operator fun invoke(): BsonObjectId {
-            return BsonObjectId(getCurrentTimeInSeconds(), RANDOM_VALUE1, RANDOM_VALUE2, nextCounter())
+            return invoke(getCurrentTimeInSeconds())
+        }
+
+        /**
+         * Create a new BsonObjectId
+         *
+         * @param timestamp the timestamp in millis
+         */
+        public operator fun invoke(timestamp: Long): BsonObjectId {
+            return invoke((timestamp / MILLIS_IN_SECOND).toInt())
         }
 
         /**
@@ -172,6 +182,10 @@ public class BsonObjectId(
             val randomValue2 = makeShort(byteArray[pos++], byteArray[pos++])
             val counter = makeInt(0.toByte(), byteArray[pos++], byteArray[pos++], byteArray[pos])
             return BsonObjectId(timestamp, randomValue1, randomValue2, counter)
+        }
+
+        private operator fun invoke(timestamp: Int): BsonObjectId {
+            return BsonObjectId(timestamp, RANDOM_VALUE1, RANDOM_VALUE2, nextCounter())
         }
 
         private fun nextCounter(): Int = NEXT_COUNTER.addAndGet(1) and LOW_ORDER_THREE_BYTES
