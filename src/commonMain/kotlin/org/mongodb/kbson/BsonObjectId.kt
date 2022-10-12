@@ -146,7 +146,7 @@ public class BsonObjectId(
 
         /** Create a new BsonObjectId */
         public operator fun invoke(): BsonObjectId {
-            return invoke(getCurrentTimeInSeconds())
+            return fromTimeInSeconds(getCurrentTimeInSeconds())
         }
 
         /**
@@ -155,7 +155,7 @@ public class BsonObjectId(
          * @param timestamp the timestamp in millis
          */
         public operator fun invoke(timestamp: Long): BsonObjectId {
-            return invoke((timestamp / MILLIS_IN_SECOND).toInt())
+            return fromTimeInSeconds((timestamp / MILLIS_IN_SECOND).toInt())
         }
 
         /**
@@ -184,7 +184,7 @@ public class BsonObjectId(
             return BsonObjectId(timestamp, randomValue1, randomValue2, counter)
         }
 
-        private operator fun invoke(timestamp: Int): BsonObjectId {
+        private fun fromTimeInSeconds(timestamp: Int): BsonObjectId {
             return BsonObjectId(timestamp, RANDOM_VALUE1, RANDOM_VALUE2, nextCounter())
         }
 
