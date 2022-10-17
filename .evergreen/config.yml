@@ -237,6 +237,7 @@ tasks:
   - name: "publish-release-task"
     git_tag_only: true
     commands:
+      - func: "setup android toolchain"
       - func: "publish release"
 
 buildvariants:
