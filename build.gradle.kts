@@ -318,7 +318,8 @@ val gitVersion: String by lazy {
         commandLine = "git describe --tags --always --dirty".split(" ")
         standardOutput = os
     }
-    String(os.toByteArray()).trim()
+    val gv: String =  String(os.toByteArray()).trim()
+    gv.subSequence(gv.toCharArray().indexOfFirst { it.isDigit() }, gv.length).toString()
 }
 
 val publishSystemsCheck =
