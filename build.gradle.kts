@@ -18,7 +18,7 @@ import org.gradle.api.tasks.testing.logging.TestLogEvent
 
 group = "org.mongodb.kbson"
 
-version = "0.1.0"
+version = "0.2.0-SNAPSHOT"
 
 plugins {
     kotlin("multiplatform") version "1.6.10"
