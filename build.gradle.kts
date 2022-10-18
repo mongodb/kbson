@@ -17,7 +17,7 @@ import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.gradle.api.tasks.testing.logging.TestLogEvent
 
 group = "org.mongodb.kbson"
-version = "0.1.0-SNAPSHOT"
+version = "0.1.0"
 description = "KBSON a kotlin multiplatform implementation of the BSON library."
 
 plugins {
