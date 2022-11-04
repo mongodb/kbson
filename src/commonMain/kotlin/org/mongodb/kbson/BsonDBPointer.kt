@@ -15,6 +15,9 @@
  */
 package org.mongodb.kbson
 
+import kotlinx.serialization.Serializable
+import org.mongodb.kbson.serialization.BsonDBPointerSerializer
+
 /**
  * A representation of the BSON DBPointer type.
  *
@@ -24,6 +27,7 @@ package org.mongodb.kbson
  * @property namespace the namespace
  * @property id the id
  */
+@Serializable(with = BsonDBPointerSerializer::class)
 public class BsonDBPointer(public val namespace: String, public val id: BsonObjectId) : BsonValue() {
 
     override val bsonType: BsonType

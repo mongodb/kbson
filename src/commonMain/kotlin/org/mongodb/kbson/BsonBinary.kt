@@ -15,6 +15,9 @@
  */
 package org.mongodb.kbson
 
+import kotlinx.serialization.Serializable
+import org.mongodb.kbson.serialization.BsonBinarySerializer
+
 /**
  * A representation of the BSON Binary type.
  *
@@ -25,6 +28,7 @@ package org.mongodb.kbson
  * @property type the [BsonBinarySubType] byte value
  * @property data the [ByteArray]
  */
+@Serializable(with = BsonBinarySerializer::class)
 public class BsonBinary(public val type: Byte, public val data: ByteArray) : BsonValue() {
 
     /**

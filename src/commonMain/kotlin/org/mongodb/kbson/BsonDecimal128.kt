@@ -15,7 +15,9 @@
  */
 package org.mongodb.kbson
 
+import kotlinx.serialization.Serializable
 import org.mongodb.kbson.internal.Decimal128
+import org.mongodb.kbson.serialization.BsonDecimal128Serializer
 
 /**
  * A binary integer decimal representation of a 128-bit decimal value, supporting 34 decimal digits of significand and
@@ -32,6 +34,7 @@ import org.mongodb.kbson.internal.Decimal128
  *
  * @property value the Decimal128 value
  */
+@Serializable(with = BsonDecimal128Serializer::class)
 public class BsonDecimal128 private constructor(internal val value: Decimal128) : BsonValue() {
     override val bsonType: BsonType
         get() = BsonType.DECIMAL128

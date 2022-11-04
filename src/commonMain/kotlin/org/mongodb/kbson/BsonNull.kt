@@ -15,9 +15,12 @@
  */
 package org.mongodb.kbson
 
+import kotlinx.serialization.Serializable
+import org.mongodb.kbson.serialization.BsonNullSerializer
 import kotlin.jvm.JvmStatic
 
 /** A representation of the BSON Null type. */
+@Serializable(with = BsonNullSerializer::class)
 public object BsonNull : BsonValue() {
     override val bsonType: BsonType
         get() = BsonType.NULL

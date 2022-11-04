@@ -21,9 +21,9 @@ import java.util.UUID
 import kotlin.jvm.internal.DefaultConstructorMarker
 import kotlin.test.assertEquals
 import org.junit.jupiter.api.Test
+import org.mongodb.kbson.serialization.Bson
 
 class BsonValueApiTest {
-
     @Test
     fun bsonArrayTest() {
         val bsonClass = org.bson.BsonArray::class.java
@@ -222,7 +222,7 @@ class BsonValueApiTest {
         // No constructor as it's a singleton object
 
         val bsonMethods = getMethodNames(bsonClass)
-        val kBsonMethods = getMethodNames(kBsonClass)
+        val kBsonMethods = getMethodNames(kBsonClass, listOf("serializer"))
         assertEquals(bsonMethods, kBsonMethods)
     }
 
@@ -234,7 +234,7 @@ class BsonValueApiTest {
         // No constructor as it's a singleton object
 
         val bsonMethods = getMethodNames(bsonClass)
-        val kBsonMethods = getMethodNames(kBsonClass)
+        val kBsonMethods = getMethodNames(kBsonClass, listOf("serializer"))
         assertEquals(bsonMethods, kBsonMethods)
     }
 
@@ -246,7 +246,7 @@ class BsonValueApiTest {
         // No constructor as it's a singleton object
 
         val bsonMethods = getMethodNames(bsonClass)
-        val kBsonMethods = getMethodNames(kBsonClass, listOf("getVALUE", "getVALUE\$annotations"))
+        val kBsonMethods = getMethodNames(kBsonClass, listOf("getVALUE", "getVALUE\$annotations", "serializer"))
         assertEquals(bsonMethods, kBsonMethods)
     }
 
@@ -331,7 +331,7 @@ class BsonValueApiTest {
         // No constructor as it's a singleton object
 
         val bsonMethods = getMethodNames(bsonClass)
-        val kBsonMethods = getMethodNames(kBsonClass, listOf("getUNDEFINED", "getUNDEFINED\$annotations"))
+        val kBsonMethods = getMethodNames(kBsonClass, listOf("getUNDEFINED", "getUNDEFINED\$annotations", "serializer"))
         assertEquals(bsonMethods, kBsonMethods)
     }
 

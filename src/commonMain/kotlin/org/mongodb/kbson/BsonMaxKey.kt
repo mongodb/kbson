@@ -15,7 +15,11 @@
  */
 package org.mongodb.kbson
 
+import kotlinx.serialization.Serializable
+import org.mongodb.kbson.serialization.BsonMaxKeySerializer
+
 /** A representation of the BSON the maximum key value regardless of the key's type */
+@Serializable(with = BsonMaxKeySerializer::class)
 public object BsonMaxKey : BsonValue() {
     override val bsonType: BsonType
         get() = BsonType.MAX_KEY

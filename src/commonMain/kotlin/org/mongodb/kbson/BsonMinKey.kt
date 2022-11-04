@@ -15,7 +15,11 @@
  */
 package org.mongodb.kbson
 
+import kotlinx.serialization.Serializable
+import org.mongodb.kbson.serialization.BsonMinKeySerializer
+
 /** A representation of the BSON the minimum key value regardless of the key's type */
+@Serializable(with = BsonMinKeySerializer::class)
 public object BsonMinKey : BsonValue() {
     override val bsonType: BsonType
         get() = BsonType.MIN_KEY

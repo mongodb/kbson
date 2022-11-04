@@ -15,12 +15,16 @@
  */
 package org.mongodb.kbson
 
+import kotlinx.serialization.Serializable
+import org.mongodb.kbson.serialization.BsonInt32Serializer
+
 /**
  * A representation of the BSON Int32 type.
  *
  * @constructor constructs a new instance with the given value
  * @property value the value
  */
+@Serializable(with = BsonInt32Serializer::class)
 public class BsonInt32(public val value: Int) : BsonNumber(value), Comparable<BsonInt32> {
 
     override val bsonType: BsonType

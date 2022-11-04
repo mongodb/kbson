@@ -15,6 +15,9 @@
  */
 package org.mongodb.kbson
 
+import kotlinx.serialization.Serializable
+import org.mongodb.kbson.serialization.BsonJavaScriptWithScopeSerializer
+
 /**
  * A representation of the BSON JavaScript with scope type.
  *
@@ -22,6 +25,7 @@ package org.mongodb.kbson
  * @property code the javascript code as a string
  * @property scope the javascript scope
  */
+@Serializable(with = BsonJavaScriptWithScopeSerializer::class)
 public class BsonJavaScriptWithScope(public val code: String, public val scope: BsonDocument) : BsonValue() {
     override val bsonType: BsonType
         get() = BsonType.JAVASCRIPT_WITH_SCOPE

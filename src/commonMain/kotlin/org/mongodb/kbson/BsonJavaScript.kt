@@ -15,12 +15,16 @@
  */
 package org.mongodb.kbson
 
+import kotlinx.serialization.Serializable
+import org.mongodb.kbson.serialization.BsonJavaScriptSerializer
+
 /**
  * A representation of the BSON JavaScript type.
  *
  * @constructor constructs a new instance with the given code
  * @property code the javascript code as a string
  */
+@Serializable(with = BsonJavaScriptSerializer::class)
 public class BsonJavaScript(public val code: String) : BsonValue() {
     override val bsonType: BsonType
         get() = BsonType.JAVASCRIPT
