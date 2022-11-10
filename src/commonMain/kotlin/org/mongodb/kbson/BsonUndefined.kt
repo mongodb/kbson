@@ -15,6 +15,8 @@
  */
 package org.mongodb.kbson
 
+import kotlinx.serialization.Serializable
+import org.mongodb.kbson.serialization.BsonUndefinedSerializer
 import kotlin.jvm.JvmStatic
 
 /**
@@ -22,6 +24,7 @@ import kotlin.jvm.JvmStatic
  *
  * Note: It's deprecated in BSON Specification and present here only for compatibility reasons.
  */
+@Serializable(with = BsonUndefinedSerializer::class)
 public object BsonUndefined : BsonValue() {
 
     override val bsonType: BsonType

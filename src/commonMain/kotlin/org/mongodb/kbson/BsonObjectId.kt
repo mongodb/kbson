@@ -15,9 +15,11 @@
  */
 package org.mongodb.kbson
 
+import kotlinx.serialization.Serializable
 import org.mongodb.kbson.internal.AtomicInt
 import org.mongodb.kbson.internal.CurrentTime.getCurrentTimeInSeconds
 import org.mongodb.kbson.internal.HexUtils
+import org.mongodb.kbson.serialization.BsonObjectIdSerializer
 
 /**
  * A representation of the BSON ObjectId type
@@ -40,6 +42,7 @@ import org.mongodb.kbson.internal.HexUtils
  * @property counter a counter
  */
 @Suppress("MagicNumber")
+@Serializable(with = BsonObjectIdSerializer::class)
 public class BsonObjectId(
     public val timestamp: Int,
     private val randomValue1: Int,

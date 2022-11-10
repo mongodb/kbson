@@ -15,10 +15,10 @@
  */
 package org.mongodb.kbson.internal
 
-import kotlin.contracts.ExperimentalContracts
-import kotlin.contracts.contract
 import org.mongodb.kbson.BsonInvalidOperationException
 import org.mongodb.kbson.BsonSerializationException
+import kotlin.contracts.ExperimentalContracts
+import kotlin.contracts.contract
 
 @OptIn(ExperimentalContracts::class)
 internal inline fun validateSerialization(value: Boolean, lazyMessage: () -> Any) {

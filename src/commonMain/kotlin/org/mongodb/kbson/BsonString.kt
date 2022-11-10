@@ -15,11 +15,15 @@
  */
 package org.mongodb.kbson
 
+import kotlinx.serialization.Serializable
+import org.mongodb.kbson.serialization.BsonStringSerializer
+
 /**
  * A representation of the BSON String type.
  *
  * @property value the string value
  */
+@Serializable(with = BsonStringSerializer::class)
 public class BsonString(public val value: String) : BsonValue(), Comparable<BsonString> {
     override val bsonType: BsonType
         get() = BsonType.STRING

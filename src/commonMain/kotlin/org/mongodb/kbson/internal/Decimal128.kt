@@ -15,7 +15,6 @@
  */
 package org.mongodb.kbson.internal
 
-import kotlin.math.abs
 import org.mongodb.kbson.internal.Decimal128.Flags.FirstFormExponentBits
 import org.mongodb.kbson.internal.Decimal128.Flags.SecondFormExponentBits
 import org.mongodb.kbson.internal.Decimal128.Flags.isFirstForm
@@ -24,6 +23,7 @@ import org.mongodb.kbson.internal.Decimal128.Flags.isNegative
 import org.mongodb.kbson.internal.Decimal128.Flags.isNegativeInfinity
 import org.mongodb.kbson.internal.Decimal128.Flags.isPositiveInfinity
 import org.mongodb.kbson.internal.Decimal128.Flags.isSecondForm
+import kotlin.math.abs
 
 /**
  * A binary integer decimal representation of a 128-bit decimal value, supporting 34 decimal digits of significand and

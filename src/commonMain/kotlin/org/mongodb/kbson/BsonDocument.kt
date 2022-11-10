@@ -15,12 +15,14 @@
  */
 package org.mongodb.kbson
 
+import kotlinx.serialization.Serializable
 import org.mongodb.kbson.internal.io.BsonBinaryReader
 import org.mongodb.kbson.internal.io.BsonBinaryWriter
 import org.mongodb.kbson.internal.io.BsonDocumentReader
 import org.mongodb.kbson.internal.io.BsonDocumentWriter
 import org.mongodb.kbson.internal.use
 import org.mongodb.kbson.serialization.Bson
+import org.mongodb.kbson.serialization.BsonDocumentSerializer
 
 /**
  * A type-safe container for a BSON document.
@@ -29,6 +31,7 @@ import org.mongodb.kbson.serialization.Bson
  * @param initial the initial values
  */
 @Suppress("TooManyFunctions")
+@Serializable(with = BsonDocumentSerializer::class)
 public class BsonDocument(initial: Map<String, BsonValue> = LinkedHashMap()) :
     BsonValue(), MutableMap<String, BsonValue> {
     private val _values: LinkedHashMap<String, BsonValue>

@@ -15,6 +15,9 @@
  */
 package org.mongodb.kbson
 
+import kotlinx.serialization.Serializable
+import org.mongodb.kbson.serialization.BsonTimestampSerializer
+
 /**
  * A representation the BSON timestamp type.
  *
@@ -27,6 +30,7 @@ package org.mongodb.kbson
  * @property value the timestamp
  */
 @Suppress("MagicNumber")
+@Serializable(with = BsonTimestampSerializer::class)
 public class BsonTimestamp(public val value: Long = 0) : BsonValue(), Comparable<BsonTimestamp> {
 
     /**

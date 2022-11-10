@@ -15,7 +15,9 @@
  */
 package org.mongodb.kbson
 
+import kotlinx.serialization.Serializable
 import org.mongodb.kbson.internal.CurrentTime.getCurrentTimeInMillis
+import org.mongodb.kbson.serialization.BsonDateTimeSerializer
 
 /**
  * A representation of the BSON DateTime type.
@@ -23,6 +25,7 @@ import org.mongodb.kbson.internal.CurrentTime.getCurrentTimeInMillis
  * @constructor constructs a new instance with the given value
  * @property value the time in milliseconds since epoch
  */
+@Serializable(with = BsonDateTimeSerializer::class)
 public class BsonDateTime(public val value: Long) : BsonValue(), Comparable<BsonDateTime> {
 
     /** Construct a new instance with 'now' as the current date time */

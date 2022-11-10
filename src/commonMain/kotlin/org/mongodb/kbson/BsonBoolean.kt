@@ -15,6 +15,8 @@
  */
 package org.mongodb.kbson
 
+import kotlinx.serialization.Serializable
+import org.mongodb.kbson.serialization.BsonBooleanSerializer
 import kotlin.jvm.JvmStatic
 
 /**
@@ -23,6 +25,7 @@ import kotlin.jvm.JvmStatic
  * @constructor constructs a new instance with the given value
  * @property value the boolean value
  */
+@Serializable(with = BsonBooleanSerializer::class)
 public class BsonBoolean(public val value: Boolean) : BsonValue(), Comparable<BsonBoolean> {
 
     override val bsonType: BsonType

@@ -15,6 +15,9 @@
  */
 package org.mongodb.kbson
 
+import kotlinx.serialization.Serializable
+import org.mongodb.kbson.serialization.BsonSymbolSerializer
+
 /**
  * A representation of the BSON Symbol type.
  *
@@ -22,6 +25,7 @@ package org.mongodb.kbson
  *
  * @property value the symbol value
  */
+@Serializable(with = BsonSymbolSerializer::class)
 public class BsonSymbol(public val value: String) : BsonValue() {
 
     /** Gets the symbol value */

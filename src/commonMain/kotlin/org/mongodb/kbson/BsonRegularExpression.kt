@@ -15,6 +15,9 @@
  */
 package org.mongodb.kbson
 
+import kotlinx.serialization.Serializable
+import org.mongodb.kbson.serialization.BsonRegularExpressionSerializer
+
 /**
  * A representation of the BSON regular expression type
  *
@@ -22,6 +25,7 @@ package org.mongodb.kbson
  * @property pattern the regular expression pattern
  * @param options the regular expression options
  */
+@Serializable(with = BsonRegularExpressionSerializer::class)
 public class BsonRegularExpression(public val pattern: String, options: String) : BsonValue() {
 
     /** The sorted options for the regular expression */

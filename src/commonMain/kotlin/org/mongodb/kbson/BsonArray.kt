@@ -15,12 +15,16 @@
  */
 package org.mongodb.kbson
 
+import kotlinx.serialization.Serializable
+import org.mongodb.kbson.serialization.BsonArraySerializer
+
 /**
  * A type-safe representation of the BSON array type.
  *
  * @constructor constructs the bson array with an initial list of values, defaults to no items
  * @param initial the initial list of [BsonValue]s in the array
  */
+@Serializable(with= BsonArraySerializer::class)
 public class BsonArray(initial: List<BsonValue> = emptyList()) : BsonValue(), MutableList<BsonValue> {
     private val _values: MutableList<BsonValue>
     init {

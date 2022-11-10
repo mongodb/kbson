@@ -15,12 +15,16 @@
  */
 package org.mongodb.kbson
 
+import kotlinx.serialization.Serializable
+import org.mongodb.kbson.serialization.BsonDoubleSerializer
+
 /**
  * A representation of the BSON Double type.
  *
  * @constructor constructs a new instance with the given value
  * @property value the [Double] value
  */
+@Serializable(with = BsonDoubleSerializer::class)
 public class BsonDouble(public val value: Double) : BsonNumber(value), Comparable<BsonDouble> {
 
     override val bsonType: BsonType
