@@ -96,7 +96,10 @@ public object Bson {
 
 internal object BsonValueSerializer : KSerializer<BsonValue> {
 
-    override val descriptor: SerialDescriptor = buildClassSerialDescriptor("BsonDocument") {}
+    @Serializable
+    private class BsonValueJson
+
+    override val descriptor: SerialDescriptor = BsonValueJson.serializer().descriptor
 
     @Suppress("ComplexMethod")
     override fun serialize(encoder: Encoder, value: BsonValue) {
