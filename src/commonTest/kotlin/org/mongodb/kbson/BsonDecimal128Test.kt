@@ -45,6 +45,24 @@ class BsonDecimal128Test {
     }
 
     @Test
+    fun highLowValues() {
+        assertEquals(1uL, bsonValue.high)
+        assertEquals(2uL, bsonValue.low)
+        assertEquals(0x7c00000000000000uL, BsonDecimal128.NaN.high)
+        assertEquals(0uL, BsonDecimal128.NaN.low)
+        assertEquals(0x7c00000000000000uL or 1uL.shl(63), BsonDecimal128.NEGATIVE_NaN.high)
+        assertEquals(0uL, BsonDecimal128.NEGATIVE_NaN.low)
+        assertEquals(0x7800000000000000uL, BsonDecimal128.POSITIVE_INFINITY.high)
+        assertEquals(0uL, BsonDecimal128.POSITIVE_INFINITY.low)
+        assertEquals(0x7800000000000000uL or 1uL.shl(63), BsonDecimal128.NEGATIVE_INFINITY.high)
+        assertEquals(0uL, BsonDecimal128.NEGATIVE_INFINITY.low)
+        assertEquals(0x3040000000000000uL, BsonDecimal128.POSITIVE_ZERO.high)
+        assertEquals(0uL, BsonDecimal128.POSITIVE_ZERO.low)
+        assertEquals(0xb040000000000000uL, BsonDecimal128.NEGATIVE_ZERO.high)
+        assertEquals(0uL, BsonDecimal128.NEGATIVE_ZERO.low)
+    }
+
+    @Test
     fun shouldHaveCompanionHelpersForSpecialTypes() {
         assertEquals(BsonDecimal128.NaN, BsonDecimal128("NaN"))
         assertEquals(BsonDecimal128.NEGATIVE_NaN, BsonDecimal128("-NaN"))

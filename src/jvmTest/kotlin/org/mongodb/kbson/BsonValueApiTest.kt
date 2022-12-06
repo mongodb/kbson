@@ -116,8 +116,8 @@ class BsonValueApiTest {
                     "isInfinite",
                     "isFinite",
                     "isNegative",
-                    "getHigh",
-                    "getLow",
+                    "getHigh-s-VKNKU",
+                    "getLow-s-VKNKU",
                     "getValue\$kbson",
                     "getValue\$kbson_debug",
                     "getValue\$kbson_release"))

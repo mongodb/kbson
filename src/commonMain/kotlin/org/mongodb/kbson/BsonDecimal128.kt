@@ -40,6 +40,24 @@ public class BsonDecimal128 private constructor(internal val value: Decimal128) 
         get() = BsonType.DECIMAL128
 
     /**
+     * Gets the high-order 64 bits of the IEEE 754-2008 128-bit decimal floating point encoding for this Decimal128,
+     * using the BID encoding scheme.
+     *
+     * @return the high-order 64 bits of this Decimal128
+     */
+    public val high: ULong
+        get() = value.high
+
+    /**
+     * Gets the low-order 64 bits of the IEEE 754-2008 128-bit decimal floating point encoding for this Decimal128,
+     * using the BID encoding scheme.
+     *
+     * @return the low-order 64 bits of this Decimal128
+     */
+    public val low: ULong
+        get() = value.low
+
+    /**
      * Returns true if this BsonDecimal128 is negative.
      *
      * @return true if this BsonDecimal128 is negative
