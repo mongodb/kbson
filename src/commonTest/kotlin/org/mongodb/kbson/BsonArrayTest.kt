@@ -26,7 +26,7 @@ import kotlin.test.assertTrue
 
 class BsonArrayTest {
 
-    private val listOfBsonValues = listOf(BsonBoolean.TRUE, BsonBoolean.FALSE)
+    private val listOfBsonValues = listOf(BsonBoolean.TRUE_VALUE, BsonBoolean.FALSE_VALUE)
     private val bsonValue = BsonArray(listOfBsonValues)
 
     @Test
@@ -65,57 +65,57 @@ class BsonArrayTest {
         assertEquals(BsonArray(), BsonArray())
         assertEquals(bsonValue, bsonValue)
         assertNotEquals(BsonArray(), bsonValue)
-        assertNotEquals(bsonValue, BsonArray(listOf(BsonBoolean.TRUE, BsonBoolean.TRUE)))
+        assertNotEquals(bsonValue, BsonArray(listOf(BsonBoolean.TRUE_VALUE, BsonBoolean.TRUE_VALUE)))
     }
 
     @Test
     fun shouldSupportListMethods() {
-        assertTrue(bsonValue.contains(BsonBoolean.TRUE))
+        assertTrue(bsonValue.contains(BsonBoolean.TRUE_VALUE))
         assertFalse(bsonValue.contains(BsonUndefined.UNDEFINED))
 
-        assertTrue(bsonValue.containsAll(listOf(BsonBoolean.TRUE)))
-        assertFalse(bsonValue.containsAll(listOf(BsonBoolean.TRUE, BsonUndefined.UNDEFINED)))
+        assertTrue(bsonValue.containsAll(listOf(BsonBoolean.TRUE_VALUE)))
+        assertFalse(bsonValue.containsAll(listOf(BsonBoolean.TRUE_VALUE, BsonUndefined.UNDEFINED)))
 
         val iterator = bsonValue.iterator()
         assertTrue(iterator.hasNext())
-        assertEquals(BsonBoolean.TRUE, iterator.next())
+        assertEquals(BsonBoolean.TRUE_VALUE, iterator.next())
         assertTrue(iterator.hasNext())
-        assertEquals(BsonBoolean.FALSE, iterator.next())
+        assertEquals(BsonBoolean.FALSE_VALUE, iterator.next())
         assertFalse(iterator.hasNext())
 
         val listIterator = bsonValue.listIterator()
         assertFalse(listIterator.hasPrevious())
         assertTrue(listIterator.hasNext())
-        assertEquals(BsonBoolean.TRUE, listIterator.next())
-        assertEquals(BsonBoolean.TRUE, listIterator.previous())
-        assertEquals(BsonBoolean.TRUE, listIterator.next())
-        assertEquals(BsonBoolean.FALSE, listIterator.next())
+        assertEquals(BsonBoolean.TRUE_VALUE, listIterator.next())
+        assertEquals(BsonBoolean.TRUE_VALUE, listIterator.previous())
+        assertEquals(BsonBoolean.TRUE_VALUE, listIterator.next())
+        assertEquals(BsonBoolean.FALSE_VALUE, listIterator.next())
         assertTrue(listIterator.hasPrevious())
         assertFalse(listIterator.hasNext())
 
         val subListIterator = bsonValue.listIterator(1)
         assertTrue(subListIterator.hasPrevious())
         assertTrue(subListIterator.hasNext())
-        assertEquals(BsonBoolean.FALSE, subListIterator.next())
+        assertEquals(BsonBoolean.FALSE_VALUE, subListIterator.next())
         assertTrue(subListIterator.hasPrevious())
         assertFalse(subListIterator.hasNext())
 
-        assertEquals(mutableListOf<BsonValue>(BsonBoolean.FALSE), bsonValue.subList(1, 2))
+        assertEquals(mutableListOf<BsonValue>(BsonBoolean.FALSE_VALUE), bsonValue.subList(1, 2))
         assertEquals(
             2,
             org.mongodb.kbson
-                .BsonArray(listOf(BsonBoolean.TRUE, BsonBoolean.TRUE, BsonBoolean.TRUE))
-                .lastIndexOf(BsonBoolean.TRUE))
-        assertEquals(1, bsonValue.indexOf(BsonBoolean.FALSE))
+                .BsonArray(listOf(BsonBoolean.TRUE_VALUE, BsonBoolean.TRUE_VALUE, BsonBoolean.TRUE_VALUE))
+                .lastIndexOf(BsonBoolean.TRUE_VALUE))
+        assertEquals(1, bsonValue.indexOf(BsonBoolean.FALSE_VALUE))
     }
 
     @Test
     fun shouldSupportMutableListMethods() {
         val mutableList = BsonArray()
 
-        assertTrue(mutableList.add(BsonBoolean.TRUE))
+        assertTrue(mutableList.add(BsonBoolean.TRUE_VALUE))
         assertFalse(mutableList.isEmpty())
-        assertTrue(mutableList.remove(BsonBoolean.TRUE))
+        assertTrue(mutableList.remove(BsonBoolean.TRUE_VALUE))
         assertTrue(mutableList.isEmpty())
 
         assertTrue(mutableList.addAll(listOfBsonValues))
@@ -123,7 +123,7 @@ class BsonArrayTest {
         assertTrue(mutableList.removeAll(listOfBsonValues))
         assertTrue(mutableList.isEmpty())
 
-        mutableList.addAll(listOf(BsonNull, BsonBoolean.TRUE, BsonBoolean.FALSE, BsonUndefined))
+        mutableList.addAll(listOf(BsonNull, BsonBoolean.TRUE_VALUE, BsonBoolean.FALSE_VALUE, BsonUndefined))
         assertEquals(BsonNull, mutableList.removeAt(0))
         assertEquals(3, mutableList.size)
 
@@ -135,13 +135,13 @@ class BsonArrayTest {
         assertEquals(BsonNull, mutableList.set(0, BsonMinKey))
         assertEquals(BsonMinKey, mutableList.first())
 
-        val expected = listOf(BsonMinKey, BsonBoolean.TRUE, BsonBoolean.FALSE, BsonUndefined, BsonMaxKey)
+        val expected = listOf(BsonMinKey, BsonBoolean.TRUE_VALUE, BsonBoolean.FALSE_VALUE, BsonUndefined, BsonMaxKey)
         assertContentEquals(expected, mutableList.values)
 
         assertTrue(mutableList.retainAll(listOf(BsonMinKey, BsonMaxKey, BsonUndefined)))
         assertContentEquals(listOf(BsonMinKey, BsonUndefined, BsonMaxKey), mutableList.values)
 
-        assertTrue(mutableList.addAll(1, listOf(BsonBoolean.TRUE, BsonBoolean.FALSE)))
+        assertTrue(mutableList.addAll(1, listOf(BsonBoolean.TRUE_VALUE, BsonBoolean.FALSE_VALUE)))
         assertEquals(expected, mutableList.values)
 
         mutableList.clear()

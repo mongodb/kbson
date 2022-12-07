@@ -25,8 +25,8 @@ class BsonBooleanTest {
 
     @Test
     fun shouldHaveTheExpectedBsonType() {
-        assertTrue { BsonBoolean.TRUE.isBoolean() }
-        assertEquals(BsonType.BOOLEAN, BsonBoolean.TRUE.bsonType)
+        assertTrue { BsonBoolean.TRUE_VALUE.isBoolean() }
+        assertEquals(BsonType.BOOLEAN, BsonBoolean.TRUE_VALUE.bsonType)
     }
 
     @Test
@@ -37,17 +37,17 @@ class BsonBooleanTest {
 
     @Test
     fun shouldOverrideEquals() {
-        assertEquals(BsonBoolean.TRUE, BsonBoolean(true))
-        assertEquals(BsonBoolean.FALSE, BsonBoolean(false))
-        assertNotEquals(BsonBoolean.TRUE, BsonBoolean(false))
-        assertNotEquals(BsonBoolean.FALSE, BsonBoolean(true))
+        assertEquals(BsonBoolean.TRUE_VALUE, BsonBoolean(true))
+        assertEquals(BsonBoolean.FALSE_VALUE, BsonBoolean(false))
+        assertNotEquals(BsonBoolean.TRUE_VALUE, BsonBoolean(false))
+        assertNotEquals(BsonBoolean.FALSE_VALUE, BsonBoolean(true))
     }
 
     @Test
     fun shouldBeComparable() {
-        assertEquals(-1, BsonBoolean.FALSE.compareTo(BsonBoolean.TRUE))
-        assertEquals(0, BsonBoolean.TRUE.compareTo(BsonBoolean.TRUE))
-        assertEquals(0, BsonBoolean.FALSE.compareTo(BsonBoolean.FALSE))
-        assertEquals(1, BsonBoolean.TRUE.compareTo(BsonBoolean.FALSE))
+        assertEquals(-1, BsonBoolean.FALSE_VALUE.compareTo(BsonBoolean.TRUE_VALUE))
+        assertEquals(0, BsonBoolean.TRUE_VALUE.compareTo(BsonBoolean.TRUE_VALUE))
+        assertEquals(0, BsonBoolean.FALSE_VALUE.compareTo(BsonBoolean.FALSE_VALUE))
+        assertEquals(1, BsonBoolean.TRUE_VALUE.compareTo(BsonBoolean.FALSE_VALUE))
     }
 }
