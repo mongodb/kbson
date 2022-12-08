@@ -24,7 +24,7 @@ import org.mongodb.kbson.serialization.BsonArraySerializer
  * @constructor constructs the bson array with an initial list of values, defaults to no items
  * @param initial the initial list of [BsonValue]s in the array
  */
-@Serializable(with= BsonArraySerializer::class)
+@Serializable(with = BsonArraySerializer::class)
 public class BsonArray(initial: List<BsonValue> = emptyList()) : BsonValue(), MutableList<BsonValue> {
     private val _values: MutableList<BsonValue>
     init {

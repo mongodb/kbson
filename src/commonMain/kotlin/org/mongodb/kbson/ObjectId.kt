@@ -15,7 +15,5 @@
  */
 package org.mongodb.kbson
 
-/**
- * A type alias for BsonObjectId
- */
+/** A type alias for BsonObjectId */
 public typealias ObjectId = BsonObjectId

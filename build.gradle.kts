@@ -72,7 +72,7 @@ kotlin {
                 implementation(kotlin("test-junit5"))
                 implementation(kotlin("reflect"))
                 implementation("org.reflections:reflections:0.10.2")
-                implementation("org.mongodb:bson:4.7.1")
+                implementation("org.mongodb:bson:4.7.2")
             }
         }
 

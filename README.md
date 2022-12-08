@@ -21,7 +21,7 @@ $ ./gradlew clean check
 
 **Note:** Releases are automatically created from commits via [evergeen](https://evergreen.mongodb.com/waterfall/kbson).
 
-Snapshot versions are published automatically by evergreen. 
+Snapshot versions are published automatically by evergreen.
 See: https://oss.sonatype.org/content/repositories/snapshots/org/mongodb/kbson/
 
 For an official release:

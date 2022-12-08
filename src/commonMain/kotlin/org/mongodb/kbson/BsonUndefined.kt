@@ -15,9 +15,9 @@
  */
 package org.mongodb.kbson
 
+import kotlin.jvm.JvmStatic
 import kotlinx.serialization.Serializable
 import org.mongodb.kbson.serialization.BsonUndefinedSerializer
-import kotlin.jvm.JvmStatic
 
 /**
  * A representation of the BSON Undefined type.

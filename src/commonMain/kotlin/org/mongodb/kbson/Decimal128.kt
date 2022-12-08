@@ -15,7 +15,5 @@
  */
 package org.mongodb.kbson
 
-/**
- * A type alias for BsonDecimal128
- */
+/** A type alias for BsonDecimal128 */
 public typealias Decimal128 = BsonDecimal128

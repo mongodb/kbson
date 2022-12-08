@@ -27,7 +27,6 @@ import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.descriptors.PrimitiveKind
 import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
 import kotlinx.serialization.descriptors.SerialDescriptor
-import kotlinx.serialization.descriptors.buildClassSerialDescriptor
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
@@ -81,8 +80,7 @@ public object Bson {
      * @param json the Json String
      * @return a BsonDocument
      */
-    public operator fun invoke(jsonString: String): BsonValue =
-        Json.decodeFromString(jsonString)
+    public operator fun invoke(jsonString: String): BsonValue = Json.decodeFromString(jsonString)
 
     /**
      * Create a Json string from a BsonValue
@@ -90,14 +88,12 @@ public object Bson {
      * @param bsonValue the BsonValue
      * @return the Json String
      */
-    public fun toJson(bsonValue: BsonValue): String =
-        Json.encodeToString(bsonValue)
+    public fun toJson(bsonValue: BsonValue): String = Json.encodeToString(bsonValue)
 }
 
 internal object BsonValueSerializer : KSerializer<BsonValue> {
 
-    @Serializable
-    private class BsonValueJson
+    @Serializable private class BsonValueJson
 
     override val descriptor: SerialDescriptor = BsonValueJson.serializer().descriptor
 
@@ -272,7 +268,6 @@ internal object BsonDocumentKeySerializer : KSerializer<String> {
         String.serializer().serialize(encoder, value)
     }
 }
-
 
 internal object BsonBinarySerializer : KSerializer<BsonBinary> {
     private const val HEX_RADIX = 16

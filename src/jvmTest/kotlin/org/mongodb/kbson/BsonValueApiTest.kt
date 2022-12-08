@@ -21,7 +21,6 @@ import java.util.UUID
 import kotlin.jvm.internal.DefaultConstructorMarker
 import kotlin.test.assertEquals
 import org.junit.jupiter.api.Test
-import org.mongodb.kbson.serialization.Bson
 
 class BsonValueApiTest {
     @Test
