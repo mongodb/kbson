@@ -17,7 +17,9 @@ import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.gradle.api.tasks.testing.logging.TestLogEvent
 
 group = "org.mongodb.kbson"
-version = "0.2.0"
+
+version = "0.3.0-SNAPSHOT"
+
 description = "KBSON a kotlin multiplatform implementation of the BSON library."
 
 plugins {
@@ -230,6 +232,7 @@ tasks.withType<AbstractTestTask> {
 // https://youtrack.jetbrains.com/issue/KT-29311/Support-Native-resource-processing-in-the-Gradle-MPP-plugin
 
 val environments = listOf("iosX64", "macosX64", "iosArm64", "iosSimulatorArm64", "macosArm64")
+
 environments.forEach { build ->
     tasks.findByName("${build}Test")?.let { task ->
         val copyTask =
@@ -318,7 +321,7 @@ val gitVersion: String by lazy {
         commandLine = "git describe --tags --always --dirty".split(" ")
         standardOutput = os
     }
-    val gv: String =  String(os.toByteArray()).trim()
+    val gv: String = String(os.toByteArray()).trim()
     gv.subSequence(gv.toCharArray().indexOfFirst { it.isDigit() }, gv.length).toString()
 }
 
