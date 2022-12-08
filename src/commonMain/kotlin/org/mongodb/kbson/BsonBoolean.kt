@@ -56,20 +56,20 @@ public class BsonBoolean(public val value: Boolean) : BsonValue(), Comparable<Bs
 
     public companion object {
         /** The true value. */
-        @JvmStatic public val TRUE: BsonBoolean = BsonBoolean(true)
+        @JvmStatic public val TRUE_VALUE: BsonBoolean = BsonBoolean(true)
 
         /** The false value. */
-        @JvmStatic public val FALSE: BsonBoolean = BsonBoolean(false)
+        @JvmStatic public val FALSE_VALUE: BsonBoolean = BsonBoolean(false)
 
         /**
          * Returns a `BsonBoolean` instance representing the specified `boolean` value.
          *
          * @param value a boolean value.
-         * @return @link if `value` is true, [BsonBoolean.FALSE] if `value` is false
+         * @return @link if `value` is true, [BsonBoolean.FALSE_VALUE] if `value` is false
          */
         @JvmStatic
         public fun valueOf(value: Boolean): BsonBoolean {
-            return if (value) TRUE else FALSE
+            return if (value) TRUE_VALUE else FALSE_VALUE
         }
     }
 }
