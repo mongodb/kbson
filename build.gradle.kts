@@ -65,7 +65,12 @@ kotlin {
         val commonMain by getting {
             dependencies { implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.3.2") }
         }
-        val commonTest by getting {}
+        val commonTest by getting {
+            dependencies {
+                implementation(kotlin("test-common"))
+                implementation(kotlin("test-annotations-common"))
+            }
+        }
         val jvmMain by getting
         val jvmTest by getting {
             dependencies {

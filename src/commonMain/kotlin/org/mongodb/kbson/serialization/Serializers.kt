@@ -77,19 +77,20 @@ import org.mongodb.kbson.internal.validateSerialization
 
 internal fun <T> Bson.writeBson(value: T, serializer: SerializationStrategy<T>): BsonValue {
     lateinit var result: BsonValue
-    val encoder = PrimitiveBsonEncoder(this.ejson.serializersModule) { result = it }
+    val encoder = PrimitiveBsonEncoder(ejson.serializersModule) { result = it }
     encoder.encodeSerializableValue(serializer, value)
     return result
 }
 
 internal fun <T> Bson.readBson(element: BsonValue, deserializer: DeserializationStrategy<T>): T =
-    BsonDecoder(element, this.ejson.serializersModule)
+    BsonDecoder(element, ejson.serializersModule)
         .decodeSerializableValue(deserializer)
 
 /** The Bson companion object */
 public object Bson {
 
-    public val ejson: Json = Json
+    @PublishedApi
+    internal val ejson: Json = Json
 
     public fun <T : Any> encodeToBsonValue(
         serializer: SerializationStrategy<T>,
@@ -101,10 +102,28 @@ public object Bson {
         value: BsonValue
     ): T = readBson(value, serializer)
 
+    public fun <T : Any> decodeFromString(
+        serializer: DeserializationStrategy<T>,
+        ejsonString: String
+    ): T = decodeFromBsonValue(
+        serializer,
+        ejson.decodeFromString(ejsonString)
+    )
+
+    public fun <T : Any> encodeToString(
+        serializer: SerializationStrategy<T>,
+        value: T
+    ): String = ejson.encodeToString(
+        encodeToBsonValue(
+            serializer,
+            value
+        )
+    )
+
     /**
      * Create a BsonDocument from a Json string
      *
-     * @param json the Json String
+     * @param jsonString the Json String
      * @return a BsonDocument
      */
     public operator fun invoke(jsonString: String): BsonValue =
@@ -120,10 +139,10 @@ public object Bson {
 }
 
 public inline fun <reified T : Any> Bson.encodeToBsonValue(value: T): BsonValue =
-    encodeToBsonValue(Bson.ejson.serializersModule.serializer(), value)
+    encodeToBsonValue(ejson.serializersModule.serializer(), value)
 
 public inline fun <reified T : Any> Bson.decodeFromBsonValue(value: BsonValue): T =
-    decodeFromBsonValue(Bson.ejson.serializersModule.serializer(), value)
+    decodeFromBsonValue(ejson.serializersModule.serializer(), value)
 
 internal object BsonValueSerializer : KSerializer<BsonValue> {
 
