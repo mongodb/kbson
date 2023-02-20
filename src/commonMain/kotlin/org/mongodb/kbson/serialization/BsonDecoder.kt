@@ -11,76 +11,12 @@ import org.mongodb.kbson.BsonDocument
 import org.mongodb.kbson.BsonString
 import org.mongodb.kbson.BsonValue
 
-
 @OptIn(ExperimentalSerializationApi::class)
-internal class ListBsonDecoder(
-    val value: BsonArray,
+internal open class BsonDecoder(
+    private val value: BsonValue,
     override val serializersModule: SerializersModule
 ) : AbstractDecoder() {
-    var decodedElementCount = 0
-
-    override fun decodeElementIndex(descriptor: SerialDescriptor): Int {
-        return if (decodedElementCount < value.size) decodedElementCount++
-        else CompositeDecoder.DECODE_DONE
-    }
-
-    override fun decodeInt(): Int = value[decodedElementCount - 1].asInt32().value
-
-    override fun decodeString(): String = value[decodedElementCount - 1].asString().value
-}
-
-@OptIn(ExperimentalSerializationApi::class)
-internal class ClassBsonDecoder(
-    val value: BsonDocument,
-    override val serializersModule: SerializersModule
-) : AbstractDecoder() {
-    var decodedElementCount = 0
-    lateinit var nextName: String
-    override fun decodeElementIndex(descriptor: SerialDescriptor): Int {
-        return if (decodedElementCount < value.size) {
-            nextName = descriptor.getElementName(decodedElementCount)
-            decodedElementCount++
-        } else {
-            CompositeDecoder.DECODE_DONE
-        }
-    }
-
-    override fun decodeInt(): Int = value[nextName]!!.asInt32().value
-
-    override fun decodeString(): String = value[nextName]!!.asString().value
-}
-
-@OptIn(ExperimentalSerializationApi::class)
-internal class MapBsonDecoder(
-    value: BsonDocument,
-    override val serializersModule: SerializersModule
-) : AbstractDecoder() {
-    var decodedElementCount = 0
-
-    val values = BsonArray(
-        value.flatMap { (key, value) ->
-            listOf(BsonString(key), value)
-        }.toList()
-    )
-
-    override fun decodeElementIndex(descriptor: SerialDescriptor): Int {
-        return if (decodedElementCount < values.size) decodedElementCount++
-        else CompositeDecoder.DECODE_DONE
-    }
-
-    override fun decodeInt(): Int = values[decodedElementCount - 1].asInt32().value
-
-    override fun decodeString(): String = values[decodedElementCount - 1].asString().value
-}
-
-@OptIn(ExperimentalSerializationApi::class)
-internal class PrimitiveBsonDecoder(
-    val value: BsonValue,
-    override val serializersModule: SerializersModule
-) : AbstractDecoder() {
-    override fun decodeElementIndex(descriptor: SerialDescriptor): Int {
-        TODO("Not yet implemented")
-    }
+    override fun decodeElementIndex(descriptor: SerialDescriptor): Int = 0
 
     override fun beginStructure(descriptor: SerialDescriptor): CompositeDecoder {
         return when (descriptor.kind) {
@@ -93,11 +29,69 @@ internal class PrimitiveBsonDecoder(
             StructureKind.CLASS -> {
                 ClassBsonDecoder(value.asDocument(), serializersModule)
             }
-            else -> TODO()
+            StructureKind.OBJECT -> TODO("decide what to do with it")
+            else -> throw IllegalStateException("Unsupported descriptor kind ${descriptor.kind}")
         }
     }
 
-    override fun decodeInt(): Int = value.asInt32().value
+    override fun decodeInt(): Int = currentValue().asInt32().value
 
-    override fun decodeString(): String = value.asString().value
+    override fun decodeString(): String = currentValue().asString().value
+
+    open fun currentValue(): BsonValue = value
+}
+
+internal class ListBsonDecoder(
+    private val bsonArray: BsonArray,
+    override val serializersModule: SerializersModule
+) : BsonDecoder(bsonArray, serializersModule) {
+    private var decodedElementCount = -1
+
+    override fun decodeElementIndex(descriptor: SerialDescriptor): Int {
+        return if (decodedElementCount < bsonArray.size) decodedElementCount++
+        else CompositeDecoder.DECODE_DONE
+    }
+
+    override fun currentValue(): BsonValue = bsonArray[decodedElementCount]
+}
+
+internal class ClassBsonDecoder(
+    private val bsonDocument: BsonDocument,
+    override val serializersModule: SerializersModule
+) : BsonDecoder(bsonDocument, serializersModule) {
+    private var decodedElementCount = -1
+    private lateinit var entryKey: String
+
+    @OptIn(ExperimentalSerializationApi::class)
+    override fun decodeElementIndex(descriptor: SerialDescriptor): Int {
+        return if (decodedElementCount < bsonDocument.size) {
+            decodedElementCount++.also {
+                entryKey = descriptor.getElementName(decodedElementCount)
+            }
+        } else {
+            CompositeDecoder.DECODE_DONE
+        }
+    }
+
+    override fun currentValue(): BsonValue = bsonDocument[entryKey]!!
+}
+
+internal class MapBsonDecoder(
+    bsonDocument: BsonDocument,
+    override val serializersModule: SerializersModule
+) : BsonDecoder(bsonDocument, serializersModule) {
+    private var decodedElementCount = -1
+
+    val values = BsonArray(
+        bsonDocument.flatMap { (key, value) ->
+            listOf(BsonString(key), value)
+        }.toList()
+    )
+
+    override fun decodeElementIndex(descriptor: SerialDescriptor): Int {
+        return if (decodedElementCount < values.size) decodedElementCount++
+        else CompositeDecoder.DECODE_DONE
+    }
+
+    override fun currentValue(): BsonValue = values[decodedElementCount]
 }

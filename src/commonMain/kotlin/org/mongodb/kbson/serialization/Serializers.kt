@@ -29,12 +29,7 @@ import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.descriptors.PrimitiveKind
 import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
 import kotlinx.serialization.descriptors.SerialDescriptor
-import kotlinx.serialization.descriptors.StructureKind
 import kotlinx.serialization.encodeToString
-import kotlinx.serialization.encoding.AbstractDecoder
-import kotlinx.serialization.encoding.AbstractEncoder
-import kotlinx.serialization.encoding.CompositeDecoder
-import kotlinx.serialization.encoding.CompositeEncoder
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
 import kotlinx.serialization.json.Json
@@ -79,12 +74,17 @@ import org.mongodb.kbson.BsonValue
 import org.mongodb.kbson.internal.Base64Utils
 import org.mongodb.kbson.internal.HexUtils
 import org.mongodb.kbson.internal.validateSerialization
+
 internal fun <T> Bson.writeBson(value: T, serializer: SerializationStrategy<T>): BsonValue {
     lateinit var result: BsonValue
     val encoder = PrimitiveBsonEncoder(this.ejson.serializersModule) { result = it }
     encoder.encodeSerializableValue(serializer, value)
     return result
 }
+
+internal fun <T> Bson.readBson(element: BsonValue, deserializer: DeserializationStrategy<T>): T =
+    BsonDecoder(element, this.ejson.serializersModule)
+        .decodeSerializableValue(deserializer)
 
 /** The Bson companion object */
 public object Bson {
@@ -99,10 +99,7 @@ public object Bson {
     public fun <T : Any> decodeFromBsonValue(
         serializer: DeserializationStrategy<T>,
         value: BsonValue
-    ): T = PrimitiveBsonDecoder(
-        value = value,
-        serializersModule = ejson.serializersModule
-    ).decodeSerializableValue(serializer)
+    ): T = readBson(value, serializer)
 
     /**
      * Create a BsonDocument from a Json string
@@ -123,10 +120,10 @@ public object Bson {
 }
 
 public inline fun <reified T : Any> Bson.encodeToBsonValue(value: T): BsonValue =
-    Bson.encodeToBsonValue(Bson.ejson.serializersModule.serializer(), value)
+    encodeToBsonValue(Bson.ejson.serializersModule.serializer(), value)
 
 public inline fun <reified T : Any> Bson.decodeFromBsonValue(value: BsonValue): T =
-    Bson.decodeFromBsonValue(Bson.ejson.serializersModule.serializer(), value)
+    decodeFromBsonValue(Bson.ejson.serializersModule.serializer(), value)
 
 internal object BsonValueSerializer : KSerializer<BsonValue> {
 

@@ -14,7 +14,6 @@ import org.mongodb.kbson.BsonNull
 import org.mongodb.kbson.BsonString
 import org.mongodb.kbson.BsonValue
 
-
 @OptIn(ExperimentalSerializationApi::class)
 internal sealed class AbstractBsonEncoder(
     override val serializersModule: SerializersModule,
