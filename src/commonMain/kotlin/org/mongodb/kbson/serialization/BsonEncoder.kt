@@ -8,14 +8,17 @@ import kotlinx.serialization.encoding.AbstractEncoder
 import kotlinx.serialization.encoding.CompositeEncoder
 import kotlinx.serialization.modules.SerializersModule
 import org.mongodb.kbson.BsonArray
+import org.mongodb.kbson.BsonBoolean
 import org.mongodb.kbson.BsonDocument
+import org.mongodb.kbson.BsonDouble
 import org.mongodb.kbson.BsonInt32
+import org.mongodb.kbson.BsonInt64
 import org.mongodb.kbson.BsonNull
 import org.mongodb.kbson.BsonString
 import org.mongodb.kbson.BsonValue
 
 @OptIn(ExperimentalSerializationApi::class)
-internal sealed class AbstractBsonEncoder(
+internal sealed class BsonEncoder(
     override val serializersModule: SerializersModule,
     val nodeConsumer: (BsonValue) -> Unit
 ) : AbstractEncoder() {
@@ -50,6 +53,38 @@ internal sealed class AbstractBsonEncoder(
         pushValue(BsonString(value))
     }
 
+    override fun encodeBoolean(value: Boolean) {
+        pushValue(BsonBoolean(value))
+    }
+
+    override fun encodeByte(value: Byte) {
+        pushValue(BsonInt32(value.toInt()))
+    }
+
+    override fun encodeChar(value: Char) {
+        pushValue(BsonString(value.toString()))
+    }
+
+    override fun encodeDouble(value: Double) {
+        pushValue(BsonDouble(value))
+    }
+
+    override fun encodeFloat(value: Float) {
+        pushValue(BsonDouble(value.toDouble()))
+    }
+
+    override fun encodeLong(value: Long) {
+        pushValue(BsonInt64(value))
+    }
+
+    override fun encodeShort(value: Short) {
+        pushValue(BsonInt32(value.toInt()))
+    }
+
+    override fun encodeNull() {
+        pushValue(BsonNull)
+    }
+
     abstract fun getCurrent(): BsonValue
 
     abstract fun pushValue(value: BsonValue)
@@ -58,7 +93,7 @@ internal sealed class AbstractBsonEncoder(
 internal class PrimitiveBsonEncoder(
     override val serializersModule: SerializersModule,
     nodeConsumer: (BsonValue) -> Unit
-) : AbstractBsonEncoder(serializersModule, nodeConsumer) {
+) : BsonEncoder(serializersModule, nodeConsumer) {
     private var bsonValue: BsonValue = BsonNull
 
     override fun pushValue(value: BsonValue) {
@@ -73,10 +108,10 @@ internal class PrimitiveBsonEncoder(
     override fun getCurrent(): BsonValue = bsonValue
 }
 
-internal sealed class StructuredAbstractBsonEncoder(
+internal sealed class StructuredBsonEncoder(
     override val serializersModule: SerializersModule,
     nodeConsumer: (BsonValue) -> Unit
-) : AbstractBsonEncoder(serializersModule, nodeConsumer) {
+) : BsonEncoder(serializersModule, nodeConsumer) {
     protected var elements = BsonArray()
 
     override fun pushValue(value: BsonValue) {
@@ -87,7 +122,7 @@ internal sealed class StructuredAbstractBsonEncoder(
 internal class BsonArrayEncoder(
     override val serializersModule: SerializersModule,
     nodeConsumer: (BsonValue) -> Unit
-) : StructuredAbstractBsonEncoder(serializersModule, nodeConsumer) {
+) : StructuredBsonEncoder(serializersModule, nodeConsumer) {
     // we can point it out directly
     override fun getCurrent(): BsonValue = elements
 }
@@ -95,7 +130,7 @@ internal class BsonArrayEncoder(
 internal open class BsonDocumentEncoder(
     override val serializersModule: SerializersModule,
     nodeConsumer: (BsonValue) -> Unit
-) : StructuredAbstractBsonEncoder(serializersModule, nodeConsumer) {
+) : StructuredBsonEncoder(serializersModule, nodeConsumer) {
     // We have all keys and fields in a plain list
     override fun getCurrent(): BsonValue = BsonDocument(
         elements

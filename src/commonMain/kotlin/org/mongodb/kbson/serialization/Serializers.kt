@@ -16,12 +16,12 @@
 package org.mongodb.kbson.serialization
 
 import kotlinx.serialization.DeserializationStrategy
-import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.SerializationStrategy
+import kotlinx.serialization.StringFormat
 import kotlinx.serialization.builtins.ListSerializer
 import kotlinx.serialization.builtins.MapSerializer
 import kotlinx.serialization.builtins.serializer
@@ -46,6 +46,7 @@ import kotlinx.serialization.json.doubleOrNull
 import kotlinx.serialization.json.floatOrNull
 import kotlinx.serialization.json.intOrNull
 import kotlinx.serialization.json.longOrNull
+import kotlinx.serialization.modules.SerializersModule
 import kotlinx.serialization.serializer
 import org.mongodb.kbson.BsonArray
 import org.mongodb.kbson.BsonBinary
@@ -76,44 +77,60 @@ import org.mongodb.kbson.internal.HexUtils
 import org.mongodb.kbson.internal.validateSerialization
 
 internal fun <T> Bson.writeBson(value: T, serializer: SerializationStrategy<T>): BsonValue {
+    if (value is BsonValue) return value
     lateinit var result: BsonValue
-    val encoder = PrimitiveBsonEncoder(ejson.serializersModule) { result = it }
+    val encoder = PrimitiveBsonEncoder(json.serializersModule) { result = it }
     encoder.encodeSerializableValue(serializer, value)
     return result
 }
 
 internal fun <T> Bson.readBson(element: BsonValue, deserializer: DeserializationStrategy<T>): T =
-    BsonDecoder(element, ejson.serializersModule)
+    BsonDecoder(element, json.serializersModule)
         .decodeSerializableValue(deserializer)
 
-/** The Bson companion object */
-public object Bson {
+//TODO Document
+public inline fun <reified T : Any> Bson.encodeToBsonValue(value: T): BsonValue =
+    encodeToBsonValue(json.serializersModule.serializer(), value)
 
+//TODO Document
+public inline fun <reified T : Any> Bson.decodeFromBsonValue(value: BsonValue): T =
+    decodeFromBsonValue(json.serializersModule.serializer(), value)
+
+
+public sealed class Bson(
     @PublishedApi
-    internal val ejson: Json = Json
+    internal val json: Json
+) : StringFormat {
+    public companion object Default : Bson(Json)
 
-    public fun <T : Any> encodeToBsonValue(
+    override val serializersModule: SerializersModule = json.serializersModule
+
+    //TODO Document
+    public fun <T> encodeToBsonValue(
         serializer: SerializationStrategy<T>,
         value: T
     ): BsonValue = writeBson(value, serializer)
 
-    public fun <T : Any> decodeFromBsonValue(
+    //TODO Document
+    public fun <T> decodeFromBsonValue(
         serializer: DeserializationStrategy<T>,
         value: BsonValue
     ): T = readBson(value, serializer)
 
-    public fun <T : Any> decodeFromString(
-        serializer: DeserializationStrategy<T>,
-        ejsonString: String
+    //TODO Document
+    public override fun <T> decodeFromString(
+        deserializer: DeserializationStrategy<T>,
+        string: String
     ): T = decodeFromBsonValue(
-        serializer,
-        ejson.decodeFromString(ejsonString)
+        deserializer,
+        json.decodeFromString(string)
     )
 
-    public fun <T : Any> encodeToString(
+    //TODO Document
+    public override fun <T> encodeToString(
         serializer: SerializationStrategy<T>,
         value: T
-    ): String = ejson.encodeToString(
+    ): String = json.encodeToString(
         encodeToBsonValue(
             serializer,
             value
@@ -127,7 +144,7 @@ public object Bson {
      * @return a BsonDocument
      */
     public operator fun invoke(jsonString: String): BsonValue =
-        ejson.decodeFromString(jsonString)
+        json.decodeFromString(jsonString)
 
     /**
      * Create a Json string from a BsonValue
@@ -135,14 +152,8 @@ public object Bson {
      * @param bsonValue the BsonValue
      * @return the Json String
      */
-    public fun toJson(bsonValue: BsonValue): String = ejson.encodeToString(bsonValue)
+    public fun toJson(bsonValue: BsonValue): String = json.encodeToString(bsonValue)
 }
-
-public inline fun <reified T : Any> Bson.encodeToBsonValue(value: T): BsonValue =
-    encodeToBsonValue(ejson.serializersModule.serializer(), value)
-
-public inline fun <reified T : Any> Bson.decodeFromBsonValue(value: BsonValue): T =
-    decodeFromBsonValue(ejson.serializersModule.serializer(), value)
 
 internal object BsonValueSerializer : KSerializer<BsonValue> {
 
@@ -154,6 +165,7 @@ internal object BsonValueSerializer : KSerializer<BsonValue> {
     @Suppress("ComplexMethod")
     override fun serialize(encoder: Encoder, value: BsonValue) {
         when (encoder) {
+            is BsonEncoder,
             is JsonEncoder -> {
                 when (value.bsonType) {
                     BsonType.ARRAY -> BsonArraySerializer.serialize(encoder, value.asArray())
@@ -227,6 +239,7 @@ internal object BsonValueSerializer : KSerializer<BsonValue> {
 
     override fun deserialize(decoder: Decoder): BsonValue {
         return when (decoder) {
+            is BsonDecoder -> decoder.currentValue()
             is JsonDecoder -> processElement(decoder.decodeJsonElement(), decoder)
             else -> throw SerializationException("Unknown decoder type: $decoder")
         }
@@ -319,6 +332,7 @@ internal object BsonDocumentSerializer : KSerializer<BsonDocument> {
 
     override fun serialize(encoder: Encoder, value: BsonDocument) {
         when (encoder) {
+            is BsonEncoder,
             is JsonEncoder -> serializer.serialize(encoder, value)
             else -> throw SerializationException("Unknown encoder type: $encoder")
         }
@@ -326,6 +340,7 @@ internal object BsonDocumentSerializer : KSerializer<BsonDocument> {
 
     override fun deserialize(decoder: Decoder): BsonDocument {
         return when (decoder) {
+            is BsonDecoder,
             is JsonDecoder -> BsonValueSerializer.deserialize(decoder).asDocument()
             else -> throw SerializationException("Unknown decoder type: $decoder")
         }
@@ -339,6 +354,7 @@ internal object BsonArraySerializer : KSerializer<BsonArray> {
 
     override fun serialize(encoder: Encoder, value: BsonArray) {
         when (encoder) {
+            is BsonEncoder,
             is JsonEncoder -> serializer.serialize(encoder, value)
             else -> throw SerializationException("Unknown encoder type: $encoder")
         }
@@ -346,6 +362,7 @@ internal object BsonArraySerializer : KSerializer<BsonArray> {
 
     override fun deserialize(decoder: Decoder): BsonArray {
         return when (decoder) {
+            is BsonDecoder,
             is JsonDecoder -> BsonValueSerializer.deserialize(decoder).asArray()
             else -> throw SerializationException("Unknown decoder type: $decoder")
         }
@@ -397,6 +414,7 @@ internal object BsonBinarySerializer : KSerializer<BsonBinary> {
 
     override fun serialize(encoder: Encoder, value: BsonBinary) {
         when (encoder) {
+            is BsonEncoder,
             is JsonEncoder -> serializer.serialize(encoder, BsonValueJson(value))
             else -> throw SerializationException("Unknown encoder type: $encoder")
         }
@@ -404,6 +422,7 @@ internal object BsonBinarySerializer : KSerializer<BsonBinary> {
 
     override fun deserialize(decoder: Decoder): BsonBinary {
         return when (decoder) {
+            is BsonDecoder,
             is JsonDecoder -> serializer.deserialize(decoder).toBsonValue()
             else -> throw SerializationException("Unknown decoder type: $decoder")
         }
@@ -415,6 +434,7 @@ internal object BsonBooleanSerializer : KSerializer<BsonBoolean> {
 
     override fun serialize(encoder: Encoder, value: BsonBoolean) {
         when (encoder) {
+            is BsonEncoder,
             is JsonEncoder -> encoder.encodeBoolean(value.value)
             else -> throw SerializationException("Unknown encoder type: $encoder")
         }
@@ -422,6 +442,7 @@ internal object BsonBooleanSerializer : KSerializer<BsonBoolean> {
 
     override fun deserialize(decoder: Decoder): BsonBoolean {
         return when (decoder) {
+            is BsonDecoder,
             is JsonDecoder -> BsonBoolean(decoder.decodeBoolean())
             else -> throw SerializationException("Unknown decoder type: $decoder")
         }
@@ -447,6 +468,7 @@ internal object BsonDateTimeSerializer : KSerializer<BsonDateTime> {
     override val descriptor: SerialDescriptor = serializer.descriptor
     override fun serialize(encoder: Encoder, value: BsonDateTime) {
         when (encoder) {
+            is BsonEncoder,
             is JsonEncoder -> serializer.serialize(encoder, BsonValueJson(value))
             else -> throw SerializationException("Unknown encoder type: $encoder")
         }
@@ -454,6 +476,7 @@ internal object BsonDateTimeSerializer : KSerializer<BsonDateTime> {
 
     override fun deserialize(decoder: Decoder): BsonDateTime {
         return when (decoder) {
+            is BsonDecoder,
             is JsonDecoder -> serializer.deserialize(decoder).toBsonValue()
             else -> throw SerializationException("Unknown decoder type: $decoder")
         }
@@ -486,6 +509,7 @@ internal object BsonDBPointerSerializer : KSerializer<BsonDBPointer> {
     override val descriptor: SerialDescriptor = serializer.descriptor
     override fun serialize(encoder: Encoder, value: BsonDBPointer) {
         when (encoder) {
+            is BsonEncoder,
             is JsonEncoder -> serializer.serialize(encoder, BsonValueJson(value))
             else -> throw SerializationException("Unknown encoder type: $encoder")
         }
@@ -493,6 +517,7 @@ internal object BsonDBPointerSerializer : KSerializer<BsonDBPointer> {
 
     override fun deserialize(decoder: Decoder): BsonDBPointer {
         return when (decoder) {
+            is BsonDecoder,
             is JsonDecoder -> serializer.deserialize(decoder).toBsonValue()
             else -> throw SerializationException("Unknown decoder type: $decoder")
         }
@@ -514,6 +539,7 @@ internal object BsonDecimal128Serializer : KSerializer<BsonDecimal128> {
     override val descriptor: SerialDescriptor = serializer.descriptor
     override fun serialize(encoder: Encoder, value: BsonDecimal128) {
         when (encoder) {
+            is BsonEncoder,
             is JsonEncoder -> serializer.serialize(encoder, BsonValueJson(value))
             else -> throw SerializationException("Unknown encoder type: $encoder")
         }
@@ -521,6 +547,7 @@ internal object BsonDecimal128Serializer : KSerializer<BsonDecimal128> {
 
     override fun deserialize(decoder: Decoder): BsonDecimal128 {
         return when (decoder) {
+            is BsonDecoder,
             is JsonDecoder -> serializer.deserialize(decoder).toBsonValue()
             else -> throw SerializationException("Unknown decoder type: $decoder")
         }
@@ -540,6 +567,7 @@ internal object BsonDoubleSerializer : KSerializer<BsonDouble> {
     override val descriptor: SerialDescriptor = serializer.descriptor
     override fun serialize(encoder: Encoder, value: BsonDouble) {
         when (encoder) {
+            is BsonEncoder,
             is JsonEncoder -> serializer.serialize(encoder, BsonValueJson(value))
             else -> throw SerializationException("Unknown encoder type: $encoder")
         }
@@ -547,6 +575,7 @@ internal object BsonDoubleSerializer : KSerializer<BsonDouble> {
 
     override fun deserialize(decoder: Decoder): BsonDouble {
         return when (decoder) {
+            is BsonDecoder,
             is JsonDecoder -> serializer.deserialize(decoder).toBsonValue()
             else -> throw SerializationException("Unknown decoder type: $decoder")
         }
@@ -566,6 +595,7 @@ internal object BsonInt32Serializer : KSerializer<BsonInt32> {
     override val descriptor: SerialDescriptor = serializer.descriptor
     override fun serialize(encoder: Encoder, value: BsonInt32) {
         when (encoder) {
+            is BsonEncoder,
             is JsonEncoder -> serializer.serialize(encoder, BsonValueJson(value))
             else -> throw SerializationException("Unknown encoder type: $encoder")
         }
@@ -573,6 +603,7 @@ internal object BsonInt32Serializer : KSerializer<BsonInt32> {
 
     override fun deserialize(decoder: Decoder): BsonInt32 {
         return when (decoder) {
+            is BsonDecoder,
             is JsonDecoder -> serializer.deserialize(decoder).toBsonValue()
             else -> throw SerializationException("Unknown decoder type: $decoder")
         }
@@ -592,6 +623,7 @@ internal object BsonInt64Serializer : KSerializer<BsonInt64> {
     override val descriptor: SerialDescriptor = serializer.descriptor
     override fun serialize(encoder: Encoder, value: BsonInt64) {
         when (encoder) {
+            is BsonEncoder,
             is JsonEncoder -> serializer.serialize(encoder, BsonValueJson(value))
             else -> throw SerializationException("Unknown encoder type: $encoder")
         }
@@ -599,6 +631,7 @@ internal object BsonInt64Serializer : KSerializer<BsonInt64> {
 
     override fun deserialize(decoder: Decoder): BsonInt64 {
         return when (decoder) {
+            is BsonDecoder,
             is JsonDecoder -> serializer.deserialize(decoder).toBsonValue()
             else -> throw SerializationException("Unknown decoder type: $decoder")
         }
@@ -618,6 +651,7 @@ internal object BsonJavaScriptSerializer : KSerializer<BsonJavaScript> {
     override val descriptor: SerialDescriptor = serializer.descriptor
     override fun serialize(encoder: Encoder, value: BsonJavaScript) {
         when (encoder) {
+            is BsonEncoder,
             is JsonEncoder -> serializer.serialize(encoder, BsonValueJson(value))
             else -> throw SerializationException("Unknown encoder type: $encoder")
         }
@@ -625,6 +659,7 @@ internal object BsonJavaScriptSerializer : KSerializer<BsonJavaScript> {
 
     override fun deserialize(decoder: Decoder): BsonJavaScript {
         return when (decoder) {
+            is BsonDecoder,
             is JsonDecoder -> serializer.deserialize(decoder).toBsonValue()
             else -> throw SerializationException("Unknown decoder type: $decoder")
         }
@@ -649,6 +684,7 @@ internal object BsonJavaScriptWithScopeSerializer : KSerializer<BsonJavaScriptWi
 
     override fun serialize(encoder: Encoder, value: BsonJavaScriptWithScope) {
         when (encoder) {
+            is BsonEncoder,
             is JsonEncoder -> serializer.serialize(encoder, BsonValueJson(value))
             else -> throw SerializationException("Unknown encoder type: $encoder")
         }
@@ -656,6 +692,7 @@ internal object BsonJavaScriptWithScopeSerializer : KSerializer<BsonJavaScriptWi
 
     override fun deserialize(decoder: Decoder): BsonJavaScriptWithScope {
         return when (decoder) {
+            is BsonDecoder,
             is JsonDecoder -> serializer.deserialize(decoder).toBsonValue()
             else -> throw SerializationException("Unknown decoder type: $decoder")
         }
@@ -677,6 +714,7 @@ internal object BsonMaxKeySerializer : KSerializer<BsonMaxKey> {
     override val descriptor: SerialDescriptor = serializer.descriptor
     override fun serialize(encoder: Encoder, value: BsonMaxKey) {
         when (encoder) {
+            is BsonEncoder,
             is JsonEncoder -> serializer.serialize(encoder, BsonValueJson(1))
             else -> throw SerializationException("Unknown encoder type: $encoder")
         }
@@ -684,6 +722,7 @@ internal object BsonMaxKeySerializer : KSerializer<BsonMaxKey> {
 
     override fun deserialize(decoder: Decoder): BsonMaxKey {
         return when (decoder) {
+            is BsonDecoder,
             is JsonDecoder -> serializer.deserialize(decoder).toBsonValue()
             else -> throw SerializationException("Unknown decoder type: $decoder")
         }
@@ -705,6 +744,7 @@ internal object BsonMinKeySerializer : KSerializer<BsonMinKey> {
     override val descriptor: SerialDescriptor = serializer.descriptor
     override fun serialize(encoder: Encoder, value: BsonMinKey) {
         when (encoder) {
+            is BsonEncoder,
             is JsonEncoder -> serializer.serialize(encoder, BsonValueJson(1))
             else -> throw SerializationException("Unknown encoder type: $encoder")
         }
@@ -712,6 +752,7 @@ internal object BsonMinKeySerializer : KSerializer<BsonMinKey> {
 
     override fun deserialize(decoder: Decoder): BsonMinKey {
         return when (decoder) {
+            is BsonDecoder,
             is JsonDecoder -> serializer.deserialize(decoder).toBsonValue()
             else -> throw SerializationException("Unknown decoder type: $decoder")
         }
@@ -723,13 +764,15 @@ internal object BsonNullSerializer : KSerializer<BsonNull> {
     override val descriptor: SerialDescriptor = serializer.descriptor
     override fun serialize(encoder: Encoder, value: BsonNull) {
         when (encoder) {
-            is JsonEncoder -> serializer.serialize(encoder, JsonNull)
+            is BsonEncoder,
+            is JsonEncoder -> encoder.encodeNull()
             else -> throw SerializationException("Unknown encoder type: $encoder")
         }
     }
 
     override fun deserialize(decoder: Decoder): BsonNull {
         return when (decoder) {
+            is BsonDecoder,
             is JsonDecoder -> {
                 serializer.deserialize(decoder)
                 BsonNull
@@ -752,6 +795,7 @@ internal object BsonObjectIdSerializer : KSerializer<BsonObjectId> {
     override val descriptor: SerialDescriptor = serializer.descriptor
     override fun serialize(encoder: Encoder, value: BsonObjectId) {
         when (encoder) {
+            is BsonEncoder,
             is JsonEncoder -> serializer.serialize(encoder, BsonValueJson(value))
             else -> throw SerializationException("Unknown encoder type: $encoder")
         }
@@ -759,6 +803,7 @@ internal object BsonObjectIdSerializer : KSerializer<BsonObjectId> {
 
     override fun deserialize(decoder: Decoder): BsonObjectId {
         return when (decoder) {
+            is BsonDecoder,
             is JsonDecoder -> serializer.deserialize(decoder).toBsonValue()
             else -> throw SerializationException("Unknown decoder type: $decoder")
         }
@@ -793,6 +838,7 @@ internal object BsonRegularExpressionSerializer : KSerializer<BsonRegularExpress
     override val descriptor: SerialDescriptor = serializer.descriptor
     override fun serialize(encoder: Encoder, value: BsonRegularExpression) {
         when (encoder) {
+            is BsonEncoder,
             is JsonEncoder -> serializer.serialize(encoder, BsonValueJson(value))
             else -> throw SerializationException("Unknown encoder type: $encoder")
         }
@@ -800,6 +846,7 @@ internal object BsonRegularExpressionSerializer : KSerializer<BsonRegularExpress
 
     override fun deserialize(decoder: Decoder): BsonRegularExpression {
         return when (decoder) {
+            is BsonDecoder,
             is JsonDecoder -> serializer.deserialize(decoder).toBsonValue()
             else -> throw SerializationException("Unknown decoder type: $decoder")
         }
@@ -810,6 +857,7 @@ internal object BsonStringSerializer : KSerializer<BsonString> {
     override val descriptor: SerialDescriptor = String.serializer().descriptor
     override fun serialize(encoder: Encoder, value: BsonString) {
         when (encoder) {
+            is BsonEncoder,
             is JsonEncoder -> encoder.encodeString(value.value)
             else -> throw SerializationException("Unknown encoder type: $encoder")
         }
@@ -817,6 +865,7 @@ internal object BsonStringSerializer : KSerializer<BsonString> {
 
     override fun deserialize(decoder: Decoder): BsonString {
         return when (decoder) {
+            is BsonDecoder,
             is JsonDecoder -> BsonString(decoder.decodeString())
             else -> throw SerializationException("Unknown decoder type: $decoder")
         }
@@ -836,6 +885,7 @@ internal object BsonSymbolSerializer : KSerializer<BsonSymbol> {
     override val descriptor: SerialDescriptor = serializer.descriptor
     override fun serialize(encoder: Encoder, value: BsonSymbol) {
         when (encoder) {
+            is BsonEncoder,
             is JsonEncoder -> serializer.serialize(encoder, BsonValueJson(value))
             else -> throw SerializationException("Unknown encoder type: $encoder")
         }
@@ -843,6 +893,7 @@ internal object BsonSymbolSerializer : KSerializer<BsonSymbol> {
 
     override fun deserialize(decoder: Decoder): BsonSymbol {
         return when (decoder) {
+            is BsonDecoder,
             is JsonDecoder -> serializer.deserialize(decoder).toBsonValue()
             else -> throw SerializationException("Unknown decoder type: $decoder")
         }
@@ -873,6 +924,7 @@ internal object BsonTimestampSerializer : KSerializer<BsonTimestamp> {
     override val descriptor: SerialDescriptor = serializer.descriptor
     override fun serialize(encoder: Encoder, value: BsonTimestamp) {
         when (encoder) {
+            is BsonEncoder,
             is JsonEncoder -> serializer.serialize(encoder, BsonValueJson(value))
             else -> throw SerializationException("Unknown encoder type: $encoder")
         }
@@ -880,6 +932,7 @@ internal object BsonTimestampSerializer : KSerializer<BsonTimestamp> {
 
     override fun deserialize(decoder: Decoder): BsonTimestamp {
         return when (decoder) {
+            is BsonDecoder,
             is JsonDecoder -> serializer.deserialize(decoder).toBsonValue()
             else -> throw SerializationException("Unknown decoder type: $decoder")
         }
@@ -901,6 +954,7 @@ internal object BsonUndefinedSerializer : KSerializer<BsonUndefined> {
     override val descriptor: SerialDescriptor = serializer.descriptor
     override fun serialize(encoder: Encoder, value: BsonUndefined) {
         when (encoder) {
+            is BsonEncoder,
             is JsonEncoder -> serializer.serialize(encoder, BsonValueJson(true))
             else -> throw SerializationException("Unknown encoder type: $encoder")
         }
@@ -908,6 +962,7 @@ internal object BsonUndefinedSerializer : KSerializer<BsonUndefined> {
 
     override fun deserialize(decoder: Decoder): BsonUndefined {
         return when (decoder) {
+            is BsonDecoder,
             is JsonDecoder -> serializer.deserialize(decoder).toBsonValue()
             else -> throw SerializationException("Unknown decoder type: $decoder")
         }
