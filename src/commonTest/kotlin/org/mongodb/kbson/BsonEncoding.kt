@@ -1,5 +1,6 @@
 package org.mongodb.kbson
 
+import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import org.mongodb.kbson.serialization.Bson
@@ -25,8 +26,6 @@ class BsonEncoding {
             }
     }
 
-
-    // Kotlin types
     @Test
     fun roundtripKotlinTypes() {
         listOf(true, false).assertRoundTrip()
@@ -40,28 +39,120 @@ class BsonEncoding {
         listOf(byteArrayOf(10, 0, 10), byteArrayOf(), byteArrayOf(0, 0)).assertRoundTrip()
     }
 
-    private inline fun <reified T> Iterable<T>.assertRoundTrip() {
-        for (value in this) assertRoundTrip(value)
+    @Test
+    fun testCollections() {
+        listOf(
+            listOf<String>("hello world")
+        ).assertRoundTrip()
+
+        listOf(
+            listOf<List<String>>(listOf("hello world"))
+        ).assertRoundTrip()
+
+        listOf(
+            setOf<String>("hello world")
+        ).assertRoundTrip()
+
+        listOf(
+            setOf(listOf<String>("hello world"))
+        ).assertRoundTrip()
+
+        listOf(
+            mapOf<String, String>("hello" to "world")
+        ).assertRoundTrip()
+
+        listOf(
+            mapOf<String, Map<String, String>>("hello" to mapOf("hello" to "world"))
+        ).assertRoundTrip()
     }
 
-    private inline fun <reified T> assertRoundTrip(value: T) {
-        val encodedValue = Bson.encodeToString(value)
-        val decodedValue: T = Bson.decodeFromString(encodedValue)
-        when(value) {
-            is ByteArray -> assertContentEquals(value as ByteArray, decodedValue as ByteArray)
-            else -> assertEquals(value, decodedValue)
+    @Test
+    fun roundtripClass() {
+        val value = AllTypes().apply {
+            allTypes = AllTypes()
+        }
+
+        assertRoundTrip(value)
+    }
+
+    @Test
+    fun roundtripNullValue() {
+        assertRoundTrip(null as String?)
+        assertRoundTrip(null as AllTypes?)
+
+        assertRoundTrip(BsonNull)
+
+        assertRoundTrip(listOf<String?>(null, null))
+        assertRoundTrip(listOf<BsonValue?>(null, null))
+        assertRoundTrip(listOf<BsonValue>(BsonNull, BsonNull))
+    }
+
+    // TODO malformed strings
+
+    // TODO enums
+
+    // TODO objects singletons
+
+    @Serializable
+    class AllTypes {
+        val boolean = true
+        val short = Short.MAX_VALUE
+        val int = Int.MAX_VALUE
+        val long = Long.MAX_VALUE
+        val float = Float.MAX_VALUE
+        val double = Double.MAX_VALUE
+        val char = '4'
+        val string = "hello world"
+        val bsonValue = BsonString("hello world")
+        val byteArray = byteArrayOf(10, 0, 10)
+        val stringList = listOf("hello world")
+        val stringMap = mapOf("hello" to "world")
+        var allTypes: AllTypes? = null
+        override fun equals(other: Any?): Boolean {
+            if (this === other) return true
+            if (other == null || this::class != other::class) return false
+
+            other as AllTypes
+
+            if (boolean != other.boolean) return false
+            if (short != other.short) return false
+            if (int != other.int) return false
+            if (long != other.long) return false
+            if (float != other.float) return false
+            if (double != other.double) return false
+            if (char != other.char) return false
+            if (string != other.string) return false
+            if (bsonValue != other.bsonValue) return false
+            if (!byteArray.contentEquals(other.byteArray)) return false
+            if (stringList != other.stringList) return false
+            if (stringMap != other.stringMap) return false
+            if (allTypes != other.allTypes) return false
+
+            return true
+        }
+
+        override fun hashCode(): Int {
+            var result = boolean.hashCode()
+            result = 31 * result + short
+            result = 31 * result + int
+            result = 31 * result + long.hashCode()
+            result = 31 * result + float.hashCode()
+            result = 31 * result + double.hashCode()
+            result = 31 * result + char.hashCode()
+            result = 31 * result + string.hashCode()
+            result = 31 * result + bsonValue.hashCode()
+            result = 31 * result + byteArray.contentHashCode()
+            result = 31 * result + stringList.hashCode()
+            result = 31 * result + stringMap.hashCode()
+            result = 31 * result + (allTypes?.hashCode() ?: 0)
+            return result
         }
     }
 
-    // classes
-
-    // nullability
-
-    // malformed strings
-
-    // enums
-
     private val bsonDataSet: List<BsonValue> = BsonType.values()
+        .filter {
+            it != BsonType.NULL // Tested separately
+        }
         .flatMap {
             when (it) {
                 BsonType.DOUBLE -> listOf(BsonDouble(10.0))
@@ -102,4 +193,16 @@ class BsonEncoding {
             }
         }
 
+    private inline fun <reified T> Iterable<T>.assertRoundTrip() {
+        for (value in this) assertRoundTrip(value)
+    }
+
+    private inline fun <reified T> assertRoundTrip(value: T) {
+        val encodedValue = Bson.encodeToString(value)
+        val decodedValue: T = Bson.decodeFromString(encodedValue)
+        when (value) {
+            is ByteArray -> assertContentEquals(value as ByteArray, decodedValue as ByteArray)
+            else -> assertEquals(value, decodedValue)
+        }
+    }
 }

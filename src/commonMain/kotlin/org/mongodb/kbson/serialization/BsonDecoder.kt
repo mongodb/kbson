@@ -9,7 +9,9 @@ import kotlinx.serialization.encoding.AbstractDecoder
 import kotlinx.serialization.encoding.CompositeDecoder
 import kotlinx.serialization.modules.SerializersModule
 import org.mongodb.kbson.BsonArray
+import org.mongodb.kbson.BsonBinary
 import org.mongodb.kbson.BsonDocument
+import org.mongodb.kbson.BsonNull
 import org.mongodb.kbson.BsonNumber
 import org.mongodb.kbson.BsonString
 import org.mongodb.kbson.BsonValue
@@ -28,25 +30,41 @@ internal open class BsonDecoder(
     override fun beginStructure(descriptor: SerialDescriptor): CompositeDecoder {
         return when (descriptor.kind) {
             StructureKind.LIST -> {
-                ListBsonDecoder(value.asArray(), serializersModule)
+                ListBsonDecoder(currentValue().asArray(), serializersModule)
             }
             StructureKind.MAP -> {
-                MapBsonDecoder(value.asDocument(), serializersModule)
+                MapBsonDecoder(currentValue().asDocument(), serializersModule)
             }
             StructureKind.CLASS -> {
-                ClassBsonDecoder(value.asDocument(), serializersModule)
+                ClassBsonDecoder(currentValue().asDocument(), serializersModule)
             }
             StructureKind.OBJECT -> TODO("decide what to do with it")
             else -> throw IllegalStateException("Unsupported descriptor kind ${descriptor.kind}")
         }
     }
 
+    @Suppress("UNCHECKED_CAST")
     override fun <T> decodeSerializableValue(deserializer: DeserializationStrategy<T>): T =
         when {
-            // Fast path for mapping BsonBinary to ByteArray
+            // TODO review if there is a better way to map these types
+            currentValue() is BsonNull -> {
+                when (deserializer) {
+                    is BsonValueSerializer,
+                    is BsonNullSerializer -> BsonNull
+                    else -> null
+                } as T
+            }
             deserializer.descriptor.isByteArray() -> {
-                require(value.isBinary()) { "TODO find right message" }
-                value.asBinary().data as T
+                // Fast path for mapping BsonBinary or BsonArray to ByteArray
+                when (val value = currentValue()) {
+                    is BsonBinary -> value.data
+                    is BsonArray -> {
+                        ByteArray(value.size) {
+                            value[it].asNumber().intValue().toByte()
+                        }
+                    }
+                    else -> throw IllegalStateException("TODO find right message")
+                } as T
             }
             else -> super.decodeSerializableValue(deserializer)
         }
@@ -61,8 +79,8 @@ internal open class BsonDecoder(
 
     override fun decodeChar(): Char =
         when (val value = currentValue()) {
-            is BsonString -> value.value[0]
-            is BsonNumber -> value.intValue().toString()[0]
+            is BsonString -> value.asString().value[0]
+            is BsonNumber -> value.asNumber().intValue().toString()[0]
             else -> throw IllegalStateException("TODO cannot decode to char")
         }
 
@@ -84,28 +102,28 @@ internal class ListBsonDecoder(
     private val bsonArray: BsonArray,
     override val serializersModule: SerializersModule
 ) : BsonDecoder(bsonArray, serializersModule) {
-    private var decodedElementCount = -1
+    private var decodedElementCount = 0
 
     override fun decodeElementIndex(descriptor: SerialDescriptor): Int {
         return if (decodedElementCount < bsonArray.size) decodedElementCount++
         else CompositeDecoder.DECODE_DONE
     }
 
-    override fun currentValue(): BsonValue = bsonArray[decodedElementCount]
+    override fun currentValue(): BsonValue = bsonArray[decodedElementCount - 1]
 }
 
 internal class ClassBsonDecoder(
     private val bsonDocument: BsonDocument,
     override val serializersModule: SerializersModule
 ) : BsonDecoder(bsonDocument, serializersModule) {
-    private var decodedElementCount = -1
+    private var decodedElementCount = 0
     private lateinit var entryKey: String
 
     @OptIn(ExperimentalSerializationApi::class)
     override fun decodeElementIndex(descriptor: SerialDescriptor): Int {
         return if (decodedElementCount < bsonDocument.size) {
             decodedElementCount++.also {
-                entryKey = descriptor.getElementName(decodedElementCount)
+                entryKey = descriptor.getElementName(it)
             }
         } else {
             CompositeDecoder.DECODE_DONE
@@ -119,7 +137,7 @@ internal class MapBsonDecoder(
     bsonDocument: BsonDocument,
     override val serializersModule: SerializersModule
 ) : BsonDecoder(bsonDocument, serializersModule) {
-    private var decodedElementCount = -1
+    private var decodedElementCount = 0
 
     val values = BsonArray(
         bsonDocument.flatMap { (key, value) ->
@@ -132,5 +150,5 @@ internal class MapBsonDecoder(
         else CompositeDecoder.DECODE_DONE
     }
 
-    override fun currentValue(): BsonValue = values[decodedElementCount]
+    override fun currentValue(): BsonValue = values[decodedElementCount - 1]
 }
