@@ -90,9 +90,6 @@ internal open class BsonDecoder(
 
     override fun decodeLong(): Long = currentValue().asInt64().value
 
-    override fun decodeNull(): Nothing? =
-        if (currentValue().isNull()) null else throw IllegalStateException("TODO not null value")
-
     override fun decodeShort(): Short = currentValue().asInt32().value.toShort()
 
     open fun currentValue(): BsonValue = value
