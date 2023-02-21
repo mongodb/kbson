@@ -8,6 +8,7 @@ import kotlinx.serialization.encoding.AbstractEncoder
 import kotlinx.serialization.encoding.CompositeEncoder
 import kotlinx.serialization.modules.SerializersModule
 import org.mongodb.kbson.BsonArray
+import org.mongodb.kbson.BsonBinary
 import org.mongodb.kbson.BsonBoolean
 import org.mongodb.kbson.BsonDocument
 import org.mongodb.kbson.BsonDouble
@@ -101,7 +102,11 @@ internal class PrimitiveBsonEncoder(
     }
 
     override fun <T> encodeSerializableValue(serializer: SerializationStrategy<T>, value: T) {
-        super.encodeSerializableValue(serializer, value)
+        // Fast path for mapping BsonBinary to ByteArray
+        when(value) {
+            is ByteArray -> pushValue(BsonBinary(value))
+            else -> super.encodeSerializableValue(serializer, value)
+        }
         nodeConsumer(getCurrent())
     }
 

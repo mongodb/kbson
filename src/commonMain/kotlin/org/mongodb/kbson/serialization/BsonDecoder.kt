@@ -1,6 +1,8 @@
 package org.mongodb.kbson.serialization
 
+import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.ExperimentalSerializationApi
+import kotlinx.serialization.descriptors.PrimitiveKind
 import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.descriptors.StructureKind
 import kotlinx.serialization.encoding.AbstractDecoder
@@ -8,8 +10,13 @@ import kotlinx.serialization.encoding.CompositeDecoder
 import kotlinx.serialization.modules.SerializersModule
 import org.mongodb.kbson.BsonArray
 import org.mongodb.kbson.BsonDocument
+import org.mongodb.kbson.BsonNumber
 import org.mongodb.kbson.BsonString
 import org.mongodb.kbson.BsonValue
+
+@OptIn(ExperimentalSerializationApi::class)
+internal fun SerialDescriptor.isByteArray(): Boolean =
+    kind == StructureKind.LIST && getElementDescriptor(0).kind == PrimitiveKind.BYTE
 
 @OptIn(ExperimentalSerializationApi::class)
 internal open class BsonDecoder(
@@ -34,9 +41,41 @@ internal open class BsonDecoder(
         }
     }
 
+    override fun <T> decodeSerializableValue(deserializer: DeserializationStrategy<T>): T =
+        when {
+            // Fast path for mapping BsonBinary to ByteArray
+            deserializer.descriptor.isByteArray() -> {
+                require(value.isBinary()) { "TODO find right message" }
+                value.asBinary().data as T
+            }
+            else -> super.decodeSerializableValue(deserializer)
+        }
+
     override fun decodeInt(): Int = currentValue().asInt32().value
 
     override fun decodeString(): String = currentValue().asString().value
+
+    override fun decodeBoolean(): Boolean = currentValue().asBoolean().value
+
+    override fun decodeByte(): Byte = currentValue().asInt32().value.toByte()
+
+    override fun decodeChar(): Char =
+        when (val value = currentValue()) {
+            is BsonString -> value.value[0]
+            is BsonNumber -> value.intValue().toString()[0]
+            else -> throw IllegalStateException("TODO cannot decode to char")
+        }
+
+    override fun decodeDouble(): Double = currentValue().asDouble().value
+
+    override fun decodeFloat(): Float = currentValue().asDouble().value.toFloat()
+
+    override fun decodeLong(): Long = currentValue().asInt64().value
+
+    override fun decodeNull(): Nothing? =
+        if (currentValue().isNull()) null else throw IllegalStateException("TODO not null value")
+
+    override fun decodeShort(): Short = currentValue().asInt32().value.toShort()
 
     open fun currentValue(): BsonValue = value
 }

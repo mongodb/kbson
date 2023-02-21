@@ -85,8 +85,7 @@ internal fun <T> Bson.writeBson(value: T, serializer: SerializationStrategy<T>):
 }
 
 internal fun <T> Bson.readBson(element: BsonValue, deserializer: DeserializationStrategy<T>): T =
-    BsonDecoder(element, json.serializersModule)
-        .decodeSerializableValue(deserializer)
+    BsonDecoder(element, json.serializersModule).decodeSerializableValue(deserializer)
 
 //TODO Document
 public inline fun <reified T : Any> Bson.encodeToBsonValue(value: T): BsonValue =
