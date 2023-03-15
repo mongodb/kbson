@@ -92,6 +92,11 @@ internal open class BsonDecoder(
 
     override fun decodeShort(): Short = currentValue().asInt32().value.toShort()
 
+    override fun decodeEnum(enumDescriptor: SerialDescriptor): Int {
+        val name = currentValue().asString().value
+        return enumDescriptor.getElementIndex(name)
+    }
+
     open fun currentValue(): BsonValue = value
 }
 

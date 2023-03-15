@@ -86,6 +86,10 @@ internal sealed class BsonEncoder(
         pushValue(BsonNull)
     }
 
+    override fun encodeEnum(enumDescriptor: SerialDescriptor, index: Int) {
+        pushValue(BsonString(enumDescriptor.getElementName(index)))
+    }
+
     abstract fun getCurrent(): BsonValue
 
     abstract fun pushValue(value: BsonValue)

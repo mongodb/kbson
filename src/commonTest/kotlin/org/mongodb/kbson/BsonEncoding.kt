@@ -1,12 +1,17 @@
 package org.mongodb.kbson
 
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.SerializationException
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 import org.mongodb.kbson.serialization.Bson
+import org.mongodb.kbson.serialization.decodeFromBsonValue
+import org.mongodb.kbson.serialization.encodeToBsonValue
 import kotlin.test.Test
 import kotlin.test.assertContentEquals
 import kotlin.test.assertEquals
+import kotlin.test.assertFailsWith
 
 class BsonEncoding {
     @Test
@@ -87,9 +92,24 @@ class BsonEncoding {
         assertRoundTrip(listOf<BsonValue>(BsonNull, BsonNull))
     }
 
-    // TODO malformed strings
+    @Test
+    fun decodeMalformedEjsonString() {
+        assertFailsWith<SerializationException> {
+            Bson.decodeFromString<BsonArray?>("💥&&][💎")
+        }
+    }
 
-    // TODO enums
+    @Serializable
+    enum class SerializableEnum(val hello: Int) {
+        A(4),
+        B(5),
+    }
+
+    @Test
+    fun roundtripEnum() {
+        assertRoundTrip(SerializableEnum.A)
+        assertRoundTrip(SerializableEnum.B)
+    }
 
     // TODO objects singletons
 
