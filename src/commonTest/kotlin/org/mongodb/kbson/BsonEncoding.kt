@@ -100,7 +100,7 @@ class BsonEncoding {
     }
 
     @Serializable
-    enum class SerializableEnum(val hello: Int) {
+    enum class SerializableEnum(val value: Int) {
         A(4),
         B(5),
     }
@@ -111,7 +111,16 @@ class BsonEncoding {
         assertRoundTrip(SerializableEnum.B)
     }
 
-    // TODO objects singletons
+    @Serializable
+    object SerializableObject {
+        val name = ""
+        var surname = ""
+    }
+
+    @Test
+    fun roundtripObject() {
+        assertRoundTrip(SerializableObject)
+    }
 
     @Serializable
     class AllTypes {

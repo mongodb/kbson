@@ -37,7 +37,10 @@ internal sealed class BsonEncoder(
                 BsonDocumentEncoder(serializersModule) {
                     pushValue(it)
                 }
-            StructureKind.OBJECT -> TODO("Decide what to do")
+            StructureKind.OBJECT -> BsonDocumentEncoder(serializersModule) {
+                // Mimics the Json encode behavior of returning an empty map on Kotlin Objects.
+                pushValue(BsonDocument())
+            }
 
             else -> throw IllegalStateException("Unsupported descriptor Kind ${descriptor.kind}")
         }

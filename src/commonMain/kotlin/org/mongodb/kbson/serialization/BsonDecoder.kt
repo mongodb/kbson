@@ -38,7 +38,9 @@ internal open class BsonDecoder(
             StructureKind.CLASS -> {
                 ClassBsonDecoder(currentValue().asDocument(), serializersModule)
             }
-            StructureKind.OBJECT -> TODO("decide what to do with it")
+            StructureKind.OBJECT -> {
+                ClassBsonDecoder(BsonDocument(), serializersModule)
+            }
             else -> throw IllegalStateException("Unsupported descriptor kind ${descriptor.kind}")
         }
     }
