@@ -79,21 +79,21 @@ import org.mongodb.kbson.internal.validateSerialization
 internal fun <T> Bson.writeBson(value: T, serializer: SerializationStrategy<T>): BsonValue {
     if (value is BsonValue) return value
     lateinit var result: BsonValue
-    val encoder = PrimitiveBsonEncoder(json.serializersModule) { result = it }
+    val encoder = PrimitiveBsonEncoder(serializersModule) { result = it }
     encoder.encodeSerializableValue(serializer, value)
     return result
 }
 
 internal fun <T> Bson.readBson(element: BsonValue, deserializer: DeserializationStrategy<T>): T =
-    BsonDecoder(element, json.serializersModule).decodeSerializableValue(deserializer)
+    BsonDecoder(element, serializersModule).decodeSerializableValue(deserializer)
 
 //TODO Document
 public inline fun <reified T : Any> Bson.encodeToBsonValue(value: T): BsonValue =
-    encodeToBsonValue(json.serializersModule.serializer(), value)
+    encodeToBsonValue(serializersModule.serializer(), value)
 
 //TODO Document
 public inline fun <reified T : Any> Bson.decodeFromBsonValue(value: BsonValue): T =
-    decodeFromBsonValue(json.serializersModule.serializer(), value)
+    decodeFromBsonValue(serializersModule.serializer(), value)
 
 
 public sealed class Bson(

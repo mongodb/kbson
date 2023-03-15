@@ -39,6 +39,7 @@ internal open class BsonDecoder(
                 ClassBsonDecoder(currentValue().asDocument(), serializersModule)
             }
             StructureKind.OBJECT -> {
+                // Mimics the Json decode behavior of using an empty map on Kotlin Objects.
                 ClassBsonDecoder(BsonDocument(), serializersModule)
             }
             else -> throw IllegalStateException("Unsupported descriptor kind ${descriptor.kind}")

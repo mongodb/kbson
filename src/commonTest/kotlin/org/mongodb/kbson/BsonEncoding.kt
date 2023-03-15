@@ -15,7 +15,7 @@ import kotlin.test.assertFailsWith
 
 class BsonEncoding {
     @Test
-    fun roundtripBsonTypes() {
+    fun bsonTypes() {
         listOf(
             BsonArray(bsonDataSet.toList()),
             BsonDocument(
@@ -32,7 +32,7 @@ class BsonEncoding {
     }
 
     @Test
-    fun roundtripKotlinTypes() {
+    fun kotlinTypes() {
         listOf(true, false).assertRoundTrip()
         listOf(Short.MAX_VALUE, Short.MIN_VALUE).assertRoundTrip()
         listOf(Int.MAX_VALUE, Int.MIN_VALUE).assertRoundTrip()
@@ -45,7 +45,7 @@ class BsonEncoding {
     }
 
     @Test
-    fun testCollections() {
+    fun collections() {
         listOf(
             listOf<String>("hello world")
         ).assertRoundTrip()
@@ -72,7 +72,7 @@ class BsonEncoding {
     }
 
     @Test
-    fun roundtripClass() {
+    fun userDefinedClasses() {
         val value = AllTypes().apply {
             allTypes = AllTypes()
         }
@@ -81,7 +81,7 @@ class BsonEncoding {
     }
 
     @Test
-    fun roundtripNullValue() {
+    fun nullValue() {
         assertRoundTrip(null as String?)
         assertRoundTrip(null as AllTypes?)
 
@@ -99,83 +99,16 @@ class BsonEncoding {
         }
     }
 
-    @Serializable
-    enum class SerializableEnum(val value: Int) {
-        A(4),
-        B(5),
-    }
-
     @Test
-    fun roundtripEnum() {
+    fun enums() {
         assertRoundTrip(SerializableEnum.A)
         assertRoundTrip(SerializableEnum.B)
     }
 
-    @Serializable
-    object SerializableObject {
-        val name = ""
-        var surname = ""
-    }
 
     @Test
-    fun roundtripObject() {
+    fun objects() {
         assertRoundTrip(SerializableObject)
-    }
-
-    @Serializable
-    class AllTypes {
-        val boolean = true
-        val short = Short.MAX_VALUE
-        val int = Int.MAX_VALUE
-        val long = Long.MAX_VALUE
-        val float = Float.MAX_VALUE
-        val double = Double.MAX_VALUE
-        val char = '4'
-        val string = "hello world"
-        val bsonValue = BsonString("hello world")
-        val byteArray = byteArrayOf(10, 0, 10)
-        val stringList = listOf("hello world")
-        val stringMap = mapOf("hello" to "world")
-        var allTypes: AllTypes? = null
-        override fun equals(other: Any?): Boolean {
-            if (this === other) return true
-            if (other == null || this::class != other::class) return false
-
-            other as AllTypes
-
-            if (boolean != other.boolean) return false
-            if (short != other.short) return false
-            if (int != other.int) return false
-            if (long != other.long) return false
-            if (float != other.float) return false
-            if (double != other.double) return false
-            if (char != other.char) return false
-            if (string != other.string) return false
-            if (bsonValue != other.bsonValue) return false
-            if (!byteArray.contentEquals(other.byteArray)) return false
-            if (stringList != other.stringList) return false
-            if (stringMap != other.stringMap) return false
-            if (allTypes != other.allTypes) return false
-
-            return true
-        }
-
-        override fun hashCode(): Int {
-            var result = boolean.hashCode()
-            result = 31 * result + short
-            result = 31 * result + int
-            result = 31 * result + long.hashCode()
-            result = 31 * result + float.hashCode()
-            result = 31 * result + double.hashCode()
-            result = 31 * result + char.hashCode()
-            result = 31 * result + string.hashCode()
-            result = 31 * result + bsonValue.hashCode()
-            result = 31 * result + byteArray.contentHashCode()
-            result = 31 * result + stringList.hashCode()
-            result = 31 * result + stringMap.hashCode()
-            result = 31 * result + (allTypes?.hashCode() ?: 0)
-            return result
-        }
     }
 
     private val bsonDataSet: List<BsonValue> = BsonType.values()
@@ -232,6 +165,74 @@ class BsonEncoding {
         when (value) {
             is ByteArray -> assertContentEquals(value as ByteArray, decodedValue as ByteArray)
             else -> assertEquals(value, decodedValue)
+        }
+    }
+
+    @Serializable
+    enum class SerializableEnum(val value: Int) {
+        A(4),
+        B(5),
+    }
+
+    @Serializable
+    object SerializableObject {
+        val name = ""
+        var surname = ""
+    }
+
+    @Serializable
+    class AllTypes {
+        val boolean = true
+        val short = Short.MAX_VALUE
+        val int = Int.MAX_VALUE
+        val long = Long.MAX_VALUE
+        val float = Float.MAX_VALUE
+        val double = Double.MAX_VALUE
+        val char = '4'
+        val string = "hello world"
+        val bsonValue = BsonString("hello world")
+        val byteArray = byteArrayOf(10, 0, 10)
+        val stringList = listOf("hello world")
+        val stringMap = mapOf("hello" to "world")
+        var allTypes: AllTypes? = null
+        override fun equals(other: Any?): Boolean {
+            if (this === other) return true
+            if (other == null || this::class != other::class) return false
+
+            other as AllTypes
+
+            if (boolean != other.boolean) return false
+            if (short != other.short) return false
+            if (int != other.int) return false
+            if (long != other.long) return false
+            if (float != other.float) return false
+            if (double != other.double) return false
+            if (char != other.char) return false
+            if (string != other.string) return false
+            if (bsonValue != other.bsonValue) return false
+            if (!byteArray.contentEquals(other.byteArray)) return false
+            if (stringList != other.stringList) return false
+            if (stringMap != other.stringMap) return false
+            if (allTypes != other.allTypes) return false
+
+            return true
+        }
+
+        override fun hashCode(): Int {
+            var result = boolean.hashCode()
+            result = 31 * result + short
+            result = 31 * result + int
+            result = 31 * result + long.hashCode()
+            result = 31 * result + float.hashCode()
+            result = 31 * result + double.hashCode()
+            result = 31 * result + char.hashCode()
+            result = 31 * result + string.hashCode()
+            result = 31 * result + bsonValue.hashCode()
+            result = 31 * result + byteArray.contentHashCode()
+            result = 31 * result + stringList.hashCode()
+            result = 31 * result + stringMap.hashCode()
+            result = 31 * result + (allTypes?.hashCode() ?: 0)
+            return result
         }
     }
 }
