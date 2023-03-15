@@ -16,6 +16,7 @@
 package org.mongodb.kbson.serialization
 
 import kotlinx.serialization.DeserializationStrategy
+import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -758,9 +759,11 @@ internal object BsonMinKeySerializer : KSerializer<BsonMinKey> {
     }
 }
 
+@ExperimentalSerializationApi
 internal object BsonNullSerializer : KSerializer<BsonNull> {
     private val serializer = JsonNull.serializer()
     override val descriptor: SerialDescriptor = serializer.descriptor
+
     override fun serialize(encoder: Encoder, value: BsonNull) {
         when (encoder) {
             is BsonEncoder,
