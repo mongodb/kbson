@@ -1,17 +1,32 @@
+/*
+ * Copyright 2008-present MongoDB, Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.mongodb.kbson
 
+import assertFailsWithMessage
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.SerializationException
+import kotlinx.serialization.Transient
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
-import kotlinx.serialization.json.Json
 import org.mongodb.kbson.serialization.Bson
-import org.mongodb.kbson.serialization.decodeFromBsonValue
-import org.mongodb.kbson.serialization.encodeToBsonValue
 import kotlin.test.Test
 import kotlin.test.assertContentEquals
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
+import kotlin.test.assertNotEquals
 
 class BsonEncoding {
     @Test
@@ -32,7 +47,25 @@ class BsonEncoding {
     }
 
     @Test
+    fun bsonTypes_invalidType() {
+        listOf(
+            BsonArray(bsonDataSet.toList()),
+            BsonDocument(
+                bsonDataSet
+                    .mapIndexed { index, bsonValue ->
+                        "$index" to bsonValue
+                    }
+                    .toMap()
+            )
+        ) + bsonDataSet
+            .forEach { bsonValue ->
+                assertDecodingFailsWithInvalidType(bsonValue)
+            }
+    }
+
+    @Test
     fun kotlinTypes() {
+        // Different list are required to retain type argument information.
         listOf(true, false).assertRoundTrip()
         listOf(Short.MAX_VALUE, Short.MIN_VALUE).assertRoundTrip()
         listOf(Int.MAX_VALUE, Int.MIN_VALUE).assertRoundTrip()
@@ -42,6 +75,20 @@ class BsonEncoding {
         listOf("hello world", "", "🚀💎").assertRoundTrip()
         listOf('4', 'c', '[').assertRoundTrip()
         listOf(byteArrayOf(10, 0, 10), byteArrayOf(), byteArrayOf(0, 0)).assertRoundTrip()
+    }
+
+    @Test
+    fun kotlinTypes_invalidType() {
+        // Different list are required to retain type argument information.
+        assertDecodingFailsWithInvalidType(true)
+        assertDecodingFailsWithInvalidType(Short.MAX_VALUE)
+        assertDecodingFailsWithInvalidType(Int.MAX_VALUE)
+        assertDecodingFailsWithInvalidType(Long.MAX_VALUE)
+        assertDecodingFailsWithInvalidType(Float.MAX_VALUE)
+        assertDecodingFailsWithInvalidType(Double.MAX_VALUE)
+        assertDecodingFailsWithInvalidType("hello world")
+        assertDecodingFailsWithInvalidType('4')
+        assertDecodingFailsWithInvalidType(byteArrayOf(10, 0, 10))
     }
 
     @Test
@@ -59,7 +106,7 @@ class BsonEncoding {
         ).assertRoundTrip()
 
         listOf(
-            setOf(listOf<String>("hello world"))
+            setOf(setOf<String>("hello world"))
         ).assertRoundTrip()
 
         listOf(
@@ -72,12 +119,87 @@ class BsonEncoding {
     }
 
     @Test
+    fun collections_invalidType() {
+        assertDecodingFailsWithInvalidType(listOf<String>("hello world"))
+        assertDecodingFailsWithInvalidType(setOf<String>("hello world"))
+        assertDecodingFailsWithInvalidType(mapOf<String, String>("hello" to "world"))
+    }
+
+    @Test
     fun userDefinedClasses() {
         val value = AllTypes().apply {
             allTypes = AllTypes()
         }
 
         assertRoundTrip(value)
+    }
+
+    @Test
+    fun userDefinedClasses_subsetOfAllFields() {
+        val value = AllTypes().apply {
+            allTypes = AllTypes()
+        }
+
+        assertRoundTrip(value) { expected, actual: SubsetOfAllTypes ->
+            assertEquals(expected.string, actual.string)
+        }
+    }
+
+    @Test
+    fun userDefinedClasses_transientFields() {
+        val value = AllTypes().apply {
+            allTypes = AllTypes()
+        }
+
+        assertRoundTrip(value) { expected, actual: TransientFields ->
+            assertEquals(expected.string, actual.string)
+            assertNotEquals(expected.char, actual.char)
+        }
+    }
+
+    @Test
+    fun userDefinedClasses_optionalFields() {
+        val value = AllTypes().apply {
+            allTypes = AllTypes()
+        }
+
+        assertRoundTrip(value) { expected, actual: OptionalFields ->
+            assertEquals(expected.string, actual.string)
+        }
+    }
+
+    @Test
+    fun userDefinedClasses_notMappedFields() {
+        val value = AllTypes().apply {
+            allTypes = AllTypes()
+        }
+        val encodedValue = Bson.encodeToString(value)
+        assertFailsWithMessage<SerializationException>("Could not decode field 'unexistent': Undefined value on a non-optional field") {
+            Bson.decodeFromString<NotMappedFields>(encodedValue)
+        }
+    }
+
+    @Test
+    fun userDefinedClasses_notMappedOptionalFields() {
+        val value = AllTypes().apply {
+            allTypes = AllTypes()
+        }
+
+        assertRoundTrip(value) { expected, actual: NotMappedOptionalFields ->
+            assertEquals(expected.string, actual.string)
+        }
+    }
+
+    @Test
+    fun userDefinedClasses_wrongFieldType() {
+        val value = AllTypes().apply {
+            allTypes = AllTypes()
+        }
+        val encodedValue = Bson.encodeToString(value)
+
+        assertFailsWithMessage<SerializationException>("Could not decode field 'string': Value expected to be of type BOOLEAN is of unexpected type STRING") {
+            Bson.decodeFromString<WrongFieldType>(encodedValue)
+        }
     }
 
     @Test
@@ -94,7 +216,7 @@ class BsonEncoding {
 
     @Test
     fun decodeMalformedEjsonString() {
-        assertFailsWith<SerializationException> {
+        assertFailsWith<SerializationException>("Unexpected JSON token at offset 5: Expected EOF after parsing, but had ] instead") {
             Bson.decodeFromString<BsonArray?>("💥&&][💎")
         }
     }
@@ -104,7 +226,6 @@ class BsonEncoding {
         assertRoundTrip(SerializableEnum.A)
         assertRoundTrip(SerializableEnum.B)
     }
-
 
     @Test
     fun objects() {
@@ -155,17 +276,33 @@ class BsonEncoding {
             }
         }
 
+    // Assert that decoding `value` as an [AllTypes] fails.
+    private inline fun <reified T> assertDecodingFailsWithInvalidType(value: T) {
+        val encodedValue = Bson.encodeToString(value)
+        assertFailsWithMessage<SerializationException>("Value expected to be of type ") {
+            Bson.decodeFromString<AllTypes>(encodedValue)
+        }
+    }
+
     private inline fun <reified T> Iterable<T>.assertRoundTrip() {
         for (value in this) assertRoundTrip(value)
     }
 
-    private inline fun <reified T> assertRoundTrip(value: T) {
-        val encodedValue = Bson.encodeToString(value)
-        val decodedValue: T = Bson.decodeFromString(encodedValue)
-        when (value) {
-            is ByteArray -> assertContentEquals(value as ByteArray, decodedValue as ByteArray)
-            else -> assertEquals(value, decodedValue)
+    private inline fun <reified T> assertRoundTrip(value: T) =
+        assertRoundTrip(value) { expected: T, actual: T ->
+            when (expected) {
+                is ByteArray -> assertContentEquals(value as ByteArray, actual as ByteArray)
+                else -> assertEquals(value, actual)
+            }
         }
+
+    private inline fun <reified E : Any?, reified A> assertRoundTrip(
+        value: E,
+        block: (expected: E, actual: A) -> Unit
+    ) {
+        val encodedValue = Bson.encodeToString(value)
+        val decodedValue: A = Bson.decodeFromString(encodedValue)
+        block(value, decodedValue)
     }
 
     @Serializable
@@ -179,6 +316,39 @@ class BsonEncoding {
         val name = ""
         var surname = ""
     }
+
+    @Serializable
+    data class SubsetOfAllTypes(
+        val string: String
+    )
+
+    @Serializable
+    data class TransientFields(
+        val string: String,
+        @Transient val char: Char = '0'
+    )
+
+    @Serializable
+    data class OptionalFields(
+        val string: String?
+    )
+
+    @Serializable
+    data class NotMappedFields(
+        val string: String?,
+        val unexistent: String
+    )
+
+    @Serializable
+    data class NotMappedOptionalFields(
+        val string: String?,
+        val unexistent: String? = null
+    )
+
+    @Serializable
+    data class WrongFieldType(
+        val string: Boolean
+    )
 
     @Serializable
     class AllTypes {
@@ -195,6 +365,7 @@ class BsonEncoding {
         val stringList = listOf("hello world")
         val stringMap = mapOf("hello" to "world")
         var allTypes: AllTypes? = null
+
         override fun equals(other: Any?): Boolean {
             if (this === other) return true
             if (other == null || this::class != other::class) return false

@@ -2,6 +2,7 @@ package org.mongodb.kbson.serialization
 
 import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.ExperimentalSerializationApi
+import kotlinx.serialization.SerializationException
 import kotlinx.serialization.descriptors.PrimitiveKind
 import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.descriptors.StructureKind
@@ -11,6 +12,7 @@ import kotlinx.serialization.modules.SerializersModule
 import org.mongodb.kbson.BsonArray
 import org.mongodb.kbson.BsonBinary
 import org.mongodb.kbson.BsonDocument
+import org.mongodb.kbson.BsonInvalidOperationException
 import org.mongodb.kbson.BsonNull
 import org.mongodb.kbson.BsonNumber
 import org.mongodb.kbson.BsonString
@@ -30,13 +32,13 @@ internal open class BsonDecoder(
     override fun beginStructure(descriptor: SerialDescriptor): CompositeDecoder {
         return when (descriptor.kind) {
             StructureKind.LIST -> {
-                ListBsonDecoder(currentValue().asArray(), serializersModule)
+                ListBsonDecoder(rethrowAsSerializationException { currentValue().asArray() }, serializersModule)
             }
             StructureKind.MAP -> {
-                MapBsonDecoder(currentValue().asDocument(), serializersModule)
+                MapBsonDecoder(rethrowAsSerializationException { currentValue().asDocument() }, serializersModule)
             }
             StructureKind.CLASS -> {
-                ClassBsonDecoder(currentValue().asDocument(), serializersModule)
+                ClassBsonDecoder(rethrowAsSerializationException { currentValue().asDocument() }, serializersModule)
             }
             StructureKind.OBJECT -> {
                 // Mimics the Json decode behavior of using an empty map on Kotlin Objects.
@@ -72,28 +74,37 @@ internal open class BsonDecoder(
             else -> super.decodeSerializableValue(deserializer)
         }
 
-    override fun decodeInt(): Int = currentValue().asInt32().value
+    override fun decodeInt(): Int =
+        rethrowAsSerializationException { currentValue().asInt32().value }
 
-    override fun decodeString(): String = currentValue().asString().value
+    override fun decodeString(): String =
+        rethrowAsSerializationException { currentValue().asString().value }
 
-    override fun decodeBoolean(): Boolean = currentValue().asBoolean().value
+    override fun decodeBoolean(): Boolean =
+        rethrowAsSerializationException { currentValue().asBoolean().value }
 
-    override fun decodeByte(): Byte = currentValue().asInt32().value.toByte()
+    override fun decodeByte(): Byte =
+        rethrowAsSerializationException { currentValue().asInt32().value.toByte() }
 
-    override fun decodeChar(): Char =
+    override fun decodeChar(): Char = rethrowAsSerializationException {
         when (val value = currentValue()) {
             is BsonString -> value.asString().value[0]
             is BsonNumber -> value.asNumber().intValue().toString()[0]
             else -> throw IllegalStateException("TODO cannot decode to char")
         }
+    }
 
-    override fun decodeDouble(): Double = currentValue().asDouble().value
+    override fun decodeDouble(): Double =
+        rethrowAsSerializationException { currentValue().asDouble().value }
 
-    override fun decodeFloat(): Float = currentValue().asDouble().value.toFloat()
+    override fun decodeFloat(): Float =
+        rethrowAsSerializationException { currentValue().asDouble().value.toFloat() }
 
-    override fun decodeLong(): Long = currentValue().asInt64().value
+    override fun decodeLong(): Long =
+        rethrowAsSerializationException { currentValue().asInt64().value }
 
-    override fun decodeShort(): Short = currentValue().asInt32().value.toShort()
+    override fun decodeShort(): Short =
+        rethrowAsSerializationException { currentValue().asInt32().value.toShort() }
 
     override fun decodeEnum(enumDescriptor: SerialDescriptor): Int {
         val name = currentValue().asString().value
@@ -101,7 +112,14 @@ internal open class BsonDecoder(
     }
 
     open fun currentValue(): BsonValue = value
+
+    open fun <T> rethrowAsSerializationException(block: () -> T): T = try {
+        block()
+    } catch (e: BsonInvalidOperationException) {
+        throw SerializationException(e.message, e)
+    }
 }
+
 
 internal class ListBsonDecoder(
     private val bsonArray: BsonArray,
@@ -123,19 +141,31 @@ internal class ClassBsonDecoder(
 ) : BsonDecoder(bsonDocument, serializersModule) {
     private var decodedElementCount = 0
     private lateinit var entryKey: String
+    private var isOptional: Boolean = false
 
     @OptIn(ExperimentalSerializationApi::class)
     override fun decodeElementIndex(descriptor: SerialDescriptor): Int {
-        return if (decodedElementCount < bsonDocument.size) {
+        return if (decodedElementCount < descriptor.elementsCount) {
             decodedElementCount++.also {
                 entryKey = descriptor.getElementName(it)
+                isOptional = descriptor.isElementOptional(it)
             }
         } else {
             CompositeDecoder.DECODE_DONE
         }
     }
 
-    override fun currentValue(): BsonValue = bsonDocument[entryKey]!!
+    override fun currentValue(): BsonValue = bsonDocument[entryKey] ?: if (isOptional) {
+        BsonNull
+    } else {
+        throw SerializationException("Could not decode field '$entryKey': Undefined value on a non-optional field")
+    }
+
+    override fun <T> rethrowAsSerializationException(block: () -> T): T = try {
+        block()
+    } catch (e: BsonInvalidOperationException) {
+        throw SerializationException("Could not decode field '$entryKey': ${e.message}", e)
+    }
 }
 
 internal class MapBsonDecoder(
