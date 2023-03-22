@@ -2,7 +2,9 @@ package org.mongodb.kbson.serialization
 
 import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.ExperimentalSerializationApi
+import kotlinx.serialization.Polymorphic
 import kotlinx.serialization.SerializationException
+import kotlinx.serialization.descriptors.PolymorphicKind
 import kotlinx.serialization.descriptors.PrimitiveKind
 import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.descriptors.StructureKind
@@ -72,6 +74,8 @@ internal open class BsonDecoder(
                     ignoreUnknownKeys = ignoreUnknownKeys
                 )
             }
+            PolymorphicKind.OPEN,
+            PolymorphicKind.SEALED -> throw SerializationException("Polymorphic values are not supported.")
             else -> throw IllegalStateException("Unsupported descriptor kind ${descriptor.kind}")
         }
     }
@@ -147,7 +151,6 @@ internal open class BsonDecoder(
         throw SerializationException(e.message, e)
     }
 }
-
 
 internal class ListBsonDecoder(
     private val bsonArray: BsonArray,

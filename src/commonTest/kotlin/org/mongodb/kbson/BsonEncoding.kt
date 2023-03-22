@@ -29,7 +29,6 @@ import kotlinx.serialization.encodeToString
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
 import kotlinx.serialization.modules.SerializersModule
-import org.mongodb.kbson.serialization.Bson
 import org.mongodb.kbson.serialization.Ejson
 import kotlin.test.Test
 import kotlin.test.assertContentEquals
@@ -298,6 +297,15 @@ class BsonEncoding {
         }
     }
 
+    @Test
+    fun polymorphic() {
+        val expected = ClassA("Realm")
+        val expectedEjson = Ejson.encodeToString(expected)
+        assertFailsWithMessage<SerializationException>("Polymorphic values are not supported.") {
+            Ejson.decodeFromString<PolymorphicInterface>(expectedEjson)
+        }
+    }
+
     private val bsonDataSet: List<BsonValue> = BsonType.values()
         .filter {
             it != BsonType.NULL // Tested separately
@@ -371,6 +379,13 @@ class BsonEncoding {
         val decodedValue: A = ejson.decodeFromString(encodedValue)
         block(value, decodedValue)
     }
+
+    interface PolymorphicInterface {
+        val name: String
+    }
+
+    @Serializable
+    data class ClassA(override val name: String) : PolymorphicInterface
 
     @Serializable
     enum class SerializableEnum(val value: Int) {
