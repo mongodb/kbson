@@ -16,11 +16,19 @@
 package org.mongodb.kbson
 
 import assertFailsWithMessage
+import kotlinx.serialization.Contextual
+import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.Transient
+import kotlinx.serialization.builtins.serializer
 import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.descriptors.SerialDescriptor
+import kotlinx.serialization.descriptors.buildClassSerialDescriptor
 import kotlinx.serialization.encodeToString
+import kotlinx.serialization.encoding.Decoder
+import kotlinx.serialization.encoding.Encoder
+import kotlinx.serialization.modules.SerializersModule
 import org.mongodb.kbson.serialization.Bson
 import org.mongodb.kbson.serialization.Ejson
 import kotlin.test.Test
@@ -247,6 +255,49 @@ class BsonEncoding {
         assertRoundTrip(SerializableObject)
     }
 
+    @Test
+    fun contextualClass() {
+        val expected = ContextualClassHolder(
+            contextualClass = ContextualClass(
+                string = "helloworld"
+            )
+        )
+
+        val contextualSerializer = object : KSerializer<ContextualClass> {
+            override val descriptor: SerialDescriptor = buildClassSerialDescriptor("ContextualClass") {
+                element("string", String.serializer().descriptor)
+            }
+
+            override fun deserialize(decoder: Decoder): ContextualClass = ContextualClass(decoder.decodeString())
+
+            override fun serialize(encoder: Encoder, value: ContextualClass) {
+                encoder.encodeString(value.string)
+            }
+        }
+
+        assertRoundTrip(
+            value = expected,
+            ejson = Ejson(serializersModule = SerializersModule {
+                contextual(ContextualClass::class, contextualSerializer)
+            })
+        ) { expected, actual: ContextualClassHolder ->
+            assertEquals(expected, actual)
+        }
+    }
+
+    @Test
+    fun contextualMissingSerializerFails() {
+        val expected = ContextualClassHolder(
+            contextualClass = ContextualClass(
+                string = "helloworld"
+            )
+        )
+
+        assertFailsWithMessage<SerializationException>("Serializer for class 'ContextualClass' is not found.") {
+            Ejson.encodeToString(expected)
+        }
+    }
+
     private val bsonDataSet: List<BsonValue> = BsonType.values()
         .filter {
             it != BsonType.NULL // Tested separately
@@ -364,6 +415,16 @@ class BsonEncoding {
     @Serializable
     data class WrongFieldType(
         val string: Boolean
+    )
+
+    data class ContextualClass(
+        val string: String
+    )
+
+    @Serializable
+    data class ContextualClassHolder(
+        @Contextual
+        val contextualClass: ContextualClass
     )
 
     @Serializable
