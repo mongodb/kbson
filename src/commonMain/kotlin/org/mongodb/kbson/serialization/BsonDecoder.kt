@@ -8,6 +8,7 @@ import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.descriptors.StructureKind
 import kotlinx.serialization.encoding.AbstractDecoder
 import kotlinx.serialization.encoding.CompositeDecoder
+import kotlinx.serialization.encoding.CompositeDecoder.Companion.UNKNOWN_NAME
 import kotlinx.serialization.modules.SerializersModule
 import org.mongodb.kbson.BsonArray
 import org.mongodb.kbson.BsonBinary
@@ -25,24 +26,51 @@ internal fun SerialDescriptor.isByteArray(): Boolean =
 @OptIn(ExperimentalSerializationApi::class)
 internal open class BsonDecoder(
     private val value: BsonValue,
-    override val serializersModule: SerializersModule
+    override val serializersModule: SerializersModule,
+    private val ignoreUnknownKeys: Boolean
 ) : AbstractDecoder() {
     override fun decodeElementIndex(descriptor: SerialDescriptor): Int = 0
 
     override fun beginStructure(descriptor: SerialDescriptor): CompositeDecoder {
         return when (descriptor.kind) {
             StructureKind.LIST -> {
-                ListBsonDecoder(rethrowAsSerializationException { currentValue().asArray() }, serializersModule)
+                ListBsonDecoder(
+                    bsonArray = rethrowAsSerializationException { currentValue().asArray() },
+                    serializersModule = serializersModule,
+                    ignoreUnknownKeys = ignoreUnknownKeys
+                )
             }
             StructureKind.MAP -> {
-                MapBsonDecoder(rethrowAsSerializationException { currentValue().asDocument() }, serializersModule)
+                MapBsonDecoder(
+                    bsonDocument = rethrowAsSerializationException { currentValue().asDocument() },
+                    serializersModule = serializersModule,
+                    ignoreUnknownKeys = ignoreUnknownKeys
+                )
             }
             StructureKind.CLASS -> {
-                ClassBsonDecoder(rethrowAsSerializationException { currentValue().asDocument() }, serializersModule)
+                with(rethrowAsSerializationException { currentValue().asDocument() }) {
+                    // validate ignoreUnknownKeys as a precondition. Each document entry must have a matching class field
+                    if (!ignoreUnknownKeys) {
+                        forEach { entry ->
+                            if (descriptor.getElementIndex(entry.key) == UNKNOWN_NAME) {
+                                throw SerializationException("Could not decode class `${descriptor.serialName}`, encountered unknown key `${entry.key}`.")
+                            }
+                        }
+                    }
+                    ClassBsonDecoder(
+                        bsonDocument = this,
+                        serializersModule = serializersModule,
+                        ignoreUnknownKeys = ignoreUnknownKeys
+                    )
+                }
             }
             StructureKind.OBJECT -> {
                 // Mimics the Json decode behavior of using an empty map on Kotlin Objects.
-                ClassBsonDecoder(BsonDocument(), serializersModule)
+                ClassBsonDecoder(
+                    bsonDocument = BsonDocument(),
+                    serializersModule = serializersModule,
+                    ignoreUnknownKeys = ignoreUnknownKeys
+                )
             }
             else -> throw IllegalStateException("Unsupported descriptor kind ${descriptor.kind}")
         }
@@ -123,8 +151,9 @@ internal open class BsonDecoder(
 
 internal class ListBsonDecoder(
     private val bsonArray: BsonArray,
-    override val serializersModule: SerializersModule
-) : BsonDecoder(bsonArray, serializersModule) {
+    override val serializersModule: SerializersModule,
+    ignoreUnknownKeys: Boolean
+) : BsonDecoder(bsonArray, serializersModule, ignoreUnknownKeys) {
     private var decodedElementCount = 0
 
     override fun decodeElementIndex(descriptor: SerialDescriptor): Int {
@@ -137,8 +166,9 @@ internal class ListBsonDecoder(
 
 internal class ClassBsonDecoder(
     private val bsonDocument: BsonDocument,
-    override val serializersModule: SerializersModule
-) : BsonDecoder(bsonDocument, serializersModule) {
+    override val serializersModule: SerializersModule,
+    ignoreUnknownKeys: Boolean
+) : BsonDecoder(bsonDocument, serializersModule, ignoreUnknownKeys) {
     private var decodedElementCount = 0
     private lateinit var entryKey: String
     private var isOptional: Boolean = false
@@ -170,8 +200,9 @@ internal class ClassBsonDecoder(
 
 internal class MapBsonDecoder(
     bsonDocument: BsonDocument,
-    override val serializersModule: SerializersModule
-) : BsonDecoder(bsonDocument, serializersModule) {
+    override val serializersModule: SerializersModule,
+    ignoreUnknownKeys: Boolean
+) : BsonDecoder(bsonDocument, serializersModule, ignoreUnknownKeys) {
     private var decodedElementCount = 0
 
     val values = BsonArray(

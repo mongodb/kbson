@@ -47,6 +47,7 @@ import kotlinx.serialization.json.doubleOrNull
 import kotlinx.serialization.json.floatOrNull
 import kotlinx.serialization.json.intOrNull
 import kotlinx.serialization.json.longOrNull
+import kotlinx.serialization.modules.EmptySerializersModule
 import kotlinx.serialization.modules.SerializersModule
 import kotlinx.serialization.serializer
 import org.mongodb.kbson.BsonArray
@@ -77,7 +78,7 @@ import org.mongodb.kbson.internal.Base64Utils
 import org.mongodb.kbson.internal.HexUtils
 import org.mongodb.kbson.internal.validateSerialization
 
-internal fun <T> Bson.writeBson(value: T, serializer: SerializationStrategy<T>): BsonValue {
+internal fun <T> Ejson.writeBson(value: T, serializer: SerializationStrategy<T>): BsonValue {
     if (value is BsonValue) return value
     lateinit var result: BsonValue
     val encoder = PrimitiveBsonEncoder(serializersModule) { result = it }
@@ -85,23 +86,25 @@ internal fun <T> Bson.writeBson(value: T, serializer: SerializationStrategy<T>):
     return result
 }
 
-internal fun <T> Bson.readBson(element: BsonValue, deserializer: DeserializationStrategy<T>): T =
-    BsonDecoder(element, serializersModule).decodeSerializableValue(deserializer)
+internal fun <T> Ejson.readBson(element: BsonValue, deserializer: DeserializationStrategy<T>): T =
+    BsonDecoder(element, serializersModule, ignoreUnknownKeys).decodeSerializableValue(deserializer)
 
 //TODO Document
-public inline fun <reified T : Any> Bson.encodeToBsonValue(value: T): BsonValue =
+public inline fun <reified T : Any> Ejson.encodeToBsonValue(value: T): BsonValue =
     encodeToBsonValue(serializersModule.serializer(), value)
 
 //TODO Document
-public inline fun <reified T : Any> Bson.decodeFromBsonValue(value: BsonValue): T =
+public inline fun <reified T : Any> Ejson.decodeFromBsonValue(value: BsonValue): T =
     decodeFromBsonValue(serializersModule.serializer(), value)
 
-
-public sealed class Bson(
-    @PublishedApi
-    internal val json: Json
+public sealed class Ejson(
+    public val ignoreUnknownKeys: Boolean,
+    private val json: Json
 ) : StringFormat {
-    public companion object Default : Bson(Json)
+    public companion object Default : Ejson(
+        ignoreUnknownKeys = true,
+        json = Json
+    )
 
     override val serializersModule: SerializersModule = json.serializersModule
 
@@ -136,15 +139,32 @@ public sealed class Bson(
             value
         )
     )
+}
 
+@OptIn(ExperimentalSerializationApi::class)
+public fun Ejson(
+    ignoreUnknownKeys: Boolean = true,
+    serializersModule: SerializersModule = EmptySerializersModule
+): Ejson = EjsonImpl(ignoreUnknownKeys, serializersModule)
+
+@OptIn(ExperimentalSerializationApi::class)
+private class EjsonImpl constructor(
+    ignoreUnknownKeys: Boolean,
+    serializersModule: SerializersModule
+) : Ejson(
+    ignoreUnknownKeys,
+    if (serializersModule == EmptySerializersModule) Json else Json {
+        this.serializersModule = serializersModule
+    })
+
+public object Bson {
     /**
      * Create a BsonDocument from a Json string
      *
-     * @param jsonString the Json String
+     * @param json the Json String
      * @return a BsonDocument
      */
-    public operator fun invoke(jsonString: String): BsonValue =
-        json.decodeFromString(jsonString)
+    public operator fun invoke(jsonString: String): BsonValue = Json.decodeFromString(jsonString)
 
     /**
      * Create a Json string from a BsonValue
@@ -152,7 +172,7 @@ public sealed class Bson(
      * @param bsonValue the BsonValue
      * @return the Json String
      */
-    public fun toJson(bsonValue: BsonValue): String = json.encodeToString(bsonValue)
+    public fun toJson(bsonValue: BsonValue): String = Json.encodeToString(bsonValue)
 }
 
 internal object BsonValueSerializer : KSerializer<BsonValue> {

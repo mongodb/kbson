@@ -22,6 +22,7 @@ import kotlinx.serialization.Transient
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import org.mongodb.kbson.serialization.Bson
+import org.mongodb.kbson.serialization.Ejson
 import kotlin.test.Test
 import kotlin.test.assertContentEquals
 import kotlin.test.assertEquals
@@ -135,13 +136,27 @@ class BsonEncoding {
     }
 
     @Test
-    fun userDefinedClasses_subsetOfAllFields() {
+    fun userDefinedClasses_subsetOfAllFields_ignoreUnknownKeys() {
         val value = AllTypes().apply {
             allTypes = AllTypes()
         }
 
         assertRoundTrip(value) { expected, actual: SubsetOfAllTypes ->
             assertEquals(expected.string, actual.string)
+        }
+    }
+
+    @Test
+    fun userDefinedClasses_subsetOfAllFields_dontIgnoreUnknownKeys() {
+        val ejson = Ejson(ignoreUnknownKeys = false)
+
+        val value = AllTypes().apply {
+            allTypes = AllTypes()
+        }
+        val encodedValue = ejson.encodeToString(value)
+
+        assertFailsWithMessage<SerializationException>("Could not decode class `org.mongodb.kbson.BsonEncoding.SubsetOfAllTypes`, encountered unknown key `boolean`.") {
+            ejson.decodeFromString<SubsetOfAllTypes>(encodedValue)
         }
     }
 
@@ -173,9 +188,9 @@ class BsonEncoding {
         val value = AllTypes().apply {
             allTypes = AllTypes()
         }
-        val encodedValue = Bson.encodeToString(value)
+        val encodedValue = Ejson.encodeToString(value)
         assertFailsWithMessage<SerializationException>("Could not decode field 'unexistent': Undefined value on a non-optional field") {
-            Bson.decodeFromString<NotMappedFields>(encodedValue)
+            Ejson.decodeFromString<NotMappedFields>(encodedValue)
         }
     }
 
@@ -195,10 +210,10 @@ class BsonEncoding {
         val value = AllTypes().apply {
             allTypes = AllTypes()
         }
-        val encodedValue = Bson.encodeToString(value)
+        val encodedValue = Ejson.encodeToString(value)
 
         assertFailsWithMessage<SerializationException>("Could not decode field 'string': Value expected to be of type BOOLEAN is of unexpected type STRING") {
-            Bson.decodeFromString<WrongFieldType>(encodedValue)
+            Ejson.decodeFromString<WrongFieldType>(encodedValue)
         }
     }
 
@@ -217,7 +232,7 @@ class BsonEncoding {
     @Test
     fun decodeMalformedEjsonString() {
         assertFailsWith<SerializationException>("Unexpected JSON token at offset 5: Expected EOF after parsing, but had ] instead") {
-            Bson.decodeFromString<BsonArray?>("💥&&][💎")
+            Ejson.decodeFromString<BsonArray?>("💥&&][💎")
         }
     }
 
@@ -278,9 +293,9 @@ class BsonEncoding {
 
     // Assert that decoding `value` as an [AllTypes] fails.
     private inline fun <reified T> assertDecodingFailsWithInvalidType(value: T) {
-        val encodedValue = Bson.encodeToString(value)
+        val encodedValue = Ejson.encodeToString(value)
         assertFailsWithMessage<SerializationException>("Value expected to be of type ") {
-            Bson.decodeFromString<AllTypes>(encodedValue)
+            Ejson.decodeFromString<AllTypes>(encodedValue)
         }
     }
 
@@ -298,10 +313,11 @@ class BsonEncoding {
 
     private inline fun <reified E : Any?, reified A> assertRoundTrip(
         value: E,
+        ejson: Ejson = Ejson,
         block: (expected: E, actual: A) -> Unit
     ) {
-        val encodedValue = Bson.encodeToString(value)
-        val decodedValue: A = Bson.decodeFromString(encodedValue)
+        val encodedValue = ejson.encodeToString(value)
+        val decodedValue: A = ejson.decodeFromString(encodedValue)
         block(value, decodedValue)
     }
 
