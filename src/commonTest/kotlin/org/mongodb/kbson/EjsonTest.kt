@@ -36,7 +36,7 @@ import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 import kotlin.test.assertNotEquals
 
-class BsonEncoding {
+class EjsonTest {
     @Test
     fun bsonTypes() {
         listOf(
