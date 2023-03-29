@@ -89,18 +89,71 @@ internal fun <T> Ejson.writeBson(value: T, serializer: SerializationStrategy<T>)
 internal fun <T> Ejson.readBson(element: BsonValue, deserializer: DeserializationStrategy<T>): T =
     BsonDecoder(element, serializersModule, ignoreUnknownKeys).decodeSerializableValue(deserializer)
 
-//TODO Document
+
+/**
+ * Serializes the given [value] into an equivalent [JsonElement] using a serializer retrieved
+ * from reified type parameter.
+ *
+ * @throws [SerializationException] if the given value cannot be serialized to JSON.
+ */
 public inline fun <reified T : Any> Ejson.encodeToBsonValue(value: T): BsonValue =
     encodeToBsonValue(serializersModule.serializer(), value)
 
-//TODO Document
+
+/**
+ * Deserializes the given [json] element into a value of type [T] using a deserializer retrieved
+ * from reified type parameter.
+ *
+ * @throws [SerializationException] if the given JSON element is not a valid JSON input for the type [T]
+ * @throws [IllegalArgumentException] if the decoded input cannot be represented as a valid instance of type [T]
+ */
 public inline fun <reified T : Any> Ejson.decodeFromBsonValue(value: BsonValue): T =
     decodeFromBsonValue(serializersModule.serializer(), value)
 
+/**
+ * Main entry point to work with EJSON serialization. [EJSON](https://www.mongodb.com/docs/manual/reference/mongodb-extended-json/)
+ * a string format that extends JSON to support all BSON datatypes.
+ *
+ * A default instance is provided via [Ejson.Default], but if you require an instance with certain
+ * registered serializers or different options you can instantiate it with [Ejson].
+ *
+ * This string format also supports encoding to or from a [BsonValue] with the functions [decodeFromBsonValue]
+ * and [encodeToBsonValue].
+ *
+ * Example of usage:
+ * ```
+ * @Serializable
+ * class DataHolder(val id: Int, val data: String, val bsonValue: BsonValue)
+ *
+ * val ejson = Ejson
+ * val instance = DataHolder(42, "some data", BsonObjectId() }
+ *
+ * // Plain StringFormat usage
+ * val stringOutput: String = ejson.encodeToString(instance)
+ *
+ * // BsonValue serialization
+ * val bsonValue: BsonValue = ejson.encodeToBsonValue(instance)
+ *
+ * // Deserialize from string
+ * val deserialized: DataHolder = ejson.decodeFromString<DataHolder>(stringOutput)
+ *
+ * // Deserialize from BsonValue
+ * val deserializedFromBsonValue: DataHolder = ejson.decodeFromBsonValue<DataHolder>(bsonValue)
+ *
+ *  // Deserialize from string to BsonValue
+ *  val deserializedToBsonValue: BsonValue = Bson(stringOutput)
+ * ```
+ *
+ * It does not support polymorphic serializers yet.
+ */
 public sealed class Ejson(
     public val ignoreUnknownKeys: Boolean,
     private val json: Json
 ) : StringFormat {
+
+    /**
+     * The default instance of [Ejson] with default configuration.
+     */
     public companion object Default : Ejson(
         ignoreUnknownKeys = true,
         json = Json
@@ -108,19 +161,31 @@ public sealed class Ejson(
 
     override val serializersModule: SerializersModule = json.serializersModule
 
-    //TODO Document
+    /**
+     * Serializes the given [value] into an equivalent [BsonValue] using the given [serializer]
+     *
+     * @throws [SerializationException] if the given value cannot be serialized to EJSON
+     */
     public fun <T> encodeToBsonValue(
         serializer: SerializationStrategy<T>,
         value: T
     ): BsonValue = writeBson(value, serializer)
 
-    //TODO Document
+    /**
+     * Deserializes the given [value] into a value of type [T] using the given [deserializer].
+     *
+     * @throws [SerializationException] if the given EJSON element is not a valid EJSON input for the type [T]
+     */
     public fun <T> decodeFromBsonValue(
-        serializer: DeserializationStrategy<T>,
+        deserializer: DeserializationStrategy<T>,
         value: BsonValue
-    ): T = readBson(value, serializer)
+    ): T = readBson(value, deserializer)
 
-    //TODO Document
+    /**
+     * Deserializes the given EJSON [string] into a value of type [T] using the given [deserializer].
+     *
+     * @throws [SerializationException] if the given EJSON string is not a valid EJSON input for the type [T]
+     */
     public override fun <T> decodeFromString(
         deserializer: DeserializationStrategy<T>,
         string: String
@@ -129,7 +194,11 @@ public sealed class Ejson(
         json.decodeFromString(string)
     )
 
-    //TODO Document
+    /**
+     * Serializes the [value] into an equivalent EJSON using the given [serializer].
+     *
+     * @throws [SerializationException] if the given value cannot be serialized to EJSON.
+     */
     public override fun <T> encodeToString(
         serializer: SerializationStrategy<T>,
         value: T
@@ -141,13 +210,14 @@ public sealed class Ejson(
     )
 }
 
-@OptIn(ExperimentalSerializationApi::class)
+/**
+ * Creates an instance of [Ejson] configured with a [ignoreUnknownKeys] and a custom [serializersModule].
+ */
 public fun Ejson(
     ignoreUnknownKeys: Boolean = true,
     serializersModule: SerializersModule = EmptySerializersModule
 ): Ejson = EjsonImpl(ignoreUnknownKeys, serializersModule)
 
-@OptIn(ExperimentalSerializationApi::class)
 private class EjsonImpl constructor(
     ignoreUnknownKeys: Boolean,
     serializersModule: SerializersModule
