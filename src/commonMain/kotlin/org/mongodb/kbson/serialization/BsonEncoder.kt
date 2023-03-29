@@ -120,6 +120,10 @@ internal class PrimitiveBsonEncoder(
     override fun getCurrent(): BsonValue = bsonValue
 }
 
+/**
+ * Base encoder for structured types based on BsonValues. The AbstractEncoder provided by the kserializer
+ * accesses the data sequentially, thus we can have a base implementation based on an BsonArray.
+ */
 internal sealed class StructuredBsonEncoder(
     override val serializersModule: SerializersModule,
     nodeConsumer: (BsonValue) -> Unit
@@ -139,27 +143,37 @@ internal class BsonArrayEncoder(
     override fun getCurrent(): BsonValue = elements
 }
 
+/**
+ * Maps are encoded flattening keys and values into a BsonArray.
+ */
 internal open class BsonDocumentEncoder(
     override val serializersModule: SerializersModule,
     nodeConsumer: (BsonValue) -> Unit
 ) : StructuredBsonEncoder(serializersModule, nodeConsumer) {
-    // We have all keys and fields in a plain list
+    /**
+     * Constructs a BsonDocument out from a BsonArray that contains both keys and values.
+     */
     override fun getCurrent(): BsonValue = BsonDocument(
-        elements
-            .chunked(2)
+        elements.chunked(2)
             .associate { entry ->
-                require(entry[0] is BsonString) { "TODO Required BsonString" }
+                require(entry[0] is BsonString) { "Entry key must be a BsonString ${entry::class.simpleName} found" }
                 (entry[0] as BsonString).value to entry[1]
             }
     )
 }
 
+/**
+ * Classes are encoded as Maps, flattened into a BsonArray, where the key values are the names of the
+ * fields.
+ */
 @OptIn(ExperimentalSerializationApi::class)
 internal class BsonClassEncoder(
     override val serializersModule: SerializersModule,
     nodeConsumer: (BsonValue) -> Unit
 ) : BsonDocumentEncoder(serializersModule, nodeConsumer) {
-    // Push field names
+    /**
+     * Any time we encode a new element we push the field name into the BsonArray.
+     */
     override fun encodeElement(descriptor: SerialDescriptor, index: Int): Boolean {
         elements.add(BsonString(descriptor.getElementName(index)))
         return super.encodeElement(descriptor, index)

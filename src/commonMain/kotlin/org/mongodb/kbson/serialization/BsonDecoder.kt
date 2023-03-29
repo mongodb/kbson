@@ -83,7 +83,8 @@ internal open class BsonDecoder(
     @Suppress("UNCHECKED_CAST")
     override fun <T> decodeSerializableValue(deserializer: DeserializationStrategy<T>): T =
         when {
-            // TODO review if there is a better way to map these types
+            // Depending on the deserialization strategy we need to return BsonNull, if we decode
+            // to BsonValue, or null otherwise.
             currentValue() is BsonNull -> {
                 when (deserializer) {
                     is BsonValueSerializer,
@@ -92,7 +93,7 @@ internal open class BsonDecoder(
                 } as T
             }
             deserializer.descriptor.isByteArray() -> {
-                // Fast path for mapping BsonBinary or BsonArray to ByteArray
+                // Fast path to decode a BsonBinary or BsonArray as a ByteArray
                 when (val value = currentValue()) {
                     is BsonBinary -> value.data
                     is BsonArray -> {
@@ -100,7 +101,7 @@ internal open class BsonDecoder(
                             value[it].asNumber().intValue().toByte()
                         }
                     }
-                    else -> throw IllegalStateException("TODO find right message")
+                    else -> throw IllegalStateException("Cannot decode $value as a ByteArray.")
                 } as T
             }
             else -> super.decodeSerializableValue(deserializer)
@@ -122,7 +123,7 @@ internal open class BsonDecoder(
         when (val value = currentValue()) {
             is BsonString -> value.asString().value[0]
             is BsonNumber -> value.asNumber().intValue().toString()[0]
-            else -> throw IllegalStateException("TODO cannot decode to char")
+            else -> throw IllegalStateException("Cannot decode $value as a Char.")
         }
     }
 
@@ -167,6 +168,10 @@ internal class ListBsonDecoder(
     override fun currentValue(): BsonValue = bsonArray[decodedElementCount - 1]
 }
 
+/**
+ * Decodes a BsonDocument as a Class structured type.
+ */
+@OptIn(ExperimentalSerializationApi::class)
 internal class ClassBsonDecoder(
     private val bsonDocument: BsonDocument,
     override val serializersModule: SerializersModule,
@@ -176,7 +181,11 @@ internal class ClassBsonDecoder(
     private lateinit var entryKey: String
     private var isOptional: Boolean = false
 
-    @OptIn(ExperimentalSerializationApi::class)
+    /**
+     * This function is triggered each time a field is going to be decoded. During this stage
+     * we have to extract the key that would be used in [currentValue] to access the value from the
+     * [bsonDocument] that represents the class.
+     */
     override fun decodeElementIndex(descriptor: SerialDescriptor): Int {
         return if (decodedElementCount < descriptor.elementsCount) {
             decodedElementCount++.also {
@@ -208,7 +217,7 @@ internal class MapBsonDecoder(
 ) : BsonDecoder(bsonDocument, serializersModule, ignoreUnknownKeys) {
     private var decodedElementCount = 0
 
-    val values = BsonArray(
+    private val values = BsonArray(
         bsonDocument.flatMap { (key, value) ->
             listOf(BsonString(key), value)
         }.toList()
