@@ -13,6 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+@file:OptIn(ExperimentalApi::class)
+
 package org.mongodb.kbson
 
 import assertFailsWithMessage
@@ -136,7 +138,7 @@ class EjsonTest {
     @Test
     fun userDefinedClasses() {
         val value = AllTypes().apply {
-            allTypes = AllTypes()
+            allTypesObject = AllTypes()
         }
 
         assertRoundTrip(value)
@@ -145,7 +147,7 @@ class EjsonTest {
     @Test
     fun userDefinedClasses_subsetOfAllFields_ignoreUnknownKeys() {
         val value = AllTypes().apply {
-            allTypes = AllTypes()
+            allTypesObject = AllTypes()
         }
 
         assertRoundTrip(value) { expected, actual: SubsetOfAllTypes ->
@@ -158,11 +160,14 @@ class EjsonTest {
         val ejson = Ejson(ignoreUnknownKeys = false)
 
         val value = AllTypes().apply {
-            allTypes = AllTypes()
+            allTypesObject = AllTypes()
         }
         val encodedValue = ejson.encodeToString(value)
 
-        assertFailsWithMessage<SerializationException>("Could not decode class `org.mongodb.kbson.BsonEncoding.SubsetOfAllTypes`, encountered unknown key `boolean`.") {
+        assertFailsWithMessage<SerializationException>(
+            "Could not decode class " +
+                    "`org.mongodb.kbson.BsonEncoding.SubsetOfAllTypes`, encountered unknown key `boolean`."
+        ) {
             ejson.decodeFromString<SubsetOfAllTypes>(encodedValue)
         }
     }
@@ -170,7 +175,7 @@ class EjsonTest {
     @Test
     fun userDefinedClasses_transientFields() {
         val value = AllTypes().apply {
-            allTypes = AllTypes()
+            allTypesObject = AllTypes()
         }
 
         assertRoundTrip(value) { expected, actual: TransientFields ->
@@ -182,7 +187,7 @@ class EjsonTest {
     @Test
     fun userDefinedClasses_optionalFields() {
         val value = AllTypes().apply {
-            allTypes = AllTypes()
+            allTypesObject = AllTypes()
         }
 
         assertRoundTrip(value) { expected, actual: OptionalFields ->
@@ -193,10 +198,13 @@ class EjsonTest {
     @Test
     fun userDefinedClasses_notMappedFields() {
         val value = AllTypes().apply {
-            allTypes = AllTypes()
+            allTypesObject = AllTypes()
         }
         val encodedValue = Ejson.encodeToString(value)
-        assertFailsWithMessage<SerializationException>("Could not decode field 'unexistent': Undefined value on a non-optional field") {
+        assertFailsWithMessage<SerializationException>(
+            "Could not decode field " +
+                    "'unexistent': Undefined value on a non-optional field"
+        ) {
             Ejson.decodeFromString<NotMappedFields>(encodedValue)
         }
     }
@@ -204,7 +212,7 @@ class EjsonTest {
     @Test
     fun userDefinedClasses_notMappedOptionalFields() {
         val value = AllTypes().apply {
-            allTypes = AllTypes()
+            allTypesObject = AllTypes()
         }
 
         assertRoundTrip(value) { expected, actual: NotMappedOptionalFields ->
@@ -215,11 +223,14 @@ class EjsonTest {
     @Test
     fun userDefinedClasses_wrongFieldType() {
         val value = AllTypes().apply {
-            allTypes = AllTypes()
+            allTypesObject = AllTypes()
         }
         val encodedValue = Ejson.encodeToString(value)
 
-        assertFailsWithMessage<SerializationException>("Could not decode field 'string': Value expected to be of type BOOLEAN is of unexpected type STRING") {
+        assertFailsWithMessage<SerializationException>(
+            "Could not decode field" +
+                    " 'string': Value expected to be of type BOOLEAN is of unexpected type STRING"
+        ) {
             Ejson.decodeFromString<WrongFieldType>(encodedValue)
         }
     }
@@ -238,7 +249,10 @@ class EjsonTest {
 
     @Test
     fun decodeMalformedEjsonString() {
-        assertFailsWith<SerializationException>("Unexpected JSON token at offset 5: Expected EOF after parsing, but had ] instead") {
+        assertFailsWith<SerializationException>(
+            "Unexpected JSON token at offset 5: Expected" +
+                    " EOF after parsing, but had ] instead"
+        ) {
             Ejson.decodeFromString<BsonArray?>("💥&&][💎")
         }
     }
@@ -263,11 +277,13 @@ class EjsonTest {
         )
 
         val contextualSerializer = object : KSerializer<ContextualClass> {
-            override val descriptor: SerialDescriptor = buildClassSerialDescriptor("ContextualClass") {
-                element("string", String.serializer().descriptor)
-            }
+            override val descriptor: SerialDescriptor =
+                buildClassSerialDescriptor("ContextualClass") {
+                    element("string", String.serializer().descriptor)
+                }
 
-            override fun deserialize(decoder: Decoder): ContextualClass = ContextualClass(decoder.decodeString())
+            override fun deserialize(decoder: Decoder): ContextualClass =
+                ContextualClass(decoder.decodeString())
 
             override fun serialize(encoder: Encoder, value: ContextualClass) {
                 encoder.encodeString(value.string)
@@ -395,7 +411,7 @@ class EjsonTest {
 
     @Serializable
     object SerializableObject {
-        val name = ""
+        const val name = ""
         var surname = ""
     }
 
@@ -456,8 +472,9 @@ class EjsonTest {
         val byteArray = byteArrayOf(10, 0, 10)
         val stringList = listOf("hello world")
         val stringMap = mapOf("hello" to "world")
-        var allTypes: AllTypes? = null
+        var allTypesObject: AllTypes? = null
 
+        @Suppress("ComplexMethod")
         override fun equals(other: Any?): Boolean {
             if (this === other) return true
             if (other == null || this::class != other::class) return false
@@ -476,7 +493,7 @@ class EjsonTest {
             if (!byteArray.contentEquals(other.byteArray)) return false
             if (stringList != other.stringList) return false
             if (stringMap != other.stringMap) return false
-            if (allTypes != other.allTypes) return false
+            if (allTypesObject != other.allTypesObject) return false
 
             return true
         }
@@ -494,7 +511,7 @@ class EjsonTest {
             result = 31 * result + byteArray.contentHashCode()
             result = 31 * result + stringList.hashCode()
             result = 31 * result + stringMap.hashCode()
-            result = 31 * result + (allTypes?.hashCode() ?: 0)
+            result = 31 * result + (allTypesObject?.hashCode() ?: 0)
             return result
         }
     }

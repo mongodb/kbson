@@ -42,7 +42,7 @@ internal sealed class BsonEncoder(
                 pushValue(BsonDocument())
             }
 
-            else -> throw IllegalStateException("Unsupported descriptor Kind ${descriptor.kind}")
+            else -> error("Unsupported descriptor Kind ${descriptor.kind}")
         }
 
     override fun endStructure(descriptor: SerialDescriptor) {

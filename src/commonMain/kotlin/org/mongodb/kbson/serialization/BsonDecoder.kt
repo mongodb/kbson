@@ -33,6 +33,7 @@ internal open class BsonDecoder(
 ) : AbstractDecoder() {
     override fun decodeElementIndex(descriptor: SerialDescriptor): Int = 0
 
+    @Suppress("NestedBlockDepth")
     override fun beginStructure(descriptor: SerialDescriptor): CompositeDecoder {
         return when (descriptor.kind) {
             StructureKind.LIST -> {
@@ -51,11 +52,13 @@ internal open class BsonDecoder(
             }
             StructureKind.CLASS -> {
                 with(rethrowAsSerializationException { currentValue().asDocument() }) {
-                    // validate ignoreUnknownKeys as a precondition. Each document entry must have a matching class field
+                    // validate ignoreUnknownKeys as a precondition. Each document entry must have a
+                    // matching class field
                     if (!ignoreUnknownKeys) {
                         forEach { entry ->
                             if (descriptor.getElementIndex(entry.key) == UNKNOWN_NAME) {
-                                throw SerializationException("Could not decode class `${descriptor.serialName}`, encountered unknown key `${entry.key}`.")
+                                throw SerializationException("Could not decode class `${descriptor.serialName}`, " +
+                                        "encountered unknown key `${entry.key}`.")
                             }
                         }
                     }
@@ -76,7 +79,7 @@ internal open class BsonDecoder(
             }
             PolymorphicKind.OPEN,
             PolymorphicKind.SEALED -> throw SerializationException("Polymorphic values are not supported.")
-            else -> throw IllegalStateException("Unsupported descriptor kind ${descriptor.kind}")
+            else -> error("Unsupported descriptor kind ${descriptor.kind}")
         }
     }
 
@@ -101,7 +104,7 @@ internal open class BsonDecoder(
                             value[it].asNumber().intValue().toByte()
                         }
                     }
-                    else -> throw IllegalStateException("Cannot decode $value as a ByteArray.")
+                    else -> error("Cannot decode $value as a ByteArray.")
                 } as T
             }
             else -> super.decodeSerializableValue(deserializer)
@@ -123,7 +126,7 @@ internal open class BsonDecoder(
         when (val value = currentValue()) {
             is BsonString -> value.asString().value[0]
             is BsonNumber -> value.asNumber().intValue().toString()[0]
-            else -> throw IllegalStateException("Cannot decode $value as a Char.")
+            else -> error("Cannot decode $value as a Char.")
         }
     }
 
