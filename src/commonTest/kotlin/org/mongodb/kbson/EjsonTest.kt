@@ -166,7 +166,7 @@ class EjsonTest {
 
         assertFailsWithMessage<SerializationException>(
             "Could not decode class " +
-                    "`org.mongodb.kbson.BsonEncoding.SubsetOfAllTypes`, encountered unknown key `boolean`."
+                    "`org.mongodb.kbson.EjsonTest.SubsetOfAllTypes`, encountered unknown key `boolean`."
         ) {
             ejson.decodeFromString<SubsetOfAllTypes>(encodedValue)
         }
