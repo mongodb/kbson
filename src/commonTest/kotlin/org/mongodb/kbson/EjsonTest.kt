@@ -31,7 +31,7 @@ import kotlinx.serialization.encodeToString
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
 import kotlinx.serialization.modules.SerializersModule
-import org.mongodb.kbson.serialization.Ejson
+import org.mongodb.kbson.serialization.EJson
 import kotlin.test.Test
 import kotlin.test.assertContentEquals
 import kotlin.test.assertEquals
@@ -157,7 +157,7 @@ class EjsonTest {
 
     @Test
     fun userDefinedClasses_subsetOfAllFields_dontIgnoreUnknownKeys() {
-        val ejson = Ejson(ignoreUnknownKeys = false)
+        val ejson = EJson(ignoreUnknownKeys = false)
 
         val value = AllTypes().apply {
             allTypesObject = AllTypes()
@@ -200,12 +200,12 @@ class EjsonTest {
         val value = AllTypes().apply {
             allTypesObject = AllTypes()
         }
-        val encodedValue = Ejson.encodeToString(value)
+        val encodedValue = EJson.encodeToString(value)
         assertFailsWithMessage<SerializationException>(
             "Could not decode field " +
                     "'unexistent': Undefined value on a non-optional field"
         ) {
-            Ejson.decodeFromString<NotMappedFields>(encodedValue)
+            EJson.decodeFromString<NotMappedFields>(encodedValue)
         }
     }
 
@@ -225,13 +225,13 @@ class EjsonTest {
         val value = AllTypes().apply {
             allTypesObject = AllTypes()
         }
-        val encodedValue = Ejson.encodeToString(value)
+        val encodedValue = EJson.encodeToString(value)
 
         assertFailsWithMessage<SerializationException>(
             "Could not decode field" +
                     " 'string': Value expected to be of type BOOLEAN is of unexpected type STRING"
         ) {
-            Ejson.decodeFromString<WrongFieldType>(encodedValue)
+            EJson.decodeFromString<WrongFieldType>(encodedValue)
         }
     }
 
@@ -253,7 +253,7 @@ class EjsonTest {
             "Unexpected JSON token at offset 5: Expected" +
                     " EOF after parsing, but had ] instead"
         ) {
-            Ejson.decodeFromString<BsonArray?>("💥&&][💎")
+            EJson.decodeFromString<BsonArray?>("💥&&][💎")
         }
     }
 
@@ -292,7 +292,7 @@ class EjsonTest {
 
         assertRoundTrip(
             value = expected,
-            ejson = Ejson(serializersModule = SerializersModule {
+            ejson = EJson(serializersModule = SerializersModule {
                 contextual(ContextualClass::class, contextualSerializer)
             })
         ) { expected, actual: ContextualClassHolder ->
@@ -309,16 +309,16 @@ class EjsonTest {
         )
 
         assertFailsWithMessage<SerializationException>("Serializer for class 'ContextualClass' is not found.") {
-            Ejson.encodeToString(expected)
+            EJson.encodeToString(expected)
         }
     }
 
     @Test
     fun polymorphic() {
         val expected = ClassA("Realm")
-        val expectedEjson = Ejson.encodeToString(expected)
+        val expectedEjson = EJson.encodeToString(expected)
         assertFailsWithMessage<SerializationException>("Polymorphic values are not supported.") {
-            Ejson.decodeFromString<PolymorphicInterface>(expectedEjson)
+            EJson.decodeFromString<PolymorphicInterface>(expectedEjson)
         }
     }
 
@@ -368,9 +368,9 @@ class EjsonTest {
 
     // Assert that decoding `value` as an [AllTypes] fails.
     private inline fun <reified T> assertDecodingFailsWithInvalidType(value: T) {
-        val encodedValue = Ejson.encodeToString(value)
+        val encodedValue = EJson.encodeToString(value)
         assertFailsWithMessage<SerializationException>("Value expected to be of type ") {
-            Ejson.decodeFromString<AllTypes>(encodedValue)
+            EJson.decodeFromString<AllTypes>(encodedValue)
         }
     }
 
@@ -388,7 +388,7 @@ class EjsonTest {
 
     private inline fun <reified E : Any?, reified A> assertRoundTrip(
         value: E,
-        ejson: Ejson = Ejson,
+        ejson: EJson = EJson,
         block: (expected: E, actual: A) -> Unit
     ) {
         val encodedValue = ejson.encodeToString(value)
