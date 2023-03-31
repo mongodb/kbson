@@ -118,7 +118,7 @@ public inline fun <reified T : Any> EJson.decodeFromBsonValue(value: BsonValue):
 /**
  * Main entry point to work with EJSON serialization.
  * [EJSON](https://www.mongodb.com/docs/manual/reference/mongodb-extended-json/)
- * a string format that extends JSON to support all BSON datatypes.
+ * is a JSON format that can be used to encode all BSON datatypes.
  *
  * A default instance is provided via [EJson.Default], but if you require an instance with certain
  * registered serializers or different options you can instantiate it with [EJson].
