@@ -74,13 +74,13 @@ import org.mongodb.kbson.BsonTimestamp
 import org.mongodb.kbson.BsonType
 import org.mongodb.kbson.BsonUndefined
 import org.mongodb.kbson.BsonValue
-import org.mongodb.kbson.ExperimentalApi
+import org.mongodb.kbson.ExperimentalKSerializerApi
 import org.mongodb.kbson.internal.Base64Utils
 import org.mongodb.kbson.internal.HexUtils
 import org.mongodb.kbson.internal.validateSerialization
 
-@ExperimentalApi
-internal fun <T> Ejson.writeBson(value: T, serializer: SerializationStrategy<T>): BsonValue {
+@ExperimentalKSerializerApi
+internal fun <T> EJson.writeBson(value: T, serializer: SerializationStrategy<T>): BsonValue {
     if (value is BsonValue) return value
     lateinit var result: BsonValue
     val encoder = PrimitiveBsonEncoder(serializersModule) { result = it }
@@ -88,31 +88,31 @@ internal fun <T> Ejson.writeBson(value: T, serializer: SerializationStrategy<T>)
     return result
 }
 
-@ExperimentalApi
-internal fun <T> Ejson.readBson(element: BsonValue, deserializer: DeserializationStrategy<T>): T =
+@ExperimentalKSerializerApi
+internal fun <T> EJson.readBson(element: BsonValue, deserializer: DeserializationStrategy<T>): T =
     BsonDecoder(element, serializersModule, ignoreUnknownKeys).decodeSerializableValue(deserializer)
 
 
 /**
- * Serializes the given [value] into an equivalent [JsonElement] using a serializer retrieved
+ * Serializes the given [value] into an equivalent [BsonValue] using a serializer retrieved
  * from reified type parameter.
  *
- * @throws [SerializationException] if the given value cannot be serialized to JSON.
+ * @throws [SerializationException] if the given value cannot be serialized to BSON.
  */
-@ExperimentalApi
-public inline fun <reified T : Any> Ejson.encodeToBsonValue(value: T): BsonValue =
+@ExperimentalKSerializerApi
+public inline fun <reified T : Any> EJson.encodeToBsonValue(value: T): BsonValue =
     encodeToBsonValue(serializersModule.serializer(), value)
 
 
 /**
- * Deserializes the given [json] element into a value of type [T] using a deserializer retrieved
+ * Deserializes the given [value] element into a value of type [T] using a deserializer retrieved
  * from reified type parameter.
  *
- * @throws [SerializationException] if the given JSON element is not a valid JSON input for the type [T]
+ * @throws [SerializationException] if the given [BsonValue] element is not a valid BSON input for the type [T]
  * @throws [IllegalArgumentException] if the decoded input cannot be represented as a valid instance of type [T]
  */
-@ExperimentalApi
-public inline fun <reified T : Any> Ejson.decodeFromBsonValue(value: BsonValue): T =
+@ExperimentalKSerializerApi
+public inline fun <reified T : Any> EJson.decodeFromBsonValue(value: BsonValue): T =
     decodeFromBsonValue(serializersModule.serializer(), value)
 
 /**
@@ -120,8 +120,8 @@ public inline fun <reified T : Any> Ejson.decodeFromBsonValue(value: BsonValue):
  * [EJSON](https://www.mongodb.com/docs/manual/reference/mongodb-extended-json/)
  * a string format that extends JSON to support all BSON datatypes.
  *
- * A default instance is provided via [Ejson.Default], but if you require an instance with certain
- * registered serializers or different options you can instantiate it with [Ejson].
+ * A default instance is provided via [EJson.Default], but if you require an instance with certain
+ * registered serializers or different options you can instantiate it with [EJson].
  *
  * This string format also supports encoding to or from a [BsonValue] with the functions [decodeFromBsonValue]
  * and [encodeToBsonValue].
@@ -131,7 +131,7 @@ public inline fun <reified T : Any> Ejson.decodeFromBsonValue(value: BsonValue):
  * @Serializable
  * class DataHolder(val id: Int, val data: String, val bsonValue: BsonValue)
  *
- * val ejson = Ejson
+ * val ejson = EJson
  * val instance = DataHolder(42, "some data", BsonObjectId() }
  *
  * // Plain StringFormat usage
@@ -152,16 +152,16 @@ public inline fun <reified T : Any> Ejson.decodeFromBsonValue(value: BsonValue):
  *
  * It does not support polymorphic serializers yet.
  */
-@ExperimentalApi
-public sealed class Ejson(
+@ExperimentalKSerializerApi
+public sealed class EJson(
     public val ignoreUnknownKeys: Boolean,
     private val json: Json
 ) : StringFormat {
 
     /**
-     * The default instance of [Ejson] with default configuration.
+     * The default instance of [EJson] with default configuration.
      */
-    public companion object Default : Ejson(
+    public companion object Default : EJson(
         ignoreUnknownKeys = true,
         json = Json
     )
@@ -218,19 +218,19 @@ public sealed class Ejson(
 }
 
 /**
- * Creates an instance of [Ejson] configured with a [ignoreUnknownKeys] and a custom [serializersModule].
+ * Creates an instance of [EJson] configured with a [ignoreUnknownKeys] and a custom [serializersModule].
  */
-@ExperimentalApi
-public fun Ejson(
+@ExperimentalKSerializerApi
+public fun EJson(
     ignoreUnknownKeys: Boolean = true,
     serializersModule: SerializersModule = EmptySerializersModule
-): Ejson = EjsonImpl(ignoreUnknownKeys, serializersModule)
+): EJson = EJsonImpl(ignoreUnknownKeys, serializersModule)
 
-@ExperimentalApi
-private class EjsonImpl constructor(
+@ExperimentalKSerializerApi
+private class EJsonImpl constructor(
     ignoreUnknownKeys: Boolean,
     serializersModule: SerializersModule
-) : Ejson(
+) : EJson(
     ignoreUnknownKeys,
     if (serializersModule == EmptySerializersModule) Json else Json {
         this.serializersModule = serializersModule

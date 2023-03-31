@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-@file:OptIn(ExperimentalApi::class)
+@file:OptIn(ExperimentalKSerializerApi::class)
 
 package org.mongodb.kbson
 
