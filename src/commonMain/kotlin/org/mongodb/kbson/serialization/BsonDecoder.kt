@@ -2,7 +2,6 @@ package org.mongodb.kbson.serialization
 
 import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.ExperimentalSerializationApi
-import kotlinx.serialization.Polymorphic
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.descriptors.PolymorphicKind
 import kotlinx.serialization.descriptors.PrimitiveKind
@@ -57,8 +56,10 @@ internal open class BsonDecoder(
                     if (!ignoreUnknownKeys) {
                         forEach { entry ->
                             if (descriptor.getElementIndex(entry.key) == UNKNOWN_NAME) {
-                                throw SerializationException("Could not decode class `${descriptor.serialName}`, " +
-                                        "encountered unknown key `${entry.key}`.")
+                                throw SerializationException(
+                                    "Could not decode class `${descriptor.serialName}`, " +
+                                            "encountered unknown key `${entry.key}`."
+                                )
                             }
                         }
                     }
@@ -83,32 +84,37 @@ internal open class BsonDecoder(
         }
     }
 
+    // TODO document fast paths
+    override fun <T> decodeSerializableValue(deserializer: DeserializationStrategy<T>): T = when {
+        currentValue() is BsonNull -> fastPathBsonNull(deserializer)
+        deserializer is BsonSerializer -> fastPathBsonValue()
+        deserializer.descriptor.isByteArray() -> fastPathByteArray()
+        else -> super.decodeSerializableValue(deserializer)
+    }
+
     @Suppress("UNCHECKED_CAST")
-    override fun <T> decodeSerializableValue(deserializer: DeserializationStrategy<T>): T =
-        when {
-            // Depending on the deserialization strategy we need to return BsonNull, if we decode
-            // to BsonValue, or null otherwise.
-            currentValue() is BsonNull -> {
-                when (deserializer) {
-                    is BsonValueSerializer,
-                    is BsonNullSerializer -> BsonNull
-                    else -> null
-                } as T
+    private inline fun <T> fastPathBsonValue(): T = currentValue() as T
+
+    @Suppress("UNCHECKED_CAST")
+    private inline fun <T> fastPathByteArray(): T = when (val value = currentValue()) {
+        is BsonBinary -> value.data
+        is BsonArray -> {
+            ByteArray(value.size) {
+                value[it].asNumber().intValue().toByte()
             }
-            deserializer.descriptor.isByteArray() -> {
-                // Fast path to decode a BsonBinary or BsonArray as a ByteArray
-                when (val value = currentValue()) {
-                    is BsonBinary -> value.data
-                    is BsonArray -> {
-                        ByteArray(value.size) {
-                            value[it].asNumber().intValue().toByte()
-                        }
-                    }
-                    else -> error("Cannot decode $value as a ByteArray.")
-                } as T
-            }
-            else -> super.decodeSerializableValue(deserializer)
         }
+        else -> error("Cannot decode $value as a ByteArray.")
+    } as T
+
+    // Depending on the deserialization strategy we need to return BsonNull, if we decode
+    // to BsonValue, or null otherwise.
+    @Suppress("UNCHECKED_CAST")
+    private inline fun <T> fastPathBsonNull(deserializer: DeserializationStrategy<T>): T =
+        when (deserializer) {
+            is BsonValueSerializer,
+            is BsonNullSerializer -> BsonNull
+            else -> null
+        } as T
 
     override fun decodeInt(): Int =
         rethrowAsSerializationException { currentValue().asInt32().value }

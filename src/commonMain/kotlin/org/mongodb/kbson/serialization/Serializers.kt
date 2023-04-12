@@ -221,12 +221,14 @@ public sealed class EJson(
  * Creates an instance of [EJson] configured with a [ignoreUnknownKeys] and a custom [serializersModule].
  */
 @ExperimentalKSerializerApi
+@OptIn(ExperimentalSerializationApi::class)
 public fun EJson(
     ignoreUnknownKeys: Boolean = true,
     serializersModule: SerializersModule = EmptySerializersModule
 ): EJson = EJsonImpl(ignoreUnknownKeys, serializersModule)
 
 @ExperimentalKSerializerApi
+@OptIn(ExperimentalSerializationApi::class)
 private class EJsonImpl constructor(
     ignoreUnknownKeys: Boolean,
     serializersModule: SerializersModule
@@ -254,7 +256,9 @@ public object Bson {
     public fun toJson(bsonValue: BsonValue): String = Json.encodeToString(bsonValue)
 }
 
-internal object BsonValueSerializer : KSerializer<BsonValue> {
+internal sealed interface BsonSerializer
+
+internal object BsonValueSerializer : KSerializer<BsonValue>, BsonSerializer {
 
     @Serializable
     private class BsonValueJson
@@ -424,7 +428,7 @@ internal object BsonValueSerializer : KSerializer<BsonValue> {
     }
 }
 
-internal object BsonDocumentSerializer : KSerializer<BsonDocument> {
+internal object BsonDocumentSerializer : KSerializer<BsonDocument>, BsonSerializer {
 
     private val serializer = MapSerializer(BsonDocumentKeySerializer, BsonValueSerializer)
     override val descriptor: SerialDescriptor = serializer.descriptor
@@ -446,7 +450,7 @@ internal object BsonDocumentSerializer : KSerializer<BsonDocument> {
     }
 }
 
-internal object BsonArraySerializer : KSerializer<BsonArray> {
+internal object BsonArraySerializer : KSerializer<BsonArray>, BsonSerializer {
 
     private val serializer = ListSerializer(BsonValueSerializer)
     override val descriptor: SerialDescriptor = serializer.descriptor
@@ -468,7 +472,7 @@ internal object BsonArraySerializer : KSerializer<BsonArray> {
     }
 }
 
-internal object BsonDocumentKeySerializer : KSerializer<String> {
+internal object BsonDocumentKeySerializer : KSerializer<String>, BsonSerializer {
     override val descriptor: SerialDescriptor =
         PrimitiveSerialDescriptor("BsonDocumentKey", PrimitiveKind.STRING)
 
@@ -482,7 +486,7 @@ internal object BsonDocumentKeySerializer : KSerializer<String> {
     }
 }
 
-internal object BsonBinarySerializer : KSerializer<BsonBinary> {
+internal object BsonBinarySerializer : KSerializer<BsonBinary>, BsonSerializer {
     private const val HEX_RADIX = 16
 
     // { "$binary": {"base64": "<payload>", "subType": "<t>"}}
@@ -528,7 +532,7 @@ internal object BsonBinarySerializer : KSerializer<BsonBinary> {
     }
 }
 
-internal object BsonBooleanSerializer : KSerializer<BsonBoolean> {
+internal object BsonBooleanSerializer : KSerializer<BsonBoolean>, BsonSerializer {
     override val descriptor: SerialDescriptor = Boolean.serializer().descriptor
 
     override fun serialize(encoder: Encoder, value: BsonBoolean) {
@@ -548,7 +552,7 @@ internal object BsonBooleanSerializer : KSerializer<BsonBoolean> {
     }
 }
 
-internal object BsonDateTimeSerializer : KSerializer<BsonDateTime> {
+internal object BsonDateTimeSerializer : KSerializer<BsonDateTime>, BsonSerializer {
 
     // {"$date": {"$numberLong": "<millis>"}}
     @Serializable
@@ -582,7 +586,7 @@ internal object BsonDateTimeSerializer : KSerializer<BsonDateTime> {
     }
 }
 
-internal object BsonDBPointerSerializer : KSerializer<BsonDBPointer> {
+internal object BsonDBPointerSerializer : KSerializer<BsonDBPointer>, BsonSerializer {
     // {"$dbPointer": {"$ref": <namespace>, "$id": {"$oid": <hex string>}}}.
     @Serializable
     private data class BsonValueJson(@SerialName("\$dbPointer") val data: BsonValueData) {
@@ -623,7 +627,7 @@ internal object BsonDBPointerSerializer : KSerializer<BsonDBPointer> {
     }
 }
 
-internal object BsonDecimal128Serializer : KSerializer<BsonDecimal128> {
+internal object BsonDecimal128Serializer : KSerializer<BsonDecimal128>, BsonSerializer {
     // {"$numberDecimal": <decimal as a string>} [1]
     @Serializable
     private data class BsonValueJson(@SerialName("\$numberDecimal") val data: String) {
@@ -653,7 +657,7 @@ internal object BsonDecimal128Serializer : KSerializer<BsonDecimal128> {
     }
 }
 
-internal object BsonDoubleSerializer : KSerializer<BsonDouble> {
+internal object BsonDoubleSerializer : KSerializer<BsonDouble>, BsonSerializer {
     // {"$numberDouble": <64-bit signed floating point as a decimal string>}
     @Serializable
     private data class BsonValueJson(@SerialName("\$numberDouble") val data: String) {
@@ -681,7 +685,7 @@ internal object BsonDoubleSerializer : KSerializer<BsonDouble> {
     }
 }
 
-internal object BsonInt32Serializer : KSerializer<BsonInt32> {
+internal object BsonInt32Serializer : KSerializer<BsonInt32>, BsonSerializer {
     // {"$numberInt": <32-bit signed integer as a string>}
     @Serializable
     private data class BsonValueJson(@SerialName("\$numberInt") val data: String) {
@@ -709,7 +713,7 @@ internal object BsonInt32Serializer : KSerializer<BsonInt32> {
     }
 }
 
-internal object BsonInt64Serializer : KSerializer<BsonInt64> {
+internal object BsonInt64Serializer : KSerializer<BsonInt64>, BsonSerializer {
     // {"$numberLong": <64-bit signed integer as a string>}
     @Serializable
     private data class BsonValueJson(@SerialName("\$numberLong") val data: String) {
@@ -737,7 +741,7 @@ internal object BsonInt64Serializer : KSerializer<BsonInt64> {
     }
 }
 
-internal object BsonJavaScriptSerializer : KSerializer<BsonJavaScript> {
+internal object BsonJavaScriptSerializer : KSerializer<BsonJavaScript>, BsonSerializer {
     // {"$code": string}
     @Serializable
     private data class BsonValueJson(@SerialName("\$code") val code: String) {
@@ -765,7 +769,7 @@ internal object BsonJavaScriptSerializer : KSerializer<BsonJavaScript> {
     }
 }
 
-internal object BsonJavaScriptWithScopeSerializer : KSerializer<BsonJavaScriptWithScope> {
+internal object BsonJavaScriptWithScopeSerializer : KSerializer<BsonJavaScriptWithScope>, BsonSerializer {
     // {"$code": string, "$scope": Document}
     @Serializable
     private data class BsonValueJson(
@@ -798,7 +802,7 @@ internal object BsonJavaScriptWithScopeSerializer : KSerializer<BsonJavaScriptWi
     }
 }
 
-internal object BsonMaxKeySerializer : KSerializer<BsonMaxKey> {
+internal object BsonMaxKeySerializer : KSerializer<BsonMaxKey>, BsonSerializer {
     // {"$maxKey": 1}
     @Serializable
     private data class BsonValueJson(@SerialName("\$maxKey") val data: Int) {
@@ -828,7 +832,7 @@ internal object BsonMaxKeySerializer : KSerializer<BsonMaxKey> {
     }
 }
 
-internal object BsonMinKeySerializer : KSerializer<BsonMinKey> {
+internal object BsonMinKeySerializer : KSerializer<BsonMinKey>, BsonSerializer {
     // {"$minKey": 1}
     @Serializable
     private data class BsonValueJson(@SerialName("\$minKey") val data: Int) {
@@ -859,7 +863,7 @@ internal object BsonMinKeySerializer : KSerializer<BsonMinKey> {
 }
 
 @ExperimentalSerializationApi
-internal object BsonNullSerializer : KSerializer<BsonNull> {
+internal object BsonNullSerializer : KSerializer<BsonNull>, BsonSerializer {
     private val serializer = JsonNull.serializer()
     override val descriptor: SerialDescriptor = serializer.descriptor
 
@@ -883,7 +887,7 @@ internal object BsonNullSerializer : KSerializer<BsonNull> {
     }
 }
 
-internal object BsonObjectIdSerializer : KSerializer<BsonObjectId> {
+internal object BsonObjectIdSerializer : KSerializer<BsonObjectId>, BsonSerializer {
     // {"$oid": <ObjectId bytes as 24-character, big-endian hex string>}
     @Serializable
     private data class BsonValueJson(@SerialName("\$oid") val data: String) {
@@ -911,7 +915,7 @@ internal object BsonObjectIdSerializer : KSerializer<BsonObjectId> {
     }
 }
 
-internal object BsonRegularExpressionSerializer : KSerializer<BsonRegularExpression> {
+internal object BsonRegularExpressionSerializer : KSerializer<BsonRegularExpression>, BsonSerializer {
     // {"$regularExpression": {pattern: string, "options": <BSON regular expression options as a
     // string or "" [2]>}}
     @Serializable
@@ -954,7 +958,7 @@ internal object BsonRegularExpressionSerializer : KSerializer<BsonRegularExpress
     }
 }
 
-internal object BsonStringSerializer : KSerializer<BsonString> {
+internal object BsonStringSerializer : KSerializer<BsonString>, BsonSerializer {
     override val descriptor: SerialDescriptor = String.serializer().descriptor
     override fun serialize(encoder: Encoder, value: BsonString) {
         when (encoder) {
@@ -973,7 +977,7 @@ internal object BsonStringSerializer : KSerializer<BsonString> {
     }
 }
 
-internal object BsonSymbolSerializer : KSerializer<BsonSymbol> {
+internal object BsonSymbolSerializer : KSerializer<BsonSymbol>, BsonSerializer {
     // {"$symbol": string}
     @Serializable
     private data class BsonValueJson(@SerialName("\$symbol") val data: String) {
@@ -1001,7 +1005,7 @@ internal object BsonSymbolSerializer : KSerializer<BsonSymbol> {
     }
 }
 
-internal object BsonTimestampSerializer : KSerializer<BsonTimestamp> {
+internal object BsonTimestampSerializer : KSerializer<BsonTimestamp>, BsonSerializer {
     // {"$timestamp": {"t": pos-integer, "i": pos-integer}}
     @Serializable
     private data class BsonValueJson(@SerialName("\$timestamp") val data: BsonValueData) {
@@ -1040,7 +1044,7 @@ internal object BsonTimestampSerializer : KSerializer<BsonTimestamp> {
     }
 }
 
-internal object BsonUndefinedSerializer : KSerializer<BsonUndefined> {
+internal object BsonUndefinedSerializer : KSerializer<BsonUndefined>, BsonSerializer {
     // {"$undefined": true}
     @Serializable
     private data class BsonValueJson(@SerialName("\$undefined") val data: Boolean) {

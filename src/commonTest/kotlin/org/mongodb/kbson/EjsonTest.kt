@@ -31,6 +31,7 @@ import kotlinx.serialization.encodeToString
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
 import kotlinx.serialization.modules.SerializersModule
+import kotlinx.serialization.serializer
 import org.mongodb.kbson.serialization.EJson
 import kotlin.test.Test
 import kotlin.test.assertContentEquals
@@ -39,100 +40,191 @@ import kotlin.test.assertFailsWith
 import kotlin.test.assertNotEquals
 
 class EjsonTest {
-    @Test
-    fun bsonTypes() {
-        listOf(
-            BsonArray(bsonDataSet.toList()),
-            BsonDocument(
-                bsonDataSet
-                    .mapIndexed { index, bsonValue ->
-                        "$index" to bsonValue
-                    }
-                    .toMap()
-            )
-        ) + bsonDataSet
-            .forEach {
-                assertRoundTrip(it)
+    /**
+     * Generates a pair of the given value and its serializer strategy.
+     *
+     * KSerializer provides access to the serializer in compile time only. This forces to retrieve
+     * the serializer when we declare the test data rather than when we use the data in a test.
+     */
+    private inline fun <reified T> valueWithSerializer(value: T) =
+        value to EJson.serializersModule.serializer<T>()
+
+    enum class SupportedKotlinTypes {
+        ARRAY,
+        BOOLEAN,
+        SHORT,
+        INT,
+        LONG,
+        FLOAT,
+        DOUBLE,
+        STRING,
+        CHAR,
+        BYTEARRAY,
+        SET,
+        LIST,
+        MAP,
+    }
+
+    private val supportedKotlinTypesDataset: List<Pair<Any, KSerializer<out Any>>> =
+        SupportedKotlinTypes.values().flatMap { type ->
+            when (type) {
+                SupportedKotlinTypes.BOOLEAN -> listOf(
+                    valueWithSerializer(true),
+                    valueWithSerializer(false)
+                )
+                SupportedKotlinTypes.SHORT -> listOf(
+                    valueWithSerializer(Short.MIN_VALUE),
+                    valueWithSerializer(Short.MAX_VALUE)
+                )
+                SupportedKotlinTypes.INT -> listOf(
+                    valueWithSerializer(Int.MIN_VALUE),
+                    valueWithSerializer(Int.MAX_VALUE)
+                )
+                SupportedKotlinTypes.LONG -> listOf(
+                    valueWithSerializer(Long.MIN_VALUE),
+                    valueWithSerializer(Long.MAX_VALUE)
+                )
+                SupportedKotlinTypes.FLOAT -> listOf(
+                    valueWithSerializer(Float.MIN_VALUE),
+                    valueWithSerializer(Float.MAX_VALUE)
+                )
+                SupportedKotlinTypes.DOUBLE -> listOf(
+                    valueWithSerializer(Double.MIN_VALUE),
+                    valueWithSerializer(Double.MAX_VALUE)
+                )
+                SupportedKotlinTypes.STRING -> listOf(
+                    valueWithSerializer("hello world"),
+                    valueWithSerializer(""),
+                    valueWithSerializer("🚀💎")
+                )
+                SupportedKotlinTypes.CHAR -> listOf(
+                    valueWithSerializer('4'),
+                    valueWithSerializer('c'),
+                    valueWithSerializer('[')
+                )
+                SupportedKotlinTypes.BYTEARRAY -> listOf(
+                    valueWithSerializer(byteArrayOf(10, 0, 10)),
+                    valueWithSerializer(byteArrayOf()),
+                    valueWithSerializer(byteArrayOf(0, 0))
+                )
+                SupportedKotlinTypes.ARRAY -> listOf(
+                    valueWithSerializer(arrayOf<String>("hello world"))
+                )
+                SupportedKotlinTypes.LIST -> listOf(
+                    valueWithSerializer(listOf<String>("hello world")),
+                    valueWithSerializer(listOf<List<String>>(listOf("hello world"))),
+                )
+                SupportedKotlinTypes.SET -> listOf(
+                    valueWithSerializer(setOf<String>("hello world")),
+                    valueWithSerializer(setOf<Set<String>>(setOf("hello world"))),
+                )
+                SupportedKotlinTypes.MAP -> listOf(
+                    valueWithSerializer(mapOf<String, String>("hello" to "world")),
+                    valueWithSerializer(mapOf<String, Map<String, String>>("hello" to mapOf("hello" to "world"))),
+                )
             }
-    }
+        }
 
-    @Test
-    fun bsonTypes_invalidType() {
-        listOf(
-            BsonArray(bsonDataSet.toList()),
-            BsonDocument(
-                bsonDataSet
-                    .mapIndexed { index, bsonValue ->
-                        "$index" to bsonValue
-                    }
-                    .toMap()
-            )
-        ) + bsonDataSet
-            .forEach { bsonValue ->
-                assertDecodingFailsWithInvalidType(bsonValue)
+    private val bsonDataSet: List<Pair<BsonValue, KSerializer<out BsonValue>>> = BsonType.values()
+        .flatMap {
+            when (it) {
+                BsonType.DOUBLE -> listOf(valueWithSerializer(BsonDouble(10.0)))
+                BsonType.STRING -> listOf(valueWithSerializer(BsonString("hello world")))
+                BsonType.DOCUMENT -> listOf(valueWithSerializer(BsonDocument()))
+                BsonType.ARRAY -> listOf(valueWithSerializer(BsonArray()))
+                BsonType.BINARY -> listOf(valueWithSerializer(BsonBinary(byteArrayOf(10, 20, 30))))
+                BsonType.UNDEFINED -> listOf(valueWithSerializer(BsonUndefined))
+                BsonType.OBJECT_ID -> listOf(valueWithSerializer(BsonObjectId()))
+                BsonType.BOOLEAN -> listOf(
+                    valueWithSerializer(BsonBoolean.TRUE_VALUE),
+                    valueWithSerializer(BsonBoolean.FALSE_VALUE)
+                )
+                BsonType.DATE_TIME -> listOf(valueWithSerializer(BsonDateTime()))
+                BsonType.NULL -> listOf(valueWithSerializer(BsonNull))
+                BsonType.REGULAR_EXPRESSION -> listOf(valueWithSerializer(BsonRegularExpression("")))
+                BsonType.DB_POINTER -> listOf(
+                    valueWithSerializer(
+                        BsonDBPointer(
+                            "test",
+                            BsonObjectId()
+                        )
+                    )
+                )
+                BsonType.JAVASCRIPT -> listOf(
+                    valueWithSerializer(
+                        BsonJavaScript(
+                            """
+                    alert('Hello, world');
+                """.trimIndent()
+                        )
+                    )
+                )
+                BsonType.SYMBOL -> listOf(valueWithSerializer(BsonSymbol("d")))
+                BsonType.JAVASCRIPT_WITH_SCOPE -> listOf(
+                    valueWithSerializer(
+                        BsonJavaScriptWithScope(
+                            """
+                    alert('Hello, world');
+                """.trimIndent(),
+                            BsonDocument()
+                        )
+                    )
+                )
+                BsonType.INT32 -> listOf(
+                    valueWithSerializer(BsonInt32(Int.MIN_VALUE)),
+                    valueWithSerializer(BsonInt32(Int.MAX_VALUE))
+                )
+                BsonType.TIMESTAMP -> listOf(valueWithSerializer(BsonTimestamp()))
+                BsonType.INT64 -> listOf(
+                    valueWithSerializer(BsonInt64(Long.MIN_VALUE)),
+                    valueWithSerializer(BsonInt64(Long.MAX_VALUE))
+                )
+                BsonType.DECIMAL128 -> listOf(valueWithSerializer(BsonDecimal128("100")))
+                BsonType.MIN_KEY -> listOf(valueWithSerializer(BsonMinKey))
+                BsonType.MAX_KEY -> listOf(valueWithSerializer(BsonMaxKey))
+                BsonType.END_OF_DOCUMENT -> listOf()
             }
+        }.let { dataset ->
+            val bsonValues = dataset.map { it.first }
+            listOf(
+                valueWithSerializer(BsonArray(bsonValues)),
+                valueWithSerializer(
+                    BsonDocument(
+                        bsonValues.mapIndexed { index, bsonValue ->
+                            "$index" to bsonValue
+                        }.toMap()
+                    )
+                )
+            )
+            dataset
+        }
+
+    @Test
+    fun roundTripAllTypes() {
+        supportedKotlinTypesDataset + bsonDataSet.forEach { (data: Any, serializer: KSerializer<out Any>) ->
+            assertRoundTrip(data, serializer as KSerializer<Any>)
+        }
     }
 
     @Test
-    fun kotlinTypes() {
-        // Different list are required to retain type argument information.
-        listOf(true, false).assertRoundTrip()
-        listOf(Short.MAX_VALUE, Short.MIN_VALUE).assertRoundTrip()
-        listOf(Int.MAX_VALUE, Int.MIN_VALUE).assertRoundTrip()
-        listOf(Long.MAX_VALUE, Long.MIN_VALUE).assertRoundTrip()
-        listOf(Float.MAX_VALUE, Float.MIN_VALUE).assertRoundTrip()
-        listOf(Double.MAX_VALUE, Double.MIN_VALUE).assertRoundTrip()
-        listOf("hello world", "", "🚀💎").assertRoundTrip()
-        listOf('4', 'c', '[').assertRoundTrip()
-        listOf(byteArrayOf(10, 0, 10), byteArrayOf(), byteArrayOf(0, 0)).assertRoundTrip()
+    fun roundTripAllTypes_failsInvalidType() {
+        supportedKotlinTypesDataset + bsonDataSet.filterNot {
+            it.first == BsonNull // BsonNull would always decode to a valid type
+        }.forEach { (data: Any, _) ->
+            assertDecodingFailsWithInvalidType(data)
+        }
     }
 
     @Test
-    fun kotlinTypes_invalidType() {
-        // Different list are required to retain type argument information.
-        assertDecodingFailsWithInvalidType(true)
-        assertDecodingFailsWithInvalidType(Short.MAX_VALUE)
-        assertDecodingFailsWithInvalidType(Int.MAX_VALUE)
-        assertDecodingFailsWithInvalidType(Long.MAX_VALUE)
-        assertDecodingFailsWithInvalidType(Float.MAX_VALUE)
-        assertDecodingFailsWithInvalidType(Double.MAX_VALUE)
-        assertDecodingFailsWithInvalidType("hello world")
-        assertDecodingFailsWithInvalidType('4')
-        assertDecodingFailsWithInvalidType(byteArrayOf(10, 0, 10))
-    }
+    fun nullValues() {
+        assertRoundTrip(null as String?)
+        assertRoundTrip(null as AllTypes?)
 
-    @Test
-    fun collections() {
-        listOf(
-            listOf<String>("hello world")
-        ).assertRoundTrip()
+        assertRoundTrip(BsonNull)
 
-        listOf(
-            listOf<List<String>>(listOf("hello world"))
-        ).assertRoundTrip()
-
-        listOf(
-            setOf<String>("hello world")
-        ).assertRoundTrip()
-
-        listOf(
-            setOf(setOf<String>("hello world"))
-        ).assertRoundTrip()
-
-        listOf(
-            mapOf<String, String>("hello" to "world")
-        ).assertRoundTrip()
-
-        listOf(
-            mapOf<String, Map<String, String>>("hello" to mapOf("hello" to "world"))
-        ).assertRoundTrip()
-    }
-
-    @Test
-    fun collections_invalidType() {
-        assertDecodingFailsWithInvalidType(listOf<String>("hello world"))
-        assertDecodingFailsWithInvalidType(setOf<String>("hello world"))
-        assertDecodingFailsWithInvalidType(mapOf<String, String>("hello" to "world"))
+        assertRoundTrip(listOf<String?>(null, null))
+        assertRoundTrip(listOf<BsonValue?>(null, null))
+        assertRoundTrip(listOf<BsonValue>(BsonNull, BsonNull))
     }
 
     @Test
@@ -236,18 +328,6 @@ class EjsonTest {
     }
 
     @Test
-    fun nullValue() {
-        assertRoundTrip(null as String?)
-        assertRoundTrip(null as AllTypes?)
-
-        assertRoundTrip(BsonNull)
-
-        assertRoundTrip(listOf<String?>(null, null))
-        assertRoundTrip(listOf<BsonValue?>(null, null))
-        assertRoundTrip(listOf<BsonValue>(BsonNull, BsonNull))
-    }
-
-    @Test
     fun decodeMalformedEjsonString() {
         assertFailsWith<SerializationException>(
             "Unexpected JSON token at offset 5: Expected" +
@@ -258,18 +338,18 @@ class EjsonTest {
     }
 
     @Test
-    fun enums() {
+    fun userDefinedClasses_enums() {
         assertRoundTrip(SerializableEnum.A)
         assertRoundTrip(SerializableEnum.B)
     }
 
     @Test
-    fun objects() {
+    fun userDefinedClasses_objects() {
         assertRoundTrip(SerializableObject)
     }
 
     @Test
-    fun contextualClass() {
+    fun userDefinedClasses_contextualClass() {
         val expected = ContextualClassHolder(
             contextualClass = ContextualClass(
                 string = "helloworld"
@@ -301,7 +381,7 @@ class EjsonTest {
     }
 
     @Test
-    fun contextualMissingSerializerFails() {
+    fun userDefinedClasses_contextualMissingSerializerFails() {
         val expected = ContextualClassHolder(
             contextualClass = ContextualClass(
                 string = "helloworld"
@@ -314,7 +394,7 @@ class EjsonTest {
     }
 
     @Test
-    fun polymorphic() {
+    fun userDefinedClasses_polymorphic() {
         val expected = ClassA("Realm")
         val expectedEjson = EJson.encodeToString(expected)
         assertFailsWithMessage<SerializationException>("Polymorphic values are not supported.") {
@@ -322,60 +402,12 @@ class EjsonTest {
         }
     }
 
-    private val bsonDataSet: List<BsonValue> = BsonType.values()
-        .filter {
-            it != BsonType.NULL // Tested separately
-        }
-        .flatMap {
-            when (it) {
-                BsonType.DOUBLE -> listOf(BsonDouble(10.0))
-                BsonType.STRING -> listOf(BsonString("hello world"))
-                BsonType.DOCUMENT -> listOf(BsonDocument())
-                BsonType.ARRAY -> listOf(BsonArray())
-                BsonType.BINARY -> listOf(BsonBinary(byteArrayOf(10, 20, 30)))
-                BsonType.UNDEFINED -> listOf(BsonUndefined)
-                BsonType.OBJECT_ID -> listOf(BsonObjectId())
-                BsonType.BOOLEAN -> listOf(BsonBoolean.TRUE_VALUE, BsonBoolean.FALSE_VALUE)
-                BsonType.DATE_TIME -> listOf(BsonDateTime())
-                BsonType.NULL -> listOf(BsonNull)
-                BsonType.REGULAR_EXPRESSION -> listOf(BsonRegularExpression(""))
-                BsonType.DB_POINTER -> listOf(BsonDBPointer("test", BsonObjectId()))
-                BsonType.JAVASCRIPT -> listOf(
-                    BsonJavaScript(
-                        """
-                    alert('Hello, world');
-                """.trimIndent()
-                    )
-                )
-                BsonType.SYMBOL -> listOf(BsonSymbol("d"))
-                BsonType.JAVASCRIPT_WITH_SCOPE -> listOf(
-                    BsonJavaScriptWithScope(
-                        """
-                    alert('Hello, world');
-                """.trimIndent(),
-                        BsonDocument()
-                    )
-                )
-                BsonType.INT32 -> listOf(BsonInt32(Int.MIN_VALUE), BsonInt32(Int.MAX_VALUE))
-                BsonType.TIMESTAMP -> listOf(BsonTimestamp())
-                BsonType.INT64 -> listOf(BsonInt64(Long.MIN_VALUE), BsonInt64(Long.MAX_VALUE))
-                BsonType.DECIMAL128 -> listOf(BsonDecimal128("100"))
-                BsonType.MIN_KEY -> listOf(BsonMinKey)
-                BsonType.MAX_KEY -> listOf(BsonMaxKey)
-                BsonType.END_OF_DOCUMENT -> listOf()
-            }
-        }
-
     // Assert that decoding `value` as an [AllTypes] fails.
     private inline fun <reified T> assertDecodingFailsWithInvalidType(value: T) {
         val encodedValue = EJson.encodeToString(value)
         assertFailsWithMessage<SerializationException>("Value expected to be of type ") {
             EJson.decodeFromString<AllTypes>(encodedValue)
         }
-    }
-
-    private inline fun <reified T> Iterable<T>.assertRoundTrip() {
-        for (value in this) assertRoundTrip(value)
     }
 
     private inline fun <reified T> assertRoundTrip(value: T) =
@@ -394,6 +426,23 @@ class EjsonTest {
         val encodedValue = ejson.encodeToString(value)
         val decodedValue: A = ejson.decodeFromString(encodedValue)
         block(value, decodedValue)
+    }
+
+    private fun <E> assertRoundTrip(
+        expected: E,
+        serializer: KSerializer<E>,
+    ) {
+        val encodedValue = EJson.encodeToString(serializer, expected)
+        val actual: E = EJson.decodeFromString(serializer, encodedValue)
+
+        when (expected) {
+            is ByteArray -> assertContentEquals(expected as ByteArray, actual as ByteArray)
+            is Array<*> -> {
+                (actual as Array<*>)
+                assertContentEquals(expected.asList(), actual.asList())
+            }
+            else -> assertEquals(expected, actual)
+        }
     }
 
     interface PolymorphicInterface {
@@ -470,11 +519,11 @@ class EjsonTest {
         val string = "hello world"
         val bsonValue = BsonString("hello world")
         val byteArray = byteArrayOf(10, 0, 10)
+        val stringArray = arrayOf("hello world")
         val stringList = listOf("hello world")
         val stringMap = mapOf("hello" to "world")
         var allTypesObject: AllTypes? = null
 
-        @Suppress("ComplexMethod")
         override fun equals(other: Any?): Boolean {
             if (this === other) return true
             if (other == null || this::class != other::class) return false
@@ -491,6 +540,7 @@ class EjsonTest {
             if (string != other.string) return false
             if (bsonValue != other.bsonValue) return false
             if (!byteArray.contentEquals(other.byteArray)) return false
+            if (!stringArray.contentEquals(other.stringArray)) return false
             if (stringList != other.stringList) return false
             if (stringMap != other.stringMap) return false
             if (allTypesObject != other.allTypesObject) return false
@@ -509,6 +559,7 @@ class EjsonTest {
             result = 31 * result + string.hashCode()
             result = 31 * result + bsonValue.hashCode()
             result = 31 * result + byteArray.contentHashCode()
+            result = 31 * result + stringArray.contentHashCode()
             result = 31 * result + stringList.hashCode()
             result = 31 * result + stringMap.hashCode()
             result = 31 * result + (allTypesObject?.hashCode() ?: 0)
