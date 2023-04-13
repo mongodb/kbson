@@ -524,6 +524,7 @@ class EjsonTest {
         val stringMap = mapOf("hello" to "world")
         var allTypesObject: AllTypes? = null
 
+        @Suppress("ComplexMethod")
         override fun equals(other: Any?): Boolean {
             if (this === other) return true
             if (other == null || this::class != other::class) return false
