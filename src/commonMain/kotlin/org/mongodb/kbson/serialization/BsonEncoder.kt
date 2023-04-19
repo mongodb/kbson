@@ -1,7 +1,9 @@
 package org.mongodb.kbson.serialization
 
 import kotlinx.serialization.ExperimentalSerializationApi
+import kotlinx.serialization.SerializationException
 import kotlinx.serialization.SerializationStrategy
+import kotlinx.serialization.descriptors.PolymorphicKind
 import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.descriptors.StructureKind
 import kotlinx.serialization.encoding.AbstractEncoder
@@ -41,7 +43,8 @@ internal sealed class BsonEncoder(
                 // Mimics the Json encode behavior of returning an empty map on Kotlin Objects.
                 pushValue(BsonDocument())
             }
-
+            PolymorphicKind.OPEN,
+            PolymorphicKind.SEALED -> throw SerializationException("Polymorphic values are not supported.")
             else -> error("Unsupported descriptor Kind ${descriptor.kind}")
         }
 

@@ -4,7 +4,6 @@ import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.descriptors.PolymorphicKind
-import kotlinx.serialization.descriptors.PrimitiveKind
 import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.descriptors.StructureKind
 import kotlinx.serialization.encoding.AbstractDecoder
@@ -14,15 +13,15 @@ import kotlinx.serialization.modules.SerializersModule
 import org.mongodb.kbson.BsonArray
 import org.mongodb.kbson.BsonBinary
 import org.mongodb.kbson.BsonDocument
+import org.mongodb.kbson.BsonDouble
+import org.mongodb.kbson.BsonInt32
+import org.mongodb.kbson.BsonInt64
 import org.mongodb.kbson.BsonInvalidOperationException
 import org.mongodb.kbson.BsonNull
 import org.mongodb.kbson.BsonNumber
 import org.mongodb.kbson.BsonString
+import org.mongodb.kbson.BsonType
 import org.mongodb.kbson.BsonValue
-
-@OptIn(ExperimentalSerializationApi::class)
-internal fun SerialDescriptor.isByteArray(): Boolean =
-    kind == StructureKind.LIST && getElementDescriptor(0).kind == PrimitiveKind.BYTE
 
 @OptIn(ExperimentalSerializationApi::class)
 internal open class BsonDecoder(
@@ -36,11 +35,20 @@ internal open class BsonDecoder(
     override fun beginStructure(descriptor: SerialDescriptor): CompositeDecoder {
         return when (descriptor.kind) {
             StructureKind.LIST -> {
-                ListBsonDecoder(
-                    bsonArray = rethrowAsSerializationException { currentValue().asArray() },
-                    serializersModule = serializersModule,
-                    ignoreUnknownKeys = ignoreUnknownKeys
-                )
+                when (currentValue().bsonType) {
+                    BsonType.BINARY -> ListBsonBinaryDecoder(
+                        bsonBinary = currentValue().asBinary(),
+                        serializersModule = serializersModule
+                    )
+                    BsonType.ARRAY -> ListBsonDecoder(
+                        bsonArray = rethrowAsSerializationException {
+                            currentValue().asArray()
+                        },
+                        serializersModule = serializersModule,
+                        ignoreUnknownKeys = ignoreUnknownKeys
+                    )
+                    else -> error("Unsupported")
+                }
             }
             StructureKind.MAP -> {
                 MapBsonDecoder(
@@ -85,26 +93,27 @@ internal open class BsonDecoder(
     }
 
     // TODO document fast paths
+    @Suppress("UNCHECKED_CAST")
     override fun <T> decodeSerializableValue(deserializer: DeserializationStrategy<T>): T = when {
         currentValue() is BsonNull -> fastPathBsonNull(deserializer)
-        deserializer is BsonSerializer -> fastPathBsonValue()
-        deserializer.descriptor.isByteArray() -> fastPathByteArray()
+        deserializer is BsonSerializer -> fastPathBsonValue(deserializer)
         else -> super.decodeSerializableValue(deserializer)
     }
 
     @Suppress("UNCHECKED_CAST")
-    private inline fun <T> fastPathBsonValue(): T = currentValue() as T
-
-    @Suppress("UNCHECKED_CAST")
-    private inline fun <T> fastPathByteArray(): T = when (val value = currentValue()) {
-        is BsonBinary -> value.data
-        is BsonArray -> {
-            ByteArray(value.size) {
-                value[it].asNumber().intValue().toByte()
+    private inline fun <T> fastPathBsonValue(deserializer: BsonSerializer): T =
+        if (currentValue().isNumber()) {
+            val bsonNumber = currentValue().asNumber()
+            // apply coercion
+            when (deserializer) {
+                is BsonInt32Serializer -> BsonInt32(bsonNumber.intValue())
+                is BsonInt64Serializer -> BsonInt64(bsonNumber.longValue())
+                is BsonDoubleSerializer -> BsonDouble(bsonNumber.doubleValue())
+                else -> error("Could not deserialize BsonNumber")
             }
-        }
-        else -> error("Cannot decode $value as a ByteArray.")
-    } as T
+        } else {
+            currentValue()
+        } as T
 
     // Depending on the deserialization strategy we need to return BsonNull, if we decode
     // to BsonValue, or null otherwise.
@@ -117,7 +126,7 @@ internal open class BsonDecoder(
         } as T
 
     override fun decodeInt(): Int =
-        rethrowAsSerializationException { currentValue().asInt32().value }
+        rethrowAsSerializationException { currentValue().asNumber().intValue() }
 
     override fun decodeString(): String =
         rethrowAsSerializationException { currentValue().asString().value }
@@ -126,7 +135,7 @@ internal open class BsonDecoder(
         rethrowAsSerializationException { currentValue().asBoolean().value }
 
     override fun decodeByte(): Byte =
-        rethrowAsSerializationException { currentValue().asInt32().value.toByte() }
+        rethrowAsSerializationException { currentValue().asNumber().intValue().toByte() }
 
     override fun decodeChar(): Char = rethrowAsSerializationException {
         when (val value = currentValue()) {
@@ -137,16 +146,16 @@ internal open class BsonDecoder(
     }
 
     override fun decodeDouble(): Double =
-        rethrowAsSerializationException { currentValue().asDouble().value }
+        rethrowAsSerializationException { currentValue().asNumber().doubleValue() }
 
     override fun decodeFloat(): Float =
-        rethrowAsSerializationException { currentValue().asDouble().value.toFloat() }
+        rethrowAsSerializationException { currentValue().asNumber().doubleValue().toFloat() }
 
     override fun decodeLong(): Long =
-        rethrowAsSerializationException { currentValue().asInt64().value }
+        rethrowAsSerializationException { currentValue().asNumber().longValue() }
 
     override fun decodeShort(): Short =
-        rethrowAsSerializationException { currentValue().asInt32().value.toShort() }
+        rethrowAsSerializationException { currentValue().asNumber().intValue().toShort() }
 
     override fun decodeEnum(enumDescriptor: SerialDescriptor): Int {
         val name = currentValue().asString().value
@@ -160,6 +169,21 @@ internal open class BsonDecoder(
     } catch (e: BsonInvalidOperationException) {
         throw SerializationException(e.message, e)
     }
+}
+
+@ExperimentalSerializationApi
+internal class ListBsonBinaryDecoder(
+    private val bsonBinary: BsonBinary,
+    override val serializersModule: SerializersModule,
+) : AbstractDecoder() {
+    private var decodedElementCount = 0
+
+    override fun decodeElementIndex(descriptor: SerialDescriptor): Int {
+        return if (decodedElementCount < bsonBinary.data.size) decodedElementCount++
+        else CompositeDecoder.DECODE_DONE
+    }
+
+    override fun decodeByte(): Byte = bsonBinary.data[decodedElementCount - 1]
 }
 
 internal class ListBsonDecoder(

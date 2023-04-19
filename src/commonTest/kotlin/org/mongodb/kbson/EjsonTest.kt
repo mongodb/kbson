@@ -22,7 +22,9 @@ import kotlinx.serialization.Contextual
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.SerializationException
+import kotlinx.serialization.Serializer
 import kotlinx.serialization.Transient
+import kotlinx.serialization.builtins.ByteArraySerializer
 import kotlinx.serialization.builtins.serializer
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.descriptors.SerialDescriptor
@@ -31,6 +33,8 @@ import kotlinx.serialization.encodeToString
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
 import kotlinx.serialization.modules.SerializersModule
+import kotlinx.serialization.modules.polymorphic
+import kotlinx.serialization.modules.subclass
 import kotlinx.serialization.serializer
 import org.mongodb.kbson.serialization.EJson
 import kotlin.test.Test
@@ -395,10 +399,23 @@ class EjsonTest {
 
     @Test
     fun userDefinedClasses_polymorphic() {
-        val expected = ClassA("Realm")
-        val expectedEjson = EJson.encodeToString(expected)
-        assertFailsWithMessage<SerializationException>("Polymorphic values are not supported.") {
-            EJson.decodeFromString<PolymorphicInterface>(expectedEjson)
+        EJson(
+            serializersModule = SerializersModule {
+                polymorphic(PolymorphicInterface::class) {
+                    subclass(ClassA::class)
+                }
+            }
+        ).let { ejson ->
+            val expected = ClassA("Realm")
+
+            assertFailsWithMessage<SerializationException>("Polymorphic values are not supported.") {
+                ejson.encodeToString(expected as PolymorphicInterface)
+            }
+
+            val expectedEjson = ejson.encodeToString(expected)
+            assertFailsWithMessage<SerializationException>("Polymorphic values are not supported.") {
+                ejson.decodeFromString<PolymorphicInterface>(expectedEjson)
+            }
         }
     }
 
