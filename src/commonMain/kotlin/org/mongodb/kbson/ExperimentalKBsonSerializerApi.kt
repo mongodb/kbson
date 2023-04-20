@@ -28,5 +28,5 @@ package org.mongodb.kbson
  * It means that the corresponding declarations might have issues due to incompatible versions when
  * using a different one than the one used by KBson, or open issues in `kserializer`.
  */
-public annotation class ExperimentalKSerializerApi
+public annotation class ExperimentalKBsonSerializerApi
 

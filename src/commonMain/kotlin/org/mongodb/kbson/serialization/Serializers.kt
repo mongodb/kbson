@@ -74,12 +74,12 @@ import org.mongodb.kbson.BsonTimestamp
 import org.mongodb.kbson.BsonType
 import org.mongodb.kbson.BsonUndefined
 import org.mongodb.kbson.BsonValue
-import org.mongodb.kbson.ExperimentalKSerializerApi
+import org.mongodb.kbson.ExperimentalKBsonSerializerApi
 import org.mongodb.kbson.internal.Base64Utils
 import org.mongodb.kbson.internal.HexUtils
 import org.mongodb.kbson.internal.validateSerialization
 
-@ExperimentalKSerializerApi
+@ExperimentalKBsonSerializerApi
 internal fun <T> EJson.writeBson(value: T, serializer: SerializationStrategy<T>): BsonValue {
     if (value is BsonValue) return value
     lateinit var result: BsonValue
@@ -88,7 +88,7 @@ internal fun <T> EJson.writeBson(value: T, serializer: SerializationStrategy<T>)
     return result
 }
 
-@ExperimentalKSerializerApi
+@ExperimentalKBsonSerializerApi
 internal fun <T> EJson.readBson(element: BsonValue, deserializer: DeserializationStrategy<T>): T =
     BsonDecoder(element, serializersModule, ignoreUnknownKeys).decodeSerializableValue(deserializer)
 
@@ -99,7 +99,7 @@ internal fun <T> EJson.readBson(element: BsonValue, deserializer: Deserializatio
  *
  * @throws [SerializationException] if the given value cannot be serialized to BSON.
  */
-@ExperimentalKSerializerApi
+@ExperimentalKBsonSerializerApi
 public inline fun <reified T : Any> EJson.encodeToBsonValue(value: T): BsonValue =
     encodeToBsonValue(serializersModule.serializer(), value)
 
@@ -111,7 +111,7 @@ public inline fun <reified T : Any> EJson.encodeToBsonValue(value: T): BsonValue
  * @throws [SerializationException] if the given [BsonValue] element is not a valid BSON input for the type [T]
  * @throws [IllegalArgumentException] if the decoded input cannot be represented as a valid instance of type [T]
  */
-@ExperimentalKSerializerApi
+@ExperimentalKBsonSerializerApi
 public inline fun <reified T : Any> EJson.decodeFromBsonValue(value: BsonValue): T =
     decodeFromBsonValue(serializersModule.serializer(), value)
 
@@ -152,7 +152,7 @@ public inline fun <reified T : Any> EJson.decodeFromBsonValue(value: BsonValue):
  *
  * It does not support polymorphic serializers yet.
  */
-@ExperimentalKSerializerApi
+@ExperimentalKBsonSerializerApi
 public sealed class EJson(
     public val ignoreUnknownKeys: Boolean,
     private val json: Json
@@ -220,14 +220,14 @@ public sealed class EJson(
 /**
  * Creates an instance of [EJson] configured with a [ignoreUnknownKeys] and a custom [serializersModule].
  */
-@ExperimentalKSerializerApi
+@ExperimentalKBsonSerializerApi
 @OptIn(ExperimentalSerializationApi::class)
 public fun EJson(
     ignoreUnknownKeys: Boolean = true,
     serializersModule: SerializersModule = EmptySerializersModule
 ): EJson = EJsonImpl(ignoreUnknownKeys, serializersModule)
 
-@ExperimentalKSerializerApi
+@ExperimentalKBsonSerializerApi
 @OptIn(ExperimentalSerializationApi::class)
 private class EJsonImpl constructor(
     ignoreUnknownKeys: Boolean,
