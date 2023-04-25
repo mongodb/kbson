@@ -20,6 +20,7 @@ package org.mongodb.kbson
 import assertFailsWithMessage
 import kotlinx.serialization.Contextual
 import kotlinx.serialization.KSerializer
+import kotlinx.serialization.PolymorphicSerializer
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.Transient
@@ -407,12 +408,20 @@ class EjsonTest {
             val expected = ClassA("Realm")
 
             assertFailsWithMessage<SerializationException>("Polymorphic values are not supported.") {
-                ejson.encodeToString(expected as PolymorphicInterface)
+                ejson.encodeToString(
+                    // Native requires using the polymorphic serializer explicitly.
+                    serializer = PolymorphicSerializer(PolymorphicInterface::class),
+                    value = expected
+                )
             }
 
             val expectedEjson = ejson.encodeToString(expected)
             assertFailsWithMessage<SerializationException>("Polymorphic values are not supported.") {
-                ejson.decodeFromString<PolymorphicInterface>(expectedEjson)
+                ejson.decodeFromString<PolymorphicInterface>(
+                    // Native requires using the polymorphic serializer explicitly.
+                    deserializer = PolymorphicSerializer(PolymorphicInterface::class),
+                    string = expectedEjson
+                )
             }
         }
     }
