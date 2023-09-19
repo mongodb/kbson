@@ -426,6 +426,20 @@ class EjsonTest {
         }
     }
 
+    @Test
+    fun nonStrict_primitiveValues() {
+        val bsonValues = EJson.decodeFromString<BsonValue>("[true, 1, 1.5, \"kbson\"]")
+        assertEquals(
+            BsonArray(listOf(BsonBoolean(true), BsonInt64(1), BsonDouble(1.5), BsonString("kbson"))), bsonValues)
+    }
+
+    @Test
+    fun nonStrict_strings() {
+        val bsonValues = EJson.decodeFromString<BsonValue>("[\"true\", \"1\", \"1.5\", \"kbson\"]")
+        assertEquals(
+            BsonArray(listOf(BsonString("true"), BsonString("1"), BsonString("1.5"), BsonString("kbson"))), bsonValues)
+    }
+
     // Assert that decoding `value` as an [AllTypes] fails.
     private inline fun <reified T> assertDecodingFailsWithInvalidType(value: T) {
         val encodedValue = EJson.encodeToString(value)

@@ -18,13 +18,13 @@ import org.gradle.api.tasks.testing.logging.TestLogEvent
 
 group = "org.mongodb.kbson"
 
-version = "0.3.0"
+version = "0.4.0-SNAPSHOT"
 
 description = "KBSON a kotlin multiplatform implementation of the BSON library."
 
 plugins {
-    kotlin("multiplatform") version "1.6.10"
-    kotlin("plugin.serialization") version "1.6.10"
+    kotlin("multiplatform") version "1.7.20"
+    kotlin("plugin.serialization") version "1.7.20"
     id("com.android.library") version "7.3.0" apply false
     id("maven-publish")
     id("signing")
@@ -63,7 +63,7 @@ kotlin {
 
     sourceSets {
         val commonMain by getting {
-            dependencies { implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.3.2") }
+            dependencies { implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.1") }
         }
         val commonTest by getting {
             dependencies {
