@@ -397,6 +397,9 @@ internal object BsonValueSerializer : KSerializer<BsonValue>, BsonSerializer {
                 jsonElement.doubleOrNull?.let {
                     return BsonDouble(it)
                 }
+                jsonElement.contentOrNull?.let {
+                    return BsonString(it)
+                }
                 return BsonNull
             }
             is JsonNull -> return BsonNull
