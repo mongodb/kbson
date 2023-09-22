@@ -379,6 +379,9 @@ internal object BsonValueSerializer : KSerializer<BsonValue>, BsonSerializer {
                 return bsonArray
             }
             is JsonPrimitive -> {
+                if (jsonElement.isString) {
+                    return BsonString(jsonElement.content)
+                }
                 jsonElement.booleanOrNull?.let {
                     return BsonBoolean(it)
                 }
