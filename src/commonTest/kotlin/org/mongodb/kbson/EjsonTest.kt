@@ -291,6 +291,11 @@ class EjsonTest {
     }
 
     @Test
+    fun userDefinedClasses_optionalFieldWithDefaults() {
+        assertEquals(OptionalFieldsWithDefaults().string, EJson.decodeFromString("{}"))
+    }
+
+    @Test
     fun userDefinedClasses_notMappedFields() {
         val value = AllTypes().apply {
             allTypesObject = AllTypes()
@@ -516,6 +521,11 @@ class EjsonTest {
     @Serializable
     data class OptionalFields(
         val string: String?
+    )
+
+    @Serializable
+    data class OptionalFieldsWithDefaults(
+        val string: String = "Hello, world!"
     )
 
     @Serializable
