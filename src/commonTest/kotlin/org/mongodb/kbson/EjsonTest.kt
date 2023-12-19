@@ -211,11 +211,13 @@ class EjsonTest {
 
     @Test
     fun roundTripAllTypes_failsInvalidType() {
-        supportedKotlinTypesDataset + bsonDataSet.filterNot {
-            it.first == BsonNull // BsonNull would always decode to a valid type
-        }.forEach { (data: Any, _) ->
-            assertDecodingFailsWithInvalidType(data)
-        }
+        supportedKotlinTypesDataset +
+            bsonDataSet
+                .filterNot {
+                    it.first == BsonNull // BsonNull would always decode to a valid type
+                    || it.first.bsonType == BsonType.DOCUMENT // BsonDocument decodes when all properties have defaults
+                }
+                .forEach { (data: Any, _) -> assertDecodingFailsWithInvalidType(data) }
     }
 
     @Test
@@ -288,6 +290,13 @@ class EjsonTest {
         assertRoundTrip(value) { expected, actual: OptionalFields ->
             assertEquals(expected.string, actual.string)
         }
+    }
+
+    @Test
+    fun userDefinedClasses_optionalFieldWithDefaults() {
+        assertEquals(
+            OptionalFieldsWithDefaults("required").optionalWithDefault,
+            EJson.decodeFromString<OptionalFieldsWithDefaults>("""{ "required": "value" }""").optionalWithDefault)
     }
 
     @Test
@@ -517,6 +526,9 @@ class EjsonTest {
     data class OptionalFields(
         val string: String?
     )
+
+    @Serializable
+    data class OptionalFieldsWithDefaults(val required: String, val optionalWithDefault: String = "Hello, world!")
 
     @Serializable
     data class NotMappedFields(

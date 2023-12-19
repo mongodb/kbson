@@ -167,7 +167,7 @@ if (!hasAndroidSDK) {
 
         defaultConfig {
             minSdk = 16
-            targetSdk = 33
+            targetSdk = 34
 
             sourceSets {
                 getByName("main") { manifest.srcFile("src/androidMain/AndroidManifest.xml") }
