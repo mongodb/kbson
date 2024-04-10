@@ -18,4 +18,4 @@ echo "Compiling and running checks"
 
 ./gradlew --stop
 ./gradlew -version
-./gradlew --info clean check -x allTests
+./gradlew --info clean check -x allTests -x spotlessApply
