@@ -92,10 +92,8 @@ internal fun <T> EJson.writeBson(value: T, serializer: SerializationStrategy<T>)
 internal fun <T> EJson.readBson(element: BsonValue, deserializer: DeserializationStrategy<T>): T =
     BsonDecoder(element, serializersModule, ignoreUnknownKeys).decodeSerializableValue(deserializer)
 
-
 /**
- * Serializes the given [value] into an equivalent [BsonValue] using a serializer retrieved
- * from reified type parameter.
+ * Serializes the given [value] into an equivalent [BsonValue] using a serializer retrieved from reified type parameter.
  *
  * @throws [SerializationException] if the given value cannot be serialized to BSON.
  */
@@ -103,10 +101,9 @@ internal fun <T> EJson.readBson(element: BsonValue, deserializer: Deserializatio
 public inline fun <reified T : Any> EJson.encodeToBsonValue(value: T): BsonValue =
     encodeToBsonValue(serializersModule.serializer(), value)
 
-
 /**
- * Deserializes the given [value] element into a value of type [T] using a deserializer retrieved
- * from reified type parameter.
+ * Deserializes the given [value] element into a value of type [T] using a deserializer retrieved from reified type
+ * parameter.
  *
  * @throws [SerializationException] if the given [BsonValue] element is not a valid BSON input for the type [T]
  * @throws [IllegalArgumentException] if the decoded input cannot be represented as a valid instance of type [T]
@@ -117,14 +114,14 @@ public inline fun <reified T : Any> EJson.decodeFromBsonValue(value: BsonValue):
 
 /**
  * Main entry point to work with EJSON serialization.
- * [EJSON](https://www.mongodb.com/docs/manual/reference/mongodb-extended-json/)
- * is a JSON format that can be used to encode all BSON datatypes.
+ * [EJSON](https://www.mongodb.com/docs/manual/reference/mongodb-extended-json/) is a JSON format that can be used to
+ * encode all BSON datatypes.
  *
- * A default instance is provided via [EJson.Default], but if you require an instance with certain
- * registered serializers or different options you can instantiate it with [EJson].
+ * A default instance is provided via [EJson.Default], but if you require an instance with certain registered
+ * serializers or different options you can instantiate it with [EJson].
  *
- * This string format also supports encoding to or from a [BsonValue] with the functions [decodeFromBsonValue]
- * and [encodeToBsonValue].
+ * This string format also supports encoding to or from a [BsonValue] with the functions [decodeFromBsonValue] and
+ * [encodeToBsonValue].
  *
  * Example of usage:
  * ```
@@ -153,18 +150,10 @@ public inline fun <reified T : Any> EJson.decodeFromBsonValue(value: BsonValue):
  * It does not support polymorphic serializers yet.
  */
 @ExperimentalKBsonSerializerApi
-public sealed class EJson(
-    public val ignoreUnknownKeys: Boolean,
-    private val json: Json
-) : StringFormat {
+public sealed class EJson(public val ignoreUnknownKeys: Boolean, private val json: Json) : StringFormat {
 
-    /**
-     * The default instance of [EJson] with default configuration.
-     */
-    public companion object Default : EJson(
-        ignoreUnknownKeys = true,
-        json = Json
-    )
+    /** The default instance of [EJson] with default configuration. */
+    public companion object Default : EJson(ignoreUnknownKeys = true, json = Json)
 
     override val serializersModule: SerializersModule = json.serializersModule
 
@@ -173,53 +162,35 @@ public sealed class EJson(
      *
      * @throws [SerializationException] if the given value cannot be serialized to EJSON
      */
-    public fun <T> encodeToBsonValue(
-        serializer: SerializationStrategy<T>,
-        value: T
-    ): BsonValue = writeBson(value, serializer)
+    public fun <T> encodeToBsonValue(serializer: SerializationStrategy<T>, value: T): BsonValue =
+        writeBson(value, serializer)
 
     /**
      * Deserializes the given [value] into a value of type [T] using the given [deserializer].
      *
      * @throws [SerializationException] if the given EJSON element is not a valid EJSON input for the type [T]
      */
-    public fun <T> decodeFromBsonValue(
-        deserializer: DeserializationStrategy<T>,
-        value: BsonValue
-    ): T = readBson(value, deserializer)
+    public fun <T> decodeFromBsonValue(deserializer: DeserializationStrategy<T>, value: BsonValue): T =
+        readBson(value, deserializer)
 
     /**
      * Deserializes the given EJSON [string] into a value of type [T] using the given [deserializer].
      *
      * @throws [SerializationException] if the given EJSON string is not a valid EJSON input for the type [T]
      */
-    public override fun <T> decodeFromString(
-        deserializer: DeserializationStrategy<T>,
-        string: String
-    ): T = decodeFromBsonValue(
-        deserializer,
-        json.decodeFromString(string)
-    )
+    public override fun <T> decodeFromString(deserializer: DeserializationStrategy<T>, string: String): T =
+        decodeFromBsonValue(deserializer, json.decodeFromString(string))
 
     /**
      * Serializes the [value] into an equivalent EJSON using the given [serializer].
      *
      * @throws [SerializationException] if the given value cannot be serialized to EJSON.
      */
-    public override fun <T> encodeToString(
-        serializer: SerializationStrategy<T>,
-        value: T
-    ): String = json.encodeToString(
-        encodeToBsonValue(
-            serializer,
-            value
-        )
-    )
+    public override fun <T> encodeToString(serializer: SerializationStrategy<T>, value: T): String =
+        json.encodeToString(encodeToBsonValue(serializer, value))
 }
 
-/**
- * Creates an instance of [EJson] configured with a [ignoreUnknownKeys] and a custom [serializersModule].
- */
+/** Creates an instance of [EJson] configured with a [ignoreUnknownKeys] and a custom [serializersModule]. */
 @ExperimentalKBsonSerializerApi
 @OptIn(ExperimentalSerializationApi::class)
 public fun EJson(
@@ -229,14 +200,10 @@ public fun EJson(
 
 @ExperimentalKBsonSerializerApi
 @OptIn(ExperimentalSerializationApi::class)
-private class EJsonImpl constructor(
-    ignoreUnknownKeys: Boolean,
-    serializersModule: SerializersModule
-) : EJson(
-    ignoreUnknownKeys,
-    if (serializersModule == EmptySerializersModule) Json else Json {
-        this.serializersModule = serializersModule
-    })
+private class EJsonImpl constructor(ignoreUnknownKeys: Boolean, serializersModule: SerializersModule) :
+    EJson(
+        ignoreUnknownKeys,
+        if (serializersModule == EmptySerializersModule) Json else Json { this.serializersModule = serializersModule })
 
 public object Bson {
     /**
@@ -260,8 +227,7 @@ internal sealed interface BsonSerializer
 
 internal object BsonValueSerializer : KSerializer<BsonValue>, BsonSerializer {
 
-    @Serializable
-    private class BsonValueJson
+    @Serializable private class BsonValueJson
 
     override val descriptor: SerialDescriptor = BsonValueJson.serializer().descriptor
 
@@ -272,67 +238,28 @@ internal object BsonValueSerializer : KSerializer<BsonValue>, BsonSerializer {
             is JsonEncoder -> {
                 when (value.bsonType) {
                     BsonType.ARRAY -> BsonArraySerializer.serialize(encoder, value.asArray())
-                    BsonType.DOCUMENT -> BsonDocumentSerializer.serialize(
-                        encoder,
-                        value.asDocument()
-                    )
+                    BsonType.DOCUMENT -> BsonDocumentSerializer.serialize(encoder, value.asDocument())
                     BsonType.BINARY -> BsonBinarySerializer.serialize(encoder, value.asBinary())
-                    BsonType.BOOLEAN -> BsonBooleanSerializer.serialize(
-                        encoder,
-                        value.asBoolean()
-                    )
-                    BsonType.DATE_TIME -> BsonDateTimeSerializer.serialize(
-                        encoder,
-                        value.asDateTime()
-                    )
-                    BsonType.DB_POINTER -> BsonDBPointerSerializer.serialize(
-                        encoder,
-                        value.asDBPointer()
-                    )
-                    BsonType.DECIMAL128 -> BsonDecimal128Serializer.serialize(
-                        encoder,
-                        value.asDecimal128()
-                    )
+                    BsonType.BOOLEAN -> BsonBooleanSerializer.serialize(encoder, value.asBoolean())
+                    BsonType.DATE_TIME -> BsonDateTimeSerializer.serialize(encoder, value.asDateTime())
+                    BsonType.DB_POINTER -> BsonDBPointerSerializer.serialize(encoder, value.asDBPointer())
+                    BsonType.DECIMAL128 -> BsonDecimal128Serializer.serialize(encoder, value.asDecimal128())
                     BsonType.DOUBLE -> BsonDoubleSerializer.serialize(encoder, value.asDouble())
                     BsonType.INT32 -> BsonInt32Serializer.serialize(encoder, value.asInt32())
                     BsonType.INT64 -> BsonInt64Serializer.serialize(encoder, value.asInt64())
-                    BsonType.JAVASCRIPT -> BsonJavaScriptSerializer.serialize(
-                        encoder,
-                        value.asJavaScript()
-                    )
+                    BsonType.JAVASCRIPT -> BsonJavaScriptSerializer.serialize(encoder, value.asJavaScript())
                     BsonType.JAVASCRIPT_WITH_SCOPE ->
-                        BsonJavaScriptWithScopeSerializer.serialize(
-                            encoder,
-                            value.asJavaScriptWithScope()
-                        )
-                    BsonType.MAX_KEY -> BsonMaxKeySerializer.serialize(
-                        encoder,
-                        value.asBsonMaxKey()
-                    )
-                    BsonType.MIN_KEY -> BsonMinKeySerializer.serialize(
-                        encoder,
-                        value.asBsonMinKey()
-                    )
+                        BsonJavaScriptWithScopeSerializer.serialize(encoder, value.asJavaScriptWithScope())
+                    BsonType.MAX_KEY -> BsonMaxKeySerializer.serialize(encoder, value.asBsonMaxKey())
+                    BsonType.MIN_KEY -> BsonMinKeySerializer.serialize(encoder, value.asBsonMinKey())
                     BsonType.NULL -> BsonNullSerializer.serialize(encoder, value.asBsonNull())
-                    BsonType.OBJECT_ID -> BsonObjectIdSerializer.serialize(
-                        encoder,
-                        value.asObjectId()
-                    )
+                    BsonType.OBJECT_ID -> BsonObjectIdSerializer.serialize(encoder, value.asObjectId())
                     BsonType.REGULAR_EXPRESSION ->
-                        BsonRegularExpressionSerializer.serialize(
-                            encoder,
-                            value.asRegularExpression()
-                        )
+                        BsonRegularExpressionSerializer.serialize(encoder, value.asRegularExpression())
                     BsonType.STRING -> BsonStringSerializer.serialize(encoder, value.asString())
                     BsonType.SYMBOL -> BsonSymbolSerializer.serialize(encoder, value.asSymbol())
-                    BsonType.TIMESTAMP -> BsonTimestampSerializer.serialize(
-                        encoder,
-                        value.asTimestamp()
-                    )
-                    BsonType.UNDEFINED -> BsonUndefinedSerializer.serialize(
-                        encoder,
-                        value.asBsonUndefined()
-                    )
+                    BsonType.TIMESTAMP -> BsonTimestampSerializer.serialize(encoder, value.asTimestamp())
+                    BsonType.UNDEFINED -> BsonUndefinedSerializer.serialize(encoder, value.asBsonUndefined())
                     else -> throw SerializationException("Unsupported bson type: ${value.bsonType}")
                 }
             }
@@ -356,10 +283,7 @@ internal object BsonValueSerializer : KSerializer<BsonValue>, BsonSerializer {
                     try {
                         return decoder.json.decodeFromJsonElement(it, jsonElement)
                     } catch (e: Exception) {
-                        throw BsonSerializationException(
-                            "Invalid Json: ${e.message} : Source: $jsonElement",
-                            e
-                        )
+                        throw BsonSerializationException("Invalid Json: ${e.message} : Source: $jsonElement", e)
                     }
                 }
                 val document = BsonDocument()
@@ -476,8 +400,7 @@ internal object BsonArraySerializer : KSerializer<BsonArray>, BsonSerializer {
 }
 
 internal object BsonDocumentKeySerializer : KSerializer<String>, BsonSerializer {
-    override val descriptor: SerialDescriptor =
-        PrimitiveSerialDescriptor("BsonDocumentKey", PrimitiveKind.STRING)
+    override val descriptor: SerialDescriptor = PrimitiveSerialDescriptor("BsonDocumentKey", PrimitiveKind.STRING)
 
     override fun deserialize(decoder: Decoder): String {
         return String.serializer().deserialize(decoder)
@@ -497,23 +420,14 @@ internal object BsonBinarySerializer : KSerializer<BsonBinary>, BsonSerializer {
     private data class BsonValueJson(@SerialName("\$binary") val data: BsonValueData) {
         constructor(
             value: BsonBinary
-        ) : this(
-            BsonValueData(
-                Base64Utils.toBase64String(value.data),
-                HexUtils.toHexString(byteArrayOf(value.type))
-            )
-        )
+        ) : this(BsonValueData(Base64Utils.toBase64String(value.data), HexUtils.toHexString(byteArrayOf(value.type))))
 
         fun toBsonValue(): BsonBinary {
-            return BsonBinary(
-                data.subType.toInt(HEX_RADIX).toByte(),
-                Base64Utils.toByteArray(data.base64)
-            )
+            return BsonBinary(data.subType.toInt(HEX_RADIX).toByte(), Base64Utils.toByteArray(data.base64))
         }
     }
 
-    @Serializable
-    private data class BsonValueData(val base64: String, val subType: String)
+    @Serializable private data class BsonValueData(val base64: String, val subType: String)
 
     private val serializer: KSerializer<BsonValueJson> = BsonValueJson.serializer()
     override val descriptor: SerialDescriptor = serializer.descriptor
@@ -567,8 +481,7 @@ internal object BsonDateTimeSerializer : KSerializer<BsonDateTime>, BsonSerializ
         }
     }
 
-    @Serializable
-    private data class BsonValueData(@SerialName("\$numberLong") val millis: String)
+    @Serializable private data class BsonValueData(@SerialName("\$numberLong") val millis: String)
 
     private val serializer: KSerializer<BsonValueJson> = BsonValueJson.serializer()
     override val descriptor: SerialDescriptor = serializer.descriptor
@@ -593,12 +506,7 @@ internal object BsonDBPointerSerializer : KSerializer<BsonDBPointer>, BsonSerial
     // {"$dbPointer": {"$ref": <namespace>, "$id": {"$oid": <hex string>}}}.
     @Serializable
     private data class BsonValueJson(@SerialName("\$dbPointer") val data: BsonValueData) {
-        constructor(bsonValue: BsonDBPointer) : this(
-            BsonValueData(
-                bsonValue.namespace,
-                bsonValue.id
-            )
-        )
+        constructor(bsonValue: BsonDBPointer) : this(BsonValueData(bsonValue.namespace, bsonValue.id))
 
         fun toBsonValue(): BsonDBPointer {
             return BsonDBPointer(data.ref, data.id)
@@ -785,8 +693,7 @@ internal object BsonJavaScriptWithScopeSerializer : KSerializer<BsonJavaScriptWi
     }
 
     private val serializer: KSerializer<BsonValueJson> = BsonValueJson.serializer()
-    override val descriptor: SerialDescriptor =
-        PrimitiveSerialDescriptor("ZAZ", PrimitiveKind.STRING)
+    override val descriptor: SerialDescriptor = PrimitiveSerialDescriptor("ZAZ", PrimitiveKind.STRING)
 
     override fun serialize(encoder: Encoder, value: BsonJavaScriptWithScope) {
         when (encoder) {
@@ -923,15 +830,9 @@ internal object BsonRegularExpressionSerializer : KSerializer<BsonRegularExpress
     // string or "" [2]>}}
     @Serializable
     private data class BsonValueJson(@SerialName("\$regularExpression") val data: BsonValueData) {
-        constructor(bsonValue: BsonRegularExpression) : this(
-            BsonValueData(
-                bsonValue.pattern,
-                bsonValue.options
-            )
-        )
+        constructor(bsonValue: BsonRegularExpression) : this(BsonValueData(bsonValue.pattern, bsonValue.options))
 
-        fun toBsonValue(): BsonRegularExpression =
-            BsonRegularExpression(data.pattern, data.options)
+        fun toBsonValue(): BsonRegularExpression = BsonRegularExpression(data.pattern, data.options)
     }
 
     @Serializable
@@ -1012,21 +913,12 @@ internal object BsonTimestampSerializer : KSerializer<BsonTimestamp>, BsonSerial
     // {"$timestamp": {"t": pos-integer, "i": pos-integer}}
     @Serializable
     private data class BsonValueJson(@SerialName("\$timestamp") val data: BsonValueData) {
-        constructor(value: BsonTimestamp) : this(
-            BsonValueData(
-                value.time.toUInt(),
-                value.inc.toUInt()
-            )
-        )
+        constructor(value: BsonTimestamp) : this(BsonValueData(value.time.toUInt(), value.inc.toUInt()))
 
         fun toBsonValue(): BsonTimestamp = BsonTimestamp(data.time.toInt(), data.inc.toInt())
     }
 
-    @Serializable
-    private data class BsonValueData(
-        @SerialName("t") val time: UInt,
-        @SerialName("i") val inc: UInt
-    )
+    @Serializable private data class BsonValueData(@SerialName("t") val time: UInt, @SerialName("i") val inc: UInt)
 
     private val serializer: KSerializer<BsonValueJson> = BsonValueJson.serializer()
     override val descriptor: SerialDescriptor = serializer.descriptor

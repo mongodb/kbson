@@ -17,9 +17,8 @@ import kotlin.reflect.KClass
 import kotlin.test.assertFailsWith
 
 /**
- * Assert that a statement fails with a specific Exception type AND message. The message match is
- * fuzzy, i.e. we only check that the provided message is contained within the whole exception
- * message. The match is case sensitive.
+ * Assert that a statement fails with a specific Exception type AND message. The message match is fuzzy, i.e. we only
+ * check that the provided message is contained within the whole exception message. The match is case sensitive.
  */
 fun <T : Throwable> assertFailsWithMessage(exceptionClass: KClass<T>, exceptionMessage: String, block: () -> Unit): T {
     val exception: T = assertFailsWith(exceptionClass, null, block)
@@ -27,15 +26,14 @@ fun <T : Throwable> assertFailsWithMessage(exceptionClass: KClass<T>, exceptionM
         throw AssertionError(
             """
             The exception message did not match.
-            
+
             Expected:
             $exceptionMessage
-            
+
             Actual:
             ${exception.message}
-            
-            """.trimIndent()
-        )
+
+            """.trimIndent())
     }
     return exception
 }

@@ -42,22 +42,14 @@ internal sealed class BsonEncoder(
 ) : AbstractEncoder() {
     override fun beginStructure(descriptor: SerialDescriptor): CompositeEncoder =
         when (descriptor.kind) {
-            StructureKind.LIST ->
-                BsonArrayEncoder(serializersModule) {
-                    pushValue(it)
-                }
-            StructureKind.CLASS ->
-                BsonClassEncoder(serializersModule) {
-                    pushValue(it)
-                }
-            StructureKind.MAP ->
+            StructureKind.LIST -> BsonArrayEncoder(serializersModule) { pushValue(it) }
+            StructureKind.CLASS -> BsonClassEncoder(serializersModule) { pushValue(it) }
+            StructureKind.MAP -> BsonDocumentEncoder(serializersModule) { pushValue(it) }
+            StructureKind.OBJECT ->
                 BsonDocumentEncoder(serializersModule) {
-                    pushValue(it)
+                    // Mimics the Json encode behavior of returning an empty map on Kotlin Objects.
+                    pushValue(BsonDocument())
                 }
-            StructureKind.OBJECT -> BsonDocumentEncoder(serializersModule) {
-                // Mimics the Json encode behavior of returning an empty map on Kotlin Objects.
-                pushValue(BsonDocument())
-            }
             PolymorphicKind.OPEN,
             PolymorphicKind.SEALED -> throw SerializationException("Polymorphic values are not supported.")
             else -> error("Unsupported descriptor Kind ${descriptor.kind}")
@@ -128,7 +120,7 @@ internal class PrimitiveBsonEncoder(
 
     override fun <T> encodeSerializableValue(serializer: SerializationStrategy<T>, value: T) {
         // Fast path for mapping BsonBinary to ByteArray
-        when(value) {
+        when (value) {
             is ByteArray -> pushValue(BsonBinary(value))
             else -> super.encodeSerializableValue(serializer, value)
         }
@@ -139,8 +131,8 @@ internal class PrimitiveBsonEncoder(
 }
 
 /**
- * Base encoder for structured types based on BsonValues. The AbstractEncoder provided by the kserializer
- * accesses the data sequentially, thus we can have a base implementation based on an BsonArray.
+ * Base encoder for structured types based on BsonValues. The AbstractEncoder provided by the kserializer accesses the
+ * data sequentially, thus we can have a base implementation based on an BsonArray.
  */
 internal sealed class StructuredBsonEncoder(
     override val serializersModule: SerializersModule,
@@ -153,45 +145,31 @@ internal sealed class StructuredBsonEncoder(
     }
 }
 
-internal class BsonArrayEncoder(
-    override val serializersModule: SerializersModule,
-    nodeConsumer: (BsonValue) -> Unit
-) : StructuredBsonEncoder(serializersModule, nodeConsumer) {
+internal class BsonArrayEncoder(override val serializersModule: SerializersModule, nodeConsumer: (BsonValue) -> Unit) :
+    StructuredBsonEncoder(serializersModule, nodeConsumer) {
     // we can point it out directly
     override fun getCurrent(): BsonValue = elements
 }
 
-/**
- * Maps are encoded flattening keys and values into a BsonArray.
- */
+/** Maps are encoded flattening keys and values into a BsonArray. */
 internal open class BsonDocumentEncoder(
     override val serializersModule: SerializersModule,
     nodeConsumer: (BsonValue) -> Unit
 ) : StructuredBsonEncoder(serializersModule, nodeConsumer) {
-    /**
-     * Constructs a BsonDocument out from a BsonArray that contains both keys and values.
-     */
-    override fun getCurrent(): BsonValue = BsonDocument(
-        elements.chunked(2)
-            .associate { entry ->
+    /** Constructs a BsonDocument out from a BsonArray that contains both keys and values. */
+    override fun getCurrent(): BsonValue =
+        BsonDocument(
+            elements.chunked(2).associate { entry ->
                 require(entry[0] is BsonString) { "Entry key must be a BsonString ${entry::class.simpleName} found" }
                 (entry[0] as BsonString).value to entry[1]
-            }
-    )
+            })
 }
 
-/**
- * Classes are encoded as Maps, flattened into a BsonArray, where the key values are the names of the
- * fields.
- */
+/** Classes are encoded as Maps, flattened into a BsonArray, where the key values are the names of the fields. */
 @OptIn(ExperimentalSerializationApi::class)
-internal class BsonClassEncoder(
-    override val serializersModule: SerializersModule,
-    nodeConsumer: (BsonValue) -> Unit
-) : BsonDocumentEncoder(serializersModule, nodeConsumer) {
-    /**
-     * Any time we encode a new element we push the field name into the BsonArray.
-     */
+internal class BsonClassEncoder(override val serializersModule: SerializersModule, nodeConsumer: (BsonValue) -> Unit) :
+    BsonDocumentEncoder(serializersModule, nodeConsumer) {
+    /** Any time we encode a new element we push the field name into the BsonArray. */
     override fun encodeElement(descriptor: SerialDescriptor, index: Int): Boolean {
         elements.add(BsonString(descriptor.getElementName(index)))
         return super.encodeElement(descriptor, index)

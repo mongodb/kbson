@@ -16,17 +16,11 @@
 package org.mongodb.kbson
 
 @MustBeDocumented
-@Target(
-    AnnotationTarget.CLASS,
-    AnnotationTarget.PROPERTY,
-    AnnotationTarget.FUNCTION,
-    AnnotationTarget.TYPEALIAS
-)
+@Target(AnnotationTarget.CLASS, AnnotationTarget.PROPERTY, AnnotationTarget.FUNCTION, AnnotationTarget.TYPEALIAS)
 @RequiresOptIn(level = RequiresOptIn.Level.ERROR)
 /**
- * Marks declarations that use **experimental** APIs from `kotlinx.serialization` in `org.mongodb.kbson`.
- * It means that the corresponding declarations might have issues due to incompatible versions when
- * using a different one than the one used by KBson, or open issues in `kserializer`.
+ * Marks declarations that use **experimental** APIs from `kotlinx.serialization` in `org.mongodb.kbson`. It means that
+ * the corresponding declarations might have issues due to incompatible versions when using a different one than the one
+ * used by KBson, or open issues in `kserializer`.
  */
 public annotation class ExperimentalKBsonSerializerApi
-
